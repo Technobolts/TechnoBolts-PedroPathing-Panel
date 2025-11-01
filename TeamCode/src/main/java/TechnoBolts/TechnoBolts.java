@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
 @TeleOp(name="Claw - TechnoBolts Manual Run - Final", group="TechnoBolts - OpMode")
 public class TechnoBolts extends LinearOpMode {
     //private ElapsedTime runtime = new ElapsedTime();
