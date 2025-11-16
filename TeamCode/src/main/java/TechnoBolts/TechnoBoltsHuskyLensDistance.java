@@ -1,31 +1,19 @@
 package TechnoBolts;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-
-import java.util.concurrent.TimeUnit;
-
-
-
-
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "HuskyLens Distance Test", group = "Test")
+@TeleOp(name = "HuskyLens Distance Test", group = "Test")
 public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
-
-
-    private HuskyLens huskyLens;
-
 
     @Override
     public void runOpMode() {
-        // Initialize HuskyLens
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+        // Initialize HuskyLens (make sure the name matches your config!)
+        HuskyLens huskyLens = hardwareMap.get(HuskyLens.class, "HuskyLens");
         huskyLens.initialize();
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.OBJECT_RECOGNITION);
+
 
         telemetry.addLine("HuskyLens Ready");
         telemetry.update();
@@ -33,13 +21,15 @@ public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            HuskyLensObject obj = huskyLens
-            if (obj != null) {
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+
+            if (blocks != null && blocks.length > 0) {
+                HuskyLens.Block obj = blocks[0]; // first detected object
+
                 int width = obj.width;
                 int height = obj.height;
 
-                // Estimate distance (you'll calibrate this later)
-                double distanceEstimate = 1200.0 / width;
+                double distanceEstimate = 1200.0 / width; // calibrate later
 
                 telemetry.addData("Object Width", width);
                 telemetry.addData("Object Height", height);
