@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package TechnoBolts;
 
+
+
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -107,8 +109,7 @@ public class TechnoBoltsHuskyLens extends LinearOpMode {
          * The SDK itself does not assume that the user wants a particular algorithm on
          * startup, and hence does not set an algorithm.
          *
-         * Users, should, in general, explicitly choose the algorithm they want to use
-         * within the OpMode by calling selectAlgorithm() and passing it one of the values
+         * Users, should, in general, exptAlgorithm() and passing it one of the values
          * found in the enumeration HuskyLens.Algorithm.
          *
          * Other algorithm choices for FTC might be: OBJECT_RECOGNITION, COLOR_RECOGNITION or OBJECT_CLASSIFICATION.
@@ -120,7 +121,8 @@ public class TechnoBoltsHuskyLens extends LinearOpMode {
 
         /*
          * Looking for AprilTags per the call to selectAlgorithm() above.  A handy grid
-         * for testing may be found at https://wiki.dfrobot.com/HUSKYLENS_V1.0_SKU_SEN0305_SEN0336#target_20.
+         * for testing may be found at https://wiki.dfrobotlicitly choose the algorithm they want to use
+         * within the OpMode by calling selec.com/HUSKYLENS_V1.0_SKU_SEN0305_SEN0336#target_20.
          *
          * Note again that the device only recognizes the 36h11 family of tags out of the box.
          */
