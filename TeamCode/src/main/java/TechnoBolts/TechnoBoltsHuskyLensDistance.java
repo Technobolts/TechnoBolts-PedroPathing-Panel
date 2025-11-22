@@ -16,7 +16,7 @@ public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
 
     // ====== DISTANCE CALIBRATION ======
     // Update these after measuring!
-    private static final double CALIB_KNOWN_DISTANCE_CM = 55.88;
+    private static final double CALIB_KNOWN_DISTANCE_CM = 60.96;
     private static final double CALIB_KNOWN_HEIGHT_PX   = 35.56;
 
     private static final double DIST_K = CALIB_KNOWN_DISTANCE_CM * CALIB_KNOWN_HEIGHT_PX;
