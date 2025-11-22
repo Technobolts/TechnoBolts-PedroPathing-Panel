@@ -58,8 +58,8 @@ public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
                 telemetry.addData("Width", width);
                 telemetry.addData("Height", height);
                 telemetry.addData("Angle (deg)", "%.2f", angleDeg);
-                telemetry.addData("Distance (cm)", "%.1f", distanceCm);
-                telemetry.addData("Distance (in)", "%.2f", distanceInches);
+                telemetry.addData("Distance (in)", "%.1f", distanceCm);
+             //   telemetry.addData("Distance (in)", "%.2f", distanceInches);
 
             } else {
                 telemetry.addLine("No object detected");
