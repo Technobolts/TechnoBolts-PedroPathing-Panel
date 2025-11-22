@@ -11,13 +11,13 @@ public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
     private static final double IMAGE_WIDTH  = 320.0;
     private static final double IMAGE_HEIGHT = 240.0;
 
-    // HuskyLens typical horizontal field of view
+    // HuskyLens typical horizontal field of view degrees
     private static final double HFOV_DEG = 52.0;
 
     // ====== DISTANCE CALIBRATION ======
     // Update these after measuring!
-    private static final double CALIB_KNOWN_DISTANCE_CM = 130;
-    private static final double CALIB_KNOWN_HEIGHT_PX   = 42.0;
+    private static final double CALIB_KNOWN_DISTANCE_CM = 55.88;
+    private static final double CALIB_KNOWN_HEIGHT_PX   = 35.56;
 
     private static final double DIST_K = CALIB_KNOWN_DISTANCE_CM * CALIB_KNOWN_HEIGHT_PX;
 
