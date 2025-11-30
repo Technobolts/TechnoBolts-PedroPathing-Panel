@@ -28,5 +28,3 @@ import com.qualcomm.robotcore.hardware.Servo;
         }
     }
 
-
-}
