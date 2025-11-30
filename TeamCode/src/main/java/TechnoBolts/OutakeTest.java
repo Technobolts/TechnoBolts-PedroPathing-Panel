@@ -3,6 +3,7 @@ package TechnoBolts;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="OutakeTest", group="Linear Opmode")
     public class OutakeTest extends LinearOpMode {
@@ -17,7 +18,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
             // Set the motor direction if needed (e.g., if it spins backward)
              myMotorLeft.setDirection(DcMotor.Direction.FORWARD);
-            myMotorRight.setDirection(DcMotor.Direction.FORWARD);
+            myMotorRight.setDirection(DcMotor.Direction.REVERSE);
 
             telemetry.addData("Status", "Initialized");
             telemetry.update();
@@ -27,7 +28,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
             while (opModeIsActive()) { // Loop while the OpMode is active
 
                 // Example: Control motor with gamepad input
-                double motorPower = gamepad1.left_stick_y; // Use left stick Y for power
+                double motorPower = (gamepad1.left_stick_y/3); // Use left stick Y for power
 
                 myMotorLeft.setPower(motorPower); // Set the motor power
                 myMotorRight.setPower(motorPower);
