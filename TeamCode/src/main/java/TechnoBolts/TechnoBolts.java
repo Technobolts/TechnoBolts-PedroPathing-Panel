@@ -37,7 +37,7 @@ public class TechnoBolts extends LinearOpMode {
         Intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
         DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
-        RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
+        //RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
         Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
         Servo ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
