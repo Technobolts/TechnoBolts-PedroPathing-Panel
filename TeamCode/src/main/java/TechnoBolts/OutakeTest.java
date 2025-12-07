@@ -30,8 +30,7 @@ import com.qualcomm.robotcore.hardware.LED;
                 // Example: Control motor with gamepad input
                 while(gamepad1.left_bumper) {
                     motorPower += 10; // Use left bumper for power
-                    if(motorPower <= 1000) ledDepo.enableLight(true);
-                    else ledDepo.enableLight(false);
+                    ledDepo.enableLight(motorPower <= 1000);
 
                 }
                 myMotorLeft.setPower(motorPower); // Set the motor power
