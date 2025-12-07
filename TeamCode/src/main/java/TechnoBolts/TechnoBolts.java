@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.LED;
 
 @TeleOp(name="Chassis - TechnoBolts Manual Run - Final", group="TechnoBolts - OpMode")
 public class TechnoBolts extends LinearOpMode {
@@ -16,6 +17,8 @@ public class TechnoBolts extends LinearOpMode {
     public DcMotor leftBackDrive = null;
     public DcMotor rightFrontDrive = null;
     public DcMotor rightBackDrive = null;
+
+    public Servo ledDepo = null;
 
     public DcMotor Intake = null;
 
@@ -36,7 +39,7 @@ public class TechnoBolts extends LinearOpMode {
         DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
         RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
         Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
-
+        Servo ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -117,11 +120,16 @@ public class TechnoBolts extends LinearOpMode {
 
 
                 //Outtake Code
-
+                double power = 0.0;
                 if(gamepad1.left_bumper) {
-
-                    myMotorLeft.setPower(-0.7); // Set the motor power
-                    myMotorRight.setPower(0.7);
+                    power += 0.05;
+                    myMotorLeft.setPower(power); // Set the motor power
+                    myMotorRight.setPower(power);
+                    if(power >= 0.6){
+                        ledDepo.setPosition(1);
+                    }else{
+                        ledDepo.setPosition(0);
+                    }
                 }
 
                 else {
