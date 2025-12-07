@@ -1,6 +1,7 @@
 package TechnoBolts;
 
 
+import com.pedropathing.geometry.BezierCurve;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,9 +9,25 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import java.util.function.Supplier;
+@Configurable
 
 @TeleOp(name="Chassis - TechnoBolts Manual Run - Final", group="TechnoBolts - OpMode")
-public class TechnoBolts extends LinearOpMode {
+public class TechnoBolts extends OpMode {
     //private ElapsedTime runtime = new ElapsedTime();
     public DcMotor leftFrontDrive = null;
     public DcMotor leftBackDrive = null;
@@ -19,11 +36,42 @@ public class TechnoBolts extends LinearOpMode {
 
     public DcMotor Intake = null;
 
+    public Servo ledDepo = null;
+
+    private Follower follower;
+    public static Pose startingPose; //See ExampleAuto to understand how to use this
+    private boolean automatedDrive;
+    private Supplier<PathChain> pathChain;
+    private TelemetryManager telemetryM;
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.5;
 
 
     @Override
-    public void runOpMode() {
+    public void init() {
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
+        pathChain = () -> follower.pathBuilder()
+                .addPath(new BezierCurve(new Pose(38.756, 33.244), new Pose(64.178, 49.778), new Pose(80.356, 91.911)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
+                .build();
+    }
+    @Override
+    public final void start() {
+        //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
+        //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
+        //If you don't pass anything in, it uses the default (false)
+        follower.startTeleopDrive();
+    }
+
+    @Override
+    public void loop() {
+
+        follower.update();
+        telemetryM.update();
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -34,8 +82,9 @@ public class TechnoBolts extends LinearOpMode {
         Intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
         DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
-        RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
+        //RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
         Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
+        ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
 
         // ########################################################################################
@@ -59,13 +108,12 @@ public class TechnoBolts extends LinearOpMode {
         telemetry.update();
 
 
-        waitForStart();
+        
         // runtime.reset();
 
-        while (opModeIsActive()) {
-            double max;
-
-            while (opModeIsActive()) {
+        
+                double max;
+            
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x; // Counteract imperfect strafing
                 double rx = gamepad1.right_stick_x;
@@ -115,13 +163,32 @@ public class TechnoBolts extends LinearOpMode {
                 rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+                //Auto-TeleOP Code
 
-                //Outtake Code
+        if (gamepad1.xWasPressed()) {
+            follower.followPath(pathChain.get());
+            automatedDrive = true;
+        }
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+
+
+
+        //Outtake Code
+                double power = 0;
 
                 if(gamepad1.left_bumper) {
-
-                    myMotorLeft.setPower(-0.7); // Set the motor power
-                    myMotorRight.setPower(0.7);
+                    power += 0.05;
+                    myMotorLeft.setPower(power); // Set the motor power
+                    myMotorRight.setPower(power);
+                    if(power >= 0.65){
+                        ledDepo.setPosition(1);
+                    }else{
+                        ledDepo.setPosition(0);
+                    }
                 }
 
                 else {
@@ -144,16 +211,15 @@ public class TechnoBolts extends LinearOpMode {
 
             //Deposit angle code
 
-                if (gamepad1.x) {
-                    depositServo.setPosition(0.0);   // 0 degrees
-                    }
-                if (gamepad1.y) {
-                    depositServo.setPosition(0.-8);   // # degrees, The lower value means lower angle
+            double dSAngle = -5.0;
 
+                if (gamepad1.dpad_up) {
+                    depositServo.setPosition(-5);   // 0 degrees
                     }
+                if (gamepad1.dpad_down) {
+                    depositServo.setPosition(-4);   // # degrees, The lower value means lower angle
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
                 }
 
             }
-        }
-}
-
