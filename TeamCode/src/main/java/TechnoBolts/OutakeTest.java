@@ -25,10 +25,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
             waitForStart(); // Wait for the start button to be pressed
 
             while (opModeIsActive()) { // Loop while the OpMode is active
-
+                double motorPower = 0;
                 // Example: Control motor with gamepad input
-                double motorPower = gamepad1.left_stick_y; // Use left stick Y for power
-
+                while(gamepad1.left_bumper) {
+                    motorPower += 10; // Use left bumper for power
+                }
                 myMotorLeft.setPower(motorPower); // Set the motor power
                 myMotorRight.setPower(motorPower);
 
