@@ -1,6 +1,7 @@
 package TechnoBolts;
 
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -30,7 +31,13 @@ public class TechnoBolts extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftBack");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
-        Intake = hardwareMap.get(DcMotor.class, "Intake");
+        Intake = hardwareMap.get(DcMotor.class, "intake");
+        DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
+        DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
+        RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
+        Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
+
+
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -109,19 +116,44 @@ public class TechnoBolts extends LinearOpMode {
                 rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+                //Outtake Code
 
-                if (gamepad1.a) {
+                if(gamepad1.left_bumper) {
+
+                    myMotorLeft.setPower(-0.7); // Set the motor power
+                    myMotorRight.setPower(0.7);
+                }
+
+                else {
+                    myMotorLeft.setPower(0);
+                    myMotorRight.setPower(0);
+                }
+//                telemetry.addData("Motor Power");
+//                telemetry.update();
+
+
+            myMotorLeft.setPower(0);
+            myMotorRight.setPower(0);// Stop the motor when the OpMode ends
+
+            //Intake Code
+
+                if (gamepad1.a)
                     Intake.setPower(-1);
-                }
-                if (gamepad1.b) {
+                if (gamepad1.b)
                     Intake.setPower(0);
-                }
-                if(gamepad1.x) {
-                    Intake.setPower(1);
+
+            //Deposit angle code
+
+                if (gamepad1.x) {
+                    depositServo.setPosition(0.0);   // 0 degrees
+                    }
+                if (gamepad1.y) {
+                    depositServo.setPosition(0.-8);   // # degrees, The lower value means lower angle
+
+                    }
                 }
 
             }
         }
-    }
 }
 
