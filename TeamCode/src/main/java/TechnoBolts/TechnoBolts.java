@@ -19,6 +19,7 @@ import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.LED;
 
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -36,7 +37,7 @@ public class TechnoBolts extends OpMode {
 
     public DcMotor Intake = null;
 
-    public Servo ledDepo = null;
+    public CRServo ledDepo = null;
 
     private Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
@@ -59,6 +60,7 @@ public class TechnoBolts extends OpMode {
                 .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
                 .build();
     }
+
     @Override
     public final void start() {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
@@ -82,10 +84,9 @@ public class TechnoBolts extends OpMode {
         Intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
         DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
-        //RevBlinkinLedDriver LEDDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDeposit");
+        //RevBlinkinLedDriver ledDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDepo");
         Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
-        ledDepo = hardwareMap.get(Servo.class, "ledDepo");
-
+        CRServo ledDepo = hardwareMap.get(CRServo.class, "ledDepo");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -108,62 +109,61 @@ public class TechnoBolts extends OpMode {
         telemetry.update();
 
 
-        
         // runtime.reset();
 
-        
-                double max;
-            
-                double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-                double x = gamepad1.left_stick_x; // Counteract imperfect strafing
-                double rx = gamepad1.right_stick_x;
 
-                // Denominator is the largest motor power (absolute value) or 1
-                // This ensures all the powers maintain the same ratio,
-                // but only if at least one is out of the range [-1, 1]
-                double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-                double leftFrontPower = (y + x + rx) / denominator;
-                double leftBackPower = (y - x + rx) / denominator;
-                double rightFrontPower = (y - x - rx) / denominator;
-                double rightBackPower = (y + x - rx) / denominator;
+        double max;
 
+        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad1.left_stick_x; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x;
 
-                // Normalize the values so no wheel power exceeds 100%
-                // This ensures that the robot maintains the desired motion.
-                max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-                max = Math.max(max, Math.abs(leftBackPower));
-                max = Math.max(max, Math.abs(rightBackPower));
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftBackPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightBackPower = (y + x - rx) / denominator;
 
 
-                if (max > 1.0) {
-                    leftFrontPower /= max;
-                    rightFrontPower /= max;
-                    leftBackPower /= max;
-                    rightBackPower /= max;
-                }
+        // Normalize the values so no wheel power exceeds 100%
+        // This ensures that the robot maintains the desired motion.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
 
 
-                // Send calculated power to wheels
-                leftFrontDrive.setPower(leftFrontPower);
-                rightFrontDrive.setPower(rightFrontPower);
-                leftBackDrive.setPower(leftBackPower);
-                rightBackDrive.setPower(rightBackPower);
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
 
 
-                // Show the elapsed game time and wheel power.
-                //telemetry.addData("Status", "Run Time: " + runtime.toString());
-                telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-                telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-                telemetry.update();
+        // Send calculated power to wheels
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
 
 
-                //arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // Show the elapsed game time and wheel power.
+        //telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+        telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+        telemetry.update();
 
-                //Auto-TeleOP Code
+
+        //arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //Auto-TeleOP Code
 
         if (gamepad1.xWasPressed()) {
             follower.followPath(pathChain.get());
@@ -176,27 +176,25 @@ public class TechnoBolts extends OpMode {
         }
 
 
-
         //Outtake Code
-                double power = 0;
+        double power = 0;
 
-                if(gamepad1.left_bumper) {
-                    power += 0.5;
-                    myMotorLeft.setPower(power); // Set the motor power
-                    myMotorRight.setPower(power);
-                    if(power >= 0.7){
-                        ledDepo.setPosition(1);
-                        myMotorLeft.setPower(0.7); // Set the motor power
-                        myMotorRight.setPower(0.7);
-                    }else{
-                        ledDepo.setPosition(0);
-                    }
-                }
-
-                else {
-                    myMotorLeft.setPower(0);
-                    myMotorRight.setPower(0);
-                }
+        while (gamepad1.left_bumper) {
+            power += 0.5;
+            myMotorLeft.setPower(power); // Set the motor power
+            myMotorRight.setPower(power);
+            if (power >= 0.7) {
+                ledDepo.setPower(1);
+                myMotorLeft.setPower(0.7); // Set the motor power
+                myMotorRight.setPower(0.7);
+            } else {
+                ledDepo.setPower(0);
+            }
+//                }
+//                    else {
+//                    myMotorLeft.setPower(0);
+//                    myMotorRight.setPower(0);
+//                }
 //                telemetry.addData("Motor Power");
 //                telemetry.update();
 
@@ -206,22 +204,23 @@ public class TechnoBolts extends OpMode {
 
             //Intake Code
 
-                if (gamepad1.a)
-                    Intake.setPower(-1);
-                if (gamepad1.b)
-                    Intake.setPower(0);
+            if (gamepad1.a)
+                Intake.setPower(-1);
+            if (gamepad1.b)
+                Intake.setPower(0);
 
             //Deposit angle code
 
             double dSAngle = -5.0;
 
-                if (gamepad1.dpad_up) {
-                    depositServo.setPosition(-5);   // 0 degrees
-                    }
-                if (gamepad1.dpad_down) {
-                    depositServo.setPosition(-4);   // # degrees, The lower value means lower angle
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
-                }
+            if (gamepad1.dpad_up) {
+                depositServo.setPosition(-5);   // 0 degrees
+            }
+            if (gamepad1.dpad_down) {
+                depositServo.setPosition(-4);   // # degrees, The lower value means lower angle
 
             }
+        }
+
+    }
+}
