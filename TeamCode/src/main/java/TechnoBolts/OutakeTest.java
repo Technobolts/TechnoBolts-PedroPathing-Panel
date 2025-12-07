@@ -31,7 +31,6 @@ import com.qualcomm.robotcore.hardware.LED;
                 while(gamepad1.left_bumper) {
                     motorPower += 10; // Use left bumper for power
                     ledDepo.enableLight(motorPower <= 1000);
-
                 }
                 myMotorLeft.setPower(motorPower); // Set the motor power
                 myMotorRight.setPower(motorPower);
