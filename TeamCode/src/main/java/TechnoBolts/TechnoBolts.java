@@ -87,6 +87,7 @@ public class TechnoBolts extends OpMode {
         //RevBlinkinLedDriver ledDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDepo");
         Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
         CRServo ledDepo = hardwareMap.get(CRServo.class, "ledDepo");
+        Servo upperTServo = hardwareMap.get(Servo.class, "upperTServo");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -107,11 +108,11 @@ public class TechnoBolts extends OpMode {
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-
         // runtime.reset();
-
-
+        upperTServo.setPosition(1);
+//        while (gamepad1.right_bumper){
+//            upperTServo.setPosition(1);
+//        }
         double max;
 
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
@@ -179,18 +180,22 @@ public class TechnoBolts extends OpMode {
         //Outtake Code
         double power = 0;
 
-        while (gamepad1.left_bumper) {
-            power += 0.5;
-            myMotorLeft.setPower(power); // Set the motor power
-            myMotorRight.setPower(power);
-            if (power >= 0.7) {
-                ledDepo.setPower(1);
-                myMotorLeft.setPower(0.7); // Set the motor power
-                myMotorRight.setPower(0.7);
-            } else {
-                ledDepo.setPower(0);
+            while (gamepad1.left_bumper == true) {
+                power += 0.25;
+                myMotorLeft.setPower(-power); // Set the motor power
+                myMotorRight.setPower(power);
+
+//                    while (power >= 0.25) {
+//                        ledDepo.setPower(1);
+//                        myMotorLeft.setPower(-0.25); // Set the motor power
+//                        myMotorRight.setPower(0.25);
+//                        power = 0.25;
+//                    }
             }
-//                }
+                ledDepo.setPower(0);
+                myMotorLeft.setPower(0); // Set the motor power
+                myMotorRight.setPower(0);
+
 //                    else {
 //                    myMotorLeft.setPower(0);
 //                    myMotorRight.setPower(0);
@@ -223,4 +228,3 @@ public class TechnoBolts extends OpMode {
         }
 
     }
-}
