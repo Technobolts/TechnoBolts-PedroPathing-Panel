@@ -30,8 +30,8 @@ public class HuskyLensAprilTagsAndLED extends LinearOpMode {
         // ===================== HARDWARE MAP =====================
         blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        leftDeposit  = hardwareMap.get(DcMotorEx.class, "shooterLeft");   // CHANGE NAME
-        rightDeposit = hardwareMap.get(DcMotorEx.class, "shooterRight");  // CHANGE NAME
+        leftDeposit  = hardwareMap.get(DcMotorEx.class, "leftDeposit");   // CHANGE NAME
+        rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");  // CHANGE NAME
 
         huskyLens = new HuskyLens(hardwareMap);
 
@@ -73,13 +73,13 @@ public class HuskyLensAprilTagsAndLED extends LinearOpMode {
             RevBlinkinLedDriver.BlinkinPattern ledPattern;
 
             if (!rpmMet) {
-                ledPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                ledPattern = RevBlinkinLedDriver.BlinkinPattern.RED; //If RPM and April Tag not detected
             }
             else if (!tagDetected) {
-                ledPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                ledPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW; //If RPM met and April Tag not detected
             }
             else {
-                ledPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                ledPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN; //If RPM met and April Tag is detected
             }
 
             blinkin.setPattern(ledPattern);
