@@ -85,9 +85,10 @@ public class TechnoBolts extends OpMode {
         DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
         DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
         //RevBlinkinLedDriver ledDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDepo");
-        Servo depositServo = hardwareMap.get(Servo.class, "depositServo");
         CRServo ledDepo = hardwareMap.get(CRServo.class, "ledDepo");
         Servo upperTServo = hardwareMap.get(Servo.class, "upperTServo");
+        CRServo lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
+        CRServo middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -109,7 +110,7 @@ public class TechnoBolts extends OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // runtime.reset();
-        upperTServo.setPosition(1);
+
 //        while (gamepad1.right_bumper){
 //            upperTServo.setPosition(1);
 //        }
@@ -166,24 +167,23 @@ public class TechnoBolts extends OpMode {
 
         //Auto-TeleOP Code
 
-        if (gamepad1.xWasPressed()) {
-            follower.followPath(pathChain.get());
-            automatedDrive = true;
-        }
-        //Stop automated following if the follower is done
-        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
-            follower.startTeleopDrive();
-            automatedDrive = false;
-        }
+//        if (gamepad1.xWasPressed()) {
+//            follower.followPath(pathChain.get());
+//            automatedDrive = true;
+//        }
+//        //Stop automated following if the follower is done
+//        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+//            follower.startTeleopDrive();
+//            automatedDrive = false;
+//        }
 
 
         //Outtake Code
-        double power = 0;
+        double power = 1;
 
-            while (gamepad1.left_bumper == true) {
-                power += 0.25;
-                myMotorLeft.setPower(-power); // Set the motor power
-                myMotorRight.setPower(power);
+            if (gamepad1.left_bumper == true) {
+                myMotorLeft.setPower(power); // Set the motor power
+                myMotorRight.setPower(-power);
 
 //                    while (power >= 0.25) {
 //                        ledDepo.setPower(1);
@@ -214,17 +214,24 @@ public class TechnoBolts extends OpMode {
             if (gamepad1.b)
                 Intake.setPower(0);
 
-            //Deposit angle code
+            //Transfer system code
 
-            double dSAngle = -5.0;
 
-            if (gamepad1.dpad_up) {
-                depositServo.setPosition(-5);   // 0 degrees
+            if(gamepad1.x){
+             middleTServo.setPower(-1);
+             lowerTServo.setPower(-1);
             }
-            if (gamepad1.dpad_down) {
-                depositServo.setPosition(-4);   // # degrees, The lower value means lower angle
-
+            if(gamepad1.y){
+            middleTServo.setPower(0);
+            lowerTServo.setPower(0);
             }
+
+            if(gamepad1.right_bumper ==true){
+            upperTServo.setPosition(0.5);
+        }
+        else{
+            upperTServo.setPosition(0);
+        }
         }
 
     }
