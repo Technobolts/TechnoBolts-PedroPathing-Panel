@@ -11,9 +11,9 @@ public class CalculateShooterAngle{
 public static double calculateShooterAngle(double distance_x) {
 
         // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
-        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (e.g., all in METERS or all in FEET) !!!
+        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (ALL IN INCHES) !!!
 
-        final double GRAVITY_CONST = -4.905;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2
+        final double GRAVITY_CONST = -193.2;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2 (-193.2 is for in/s^2)
         final double CONSTANT_RPM = 4500.0;         // Your fixed shooter wheel speed
         final double WHEEL_RADIUS = 0.05;           // Radius of your shooter wheel (e.g., in meters)
         final double ROBOT_HEIGHT = 0.40;           // Height of the ball's exit point (e.g., in meters)
