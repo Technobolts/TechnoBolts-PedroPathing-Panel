@@ -3,43 +3,67 @@ package TechnoBolts;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx; // Use Ex for velocity control
 import com.qualcomm.robotcore.hardware.LED;
 
-@TeleOp(name="OutakeTest", group="Linear Opmode")
-    public class OutakeTest extends LinearOpMode {
+@TeleOp(name="OutakeTest", group = "Linear Opmode")
+public class OutakeTest extends LinearOpMode {
 
-        @Override
-        public void runOpMode() {
+    // Target Settings
+    final double TARGET_RPM = 3000; // Set RPM here
+    final double TICKS_PER_REV = 28; // Adjust based on motor
 
-            // Initialize the motor, matching the name in the Robot Controller configuration
+    // Stating Variables
+    boolean motorRunning = false;
+    boolean lastBumperState = false;
 
-            DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
-            DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
-            LED ledDepo = hardwareMap.get(LED.class,"ledDepo" );
-            // Set the motor direction if needed (e.g., if it spins backward)
-             myMotorLeft.setDirection(DcMotor.Direction.FORWARD);
-            myMotorRight.setDirection(DcMotor.Direction.FORWARD);
+    @Override
+    public void runOpMode() {
+        // Cast to DcMotorEx to access setVelocity()
+        DcMotorEx myMotorLeft = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        DcMotorEx myMotorRight = hardwareMap.get(DcMotorEx.class, "rightDeposit");
+        LED ledDepo = hardwareMap.get(LED.class, "ledDepo");
 
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
+        myMotorLeft.setDirection(DcMotor.Direction.FORWARD);
+        myMotorRight.setDirection(DcMotor.Direction.FORWARD);
 
-            waitForStart(); // Wait for the start button to be pressed
+        // Required for precise RPM control
+        myMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        myMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            while (opModeIsActive()) { // Loop while the OpMode is active
-                double motorPower = 0;
-                // Example: Control motor with gamepad input
-                while(gamepad1.left_bumper) {
-                    motorPower += 10; // Use left bumper for power
-                    ledDepo.enableLight(motorPower <= 1000);
-                }
-                myMotorLeft.setPower(motorPower); // Set the motor power
-                myMotorRight.setPower(motorPower);
+        // Conversion: Ticks per second = (RPM / 60) * Ticks per Rev
+        double targetVelocity = (TARGET_RPM / 60) * TICKS_PER_REV;
 
-                telemetry.addData("Motor Power", motorPower);
-                telemetry.update();
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            // Rising Edge Detector: Checks if the bumper was JUST pressed
+            if (gamepad1.left_bumper && !lastBumperState) {
+                motorRunning = !motorRunning; // Toggles the motor on/off
+            }
+            lastBumperState = gamepad1.left_bumper; // Saves state for next loop
+
+            if (motorRunning) {
+                myMotorLeft.setVelocity(targetVelocity);
+                myMotorRight.setVelocity(targetVelocity);
+                ledDepo.enableLight(true);
+            } else {
+                myMotorLeft.setVelocity(0);
+                myMotorRight.setVelocity(0);
+                ledDepo.enableLight(false);
             }
 
-            myMotorLeft.setPower(0);
-            myMotorRight.setPower(0);// Stop the motor when the OpMode ends
+            // Feedback to driver
+            telemetry.addData("Motor State", motorRunning ? "RUNNING" : "STOPPED");
+            telemetry.addData("Target RPM", TARGET_RPM);
+            telemetry.addData("Actual Left RPM", (myMotorLeft.getVelocity() / TICKS_PER_REV) * 60);
+            telemetry.update();
         }
+
+        myMotorLeft.setPower(0);
+        myMotorRight.setPower(0);
     }
+}
