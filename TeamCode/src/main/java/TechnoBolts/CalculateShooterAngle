@@ -1,0 +1,59 @@
+import java.lang.Math;
+import static java.lang.Math.PI;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.atan;
+import static java.lang.Math.toDegrees;
+
+public class CalculateShooterAngle{
+
+public static double calculateShooterAngle(double distance_x) {
+
+        // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
+        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (e.g., all in METERS or all in FEET) !!!
+
+        final double GRAVITY_CONST = -4.905;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2
+        final double CONSTANT_RPM = 4500.0;         // Your fixed shooter wheel speed
+        final double WHEEL_RADIUS = 0.05;           // Radius of your shooter wheel (e.g., in meters)
+        final double ROBOT_HEIGHT = 0.40;           // Height of the ball's exit point (e.g., in meters)
+        final double TARGET_HEIGHT = 1.0;           // Height of the center of the target goal (e.g., in meters)
+        
+        // --- 2. PHYSICS CALCULATIONS ---
+
+        // Calculate V_0^2 (Initial Velocity Squared)
+        // V = (2 * pi * r * RPM) / 60
+        double V_units_per_sec = (2.0 * PI * WHEEL_RADIUS * CONSTANT_RPM) / 60.0;
+        double V0_SQ = pow(V_units_per_sec, 2);
+
+        // Calculate the height difference (Delta_h = y - h_0)
+        double delta_h = TARGET_HEIGHT - ROBOT_HEIGHT;
+
+        // Calculate the intermediate constant K = (g * x^2) / V_0^2
+        double K = (GRAVITY_CONST * pow(distance_x, 2)) / V0_SQ;
+        
+        // --- 3. QUADRATIC SOLUTION for tan(theta) ---
+        // The form is: K*tan(theta)^2 + x*tan(theta) + (K - delta_h) = 0
+        
+        double A = K;
+        double B = distance_x;
+        double C = K - delta_h;
+
+        // Calculate the Discriminant (D = B^2 - 4AC)
+        double discriminant = pow(B, 2) - 4.0 * A * C;
+
+        // Check for Unreachable Target
+        if (discriminant < 0) {
+            return Double.NaN; // Target is out of range
+        }
+
+        // Calculate tan(theta) for the LOWER angle solution
+        // tan(theta)_low = (-B - sqrt(D)) / 2A (The minus sign ensures the lower angle is selected)
+        double tan_theta_low = (-B - sqrt(discriminant)) / (2.0 * A);
+
+        // Calculate the final angle and convert from radians to degrees
+        double theta_low_rad = atan(tan_theta_low);
+        double theta_low_deg = toDegrees(theta_low_rad);
+        
+        return theta_low_deg;
+    }
+}
