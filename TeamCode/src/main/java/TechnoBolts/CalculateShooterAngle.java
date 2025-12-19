@@ -18,7 +18,7 @@ public static double calculateShooterAngle(double distance_x) {
         final double WHEEL_RADIUS = .048;           // Radius of your shooter wheel (e.g., in meters) 48mm
         final double ROBOT_HEIGHT = 0.27305;           // Height of the ball's exit point (e.g., in meters) 10.75in
         final double TARGET_HEIGHT = 1.143;           // Height of the center of the target goal (e.g., in meters) //45in
-        final double SHOOTER_EFFICIENCY = 1.0;      // TUNING CONSTANT: An efficeancy constant of how much of the motor's eneryg transferrs to the ball
+        final double SHOOTER_EFFICIENCY = 0.6;      // TUNING CONSTANT: An efficeancy constant of how much of the motor's eneryg transferrs to the ball
         
         // --- 2. PHYSICS CALCULATIONS ---
         // 1. Calculate the theoretical speed of the wheel surface
