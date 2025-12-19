@@ -181,7 +181,7 @@ public class TechnoBolts extends OpMode {
         //Outtake Code
         double power = 1;
 
-            if (gamepad1.left_bumper == true) {
+            if (gamepad2.left_bumper == true) {
                 myMotorLeft.setPower(power); // Set the motor power
                 myMotorRight.setPower(-power);
 
@@ -209,24 +209,25 @@ public class TechnoBolts extends OpMode {
 
             //Intake Code
 
-            if (gamepad1.a)
+            if (gamepad2.a)
                 Intake.setPower(-1);
-            if (gamepad1.b)
+            if (gamepad2.b)
                 Intake.setPower(0);
 
             //Transfer system code
 
 
-            if(gamepad1.x){
-             middleTServo.setPower(-1);
+            if(gamepad2.x){
+             middleTServo.setPower(1);
              lowerTServo.setPower(-1);
             }
-            if(gamepad1.y){
+            if(gamepad2.y){
             middleTServo.setPower(0);
             lowerTServo.setPower(0);
             }
 
-            if(gamepad1.right_bumper ==true){
+            upperTServo.setDirection(Servo.Direction.REVERSE);
+            if(gamepad2.right_bumper ==true){
             upperTServo.setPosition(0.5);
         }
         else{
