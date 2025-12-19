@@ -11,14 +11,14 @@ public class CalculateShooterAngle{
 public static double calculateShooterAngle(double distance_x) {
 
         // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
-        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (ALL IN INCHES) !!!
+        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (ALL IN METERS) !!!
 
-        final double GRAVITY_CONST = --193.2;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2 (-193.2 is for in/s^2)
+        final double GRAVITY_CONST = -4.905;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2 (-193.2 is for in/s^2)
         final double CONSTANT_RPM = 4500.0;         // Your fixed shooter wheel speed
-        final double WHEEL_RADIUS = 5;           // Radius of your shooter wheel (e.g., in meters)
-        final double ROBOT_HEIGHT = 10;           // Height of the ball's exit point (e.g., in meters)
-        final double TARGET_HEIGHT = 50;           // Height of the center of the target goal (e.g., in meters)
-        final double SHOOTER_EFFICIENCY = 0.4;      // TUNING CONSTANT: An efficeancy constant of how much of the motor's eneryg transferrs to the ball
+        final double WHEEL_RADIUS = .048;           // Radius of your shooter wheel (e.g., in meters) 48mm
+        final double ROBOT_HEIGHT = 0.27305;           // Height of the ball's exit point (e.g., in meters) 10.75in
+        final double TARGET_HEIGHT = 1.143;           // Height of the center of the target goal (e.g., in meters) //45in
+        final double SHOOTER_EFFICIENCY = 1.0;      // TUNING CONSTANT: An efficeancy constant of how much of the motor's eneryg transferrs to the ball
         
         // --- 2. PHYSICS CALCULATIONS ---
         // 1. Calculate the theoretical speed of the wheel surface
