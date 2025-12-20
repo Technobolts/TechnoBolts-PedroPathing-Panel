@@ -72,6 +72,7 @@ public class TechnoBolts extends OpMode {
     @Override
     public void loop() {
 
+
         follower.update();
         telemetryM.update();
 
@@ -116,9 +117,10 @@ public class TechnoBolts extends OpMode {
 //        }
         double max;
 
-        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x; // Counteract imperfect strafing
+        double y = gamepad1.left_stick_y; // Remember, Y stick value is reversed
+        double x = -gamepad1.left_stick_x; // Counteract imperfect strafing
         double rx = gamepad1.right_stick_x;
+
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
@@ -179,11 +181,7 @@ public class TechnoBolts extends OpMode {
 
 
         //Outtake Code
-        double power = 1;
 
-            if (gamepad2.left_bumper == true) {
-                myMotorLeft.setPower(power); // Set the motor power
-                myMotorRight.setPower(-power);
 
 //                    while (power >= 0.25) {
 //                        ledDepo.setPower(1);
@@ -191,7 +189,15 @@ public class TechnoBolts extends OpMode {
 //                        myMotorRight.setPower(0.25);
 //                        power = 0.25;
 //                    }
-            }
+                if(gamepad2.dpad_up){
+                    myMotorRight.setPower(-0.75);
+                    myMotorLeft.setPower(0.75);
+                }
+                if(gamepad2.dpad_down){
+                    myMotorRight.setPower(0);
+                    myMotorLeft.setPower(0);
+                }
+
                 ledDepo.setPower(0);
                 myMotorLeft.setPower(0); // Set the motor power
                 myMotorRight.setPower(0);
@@ -203,10 +209,10 @@ public class TechnoBolts extends OpMode {
 //                telemetry.addData("Motor Power");
 //                telemetry.update();
 
-
-            myMotorLeft.setPower(0);
-            myMotorRight.setPower(0);// Stop the motor when the OpMode ends
-
+            if (gamepad2.dpad_down) {
+                myMotorLeft.setPower(0);
+                myMotorRight.setPower(0);// Stop the motor when the OpMode ends
+            }
             //Intake Code
 
             if (gamepad2.a)
@@ -228,7 +234,7 @@ public class TechnoBolts extends OpMode {
 
             upperTServo.setDirection(Servo.Direction.REVERSE);
             if(gamepad2.right_bumper ==true){
-            upperTServo.setPosition(0.5);
+            upperTServo.setPosition(0.6); //Originally 0.5
         }
         else{
             upperTServo.setPosition(0);
