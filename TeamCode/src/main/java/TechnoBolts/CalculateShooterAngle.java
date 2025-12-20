@@ -11,25 +11,30 @@ public class CalculateShooterAngle{
 public static double calculateShooterAngle(double distance_x) {
 
         // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
-        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (ALL IN INCHES) !!!
+        // !!! IMPORTANT: ENSURE ALL UNITS ARE CONSISTENT (ALL IN METERS) !!!
 
-        final double GRAVITY_CONST = -193.2;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2 (-193.2 is for in/s^2)
+        final double GRAVITY_CONST = -4.905;       // Use -4.905 for meters/s^2 OR -16.0 for feet/s^2 (-193.2 is for in/s^2)
         final double CONSTANT_RPM = 4500.0;         // Your fixed shooter wheel speed
-        final double WHEEL_RADIUS = 0.05;           // Radius of your shooter wheel (e.g., in meters)
-        final double ROBOT_HEIGHT = 0.40;           // Height of the ball's exit point (e.g., in meters)
-        final double TARGET_HEIGHT = 1.0;           // Height of the center of the target goal (e.g., in meters)
+        final double WHEEL_RADIUS = .048;           // Radius of your shooter wheel (e.g., in meters) 48mm
+        final double ROBOT_HEIGHT = 0.27305;           // Height of the ball's exit point (e.g., in meters) 10.75in
+        final double TARGET_HEIGHT = 1.143;           // Height of the center of the target goal (e.g., in meters) //45in
+        final double SHOOTER_EFFICIENCY = 0.6;      // TUNING CONSTANT: An efficeancy constant of how much of the motor's eneryg transferrs to the ball
         
         // --- 2. PHYSICS CALCULATIONS ---
-
-        // Calculate V_0^2 (Initial Velocity Squared)
-        // V = (2 * pi * r * RPM) / 60
-        double V_units_per_sec = (2.0 * PI * WHEEL_RADIUS * CONSTANT_RPM) / 60.0;
-        double V0_SQ = pow(V_units_per_sec, 2);
-
-        // Calculate the height difference (Delta_h = y - h_0)
+        // 1. Calculate the theoretical speed of the wheel surface
+        double V_theoretical = (2.0 * PI * WHEEL_RADIUS * CONSTANT_RPM) / 60.0;
+        
+        // 2. Apply the Efficiency/Slip Constant (Tuning Constant)
+        // This accounts for energy lost when the ball compressed and friction.
+        double V_actual = V_theoretical * SHOOTER_EFFICIENCY; 
+        
+        // 3. Square the ACTUAL velocity for use in the trajectory formula
+        double V0_SQ = pow(V_actual, 2);
+        
+        // 4. Calculate the height difference
         double delta_h = TARGET_HEIGHT - ROBOT_HEIGHT;
-
-        // Calculate the intermediate constant K = (g * x^2) / V_0^2
+        
+        // 5. Calculate K using the adjusted velocity
         double K = (GRAVITY_CONST * pow(distance_x, 2)) / V0_SQ;
         
         // --- 3. QUADRATIC SOLUTION for tan(theta) ---
@@ -54,7 +59,87 @@ public static double calculateShooterAngle(double distance_x) {
         // Calculate the final angle and convert from radians to degrees
         double theta_low_rad = atan(tan_theta_low);
         double theta_low_deg = toDegrees(theta_low_rad);
+
+        // --- 4. SERVO MAPPING ---
+
+        // Define your physical mounting limits
+        final double MIN_ANGLE_DEGREES = 20.0; //Need to be physically measured with a protractor
+        final double MAX_ANGLE_DEGREES = 70.0; //Need to be physically measured with a protractor
         
-        return theta_low_deg;
+        // Define your servo signal limits
+        final double SERVO_MIN_SIGNAL = 0.4;
+        final double SERVO_MAX_SIGNAL = 0.8;
+        
+        // Perform the map
+        double servoPosition = SERVO_MIN_SIGNAL + (SERVO_MAX_SIGNAL - SERVO_MIN_SIGNAL) * (theta_low_deg - MIN_ANGLE_DEGREES) / (MAX_ANGLE_DEGREES - MIN_ANGLE_DEGREES);
+
+        // THE SAFETY CLAMP
+        // This ensures that even if the math says "Aim at 150 degrees," the servo stops at its physical limit.
+        if (servoPosition < SERVO_MIN_SIGNAL) {
+            servoPosition = SERVO_MIN_SIGNAL;
+        } else if (servoPosition > SERVO_MAX_SIGNAL) {
+            servoPosition = SERVO_MAX_SIGNAL;
+        }
+        
+        // If the original math returned NaN (impossible shot), 
+        // return a "home" or "safe" position.
+        if (Double.isNaN(theta_low_deg)) {
+            return SERVO_MIN_SIGNAL; 
+        }
+        
+        return servoPosition; // Now returning the servo value instead of degrees
     }
+    public static double calculateShooterRPM(double distance_x) {
+
+            // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
+            // !!! IMPORTANT: ENSURE ALL UNITS ARE METERS !!!
+        
+            final double GRAVITY = -9.806;             // Full gravity constant (m/s^2)
+            final double FIXED_ANGLE_DEG = 45.0;       // The constant angle of your shooter
+            final double WHEEL_RADIUS = 0.048;         // 48mm in meters
+            final double ROBOT_HEIGHT = 0.27305;       // 10.75in in meters
+            final double TARGET_HEIGHT = 1.143;        // 45in in meters
+            final double SHOOTER_EFFICIENCY = 0.6;     // Start at 0.6 and tune (1.0 is "perfect")
+        
+            // --- 2. PHYSICS CALCULATIONS (Solving for V0) ---
+        
+            double theta_rad = Math.toRadians(FIXED_ANGLE_DEG);
+            double delta_h = TARGET_HEIGHT - ROBOT_HEIGHT;
+        
+            /* * Formula derived from: y = h0 + x*tan(theta) - (g*x^2) / (2 * V0^2 * cos^2(theta))
+             * Solving for V0 gives:
+             * V0 = sqrt( (g * x^2) / (2 * cos^2(theta) * (x * tan(theta) - delta_h)) )
+             */
+        
+            double cosTheta = Math.cos(theta_rad);
+            double tanTheta = Math.tan(theta_rad);
+        
+            // The denominator part: 2 * cos(theta)^2 * (x * tan(theta) - delta_h)
+            double denominator = 2.0 * Math.pow(cosTheta, 2) * (distance_x * tanTheta - delta_h);
+        
+            // We use Math.abs(GRAVITY) because the formula expects a positive magnitude here 
+            // to avoid taking the square root of a negative number.
+            double v0_required = Math.sqrt((Math.abs(GRAVITY) * Math.pow(distance_x, 2)) / denominator);
+        
+            // Check if the math failed (happens if the target is physically impossible)
+            if (Double.isNaN(v0_required)) {
+                return 0.0; 
+            }
+        
+            // --- 3. REVERSE EFFICIENCY & CONVERT TO RPM ---
+        
+            // Account for efficiency: If efficiency is 60%, we need the wheels to spin faster 
+            // than the ball's required speed.
+            double v_wheel_surface = v0_required / SHOOTER_EFFICIENCY;
+        
+            // RPM = (V * 60) / (2 * PI * r)
+            double required_RPM = (v_wheel_surface * 60.0) / (2.0 * Math.PI * WHEEL_RADIUS);
+        
+            // --- 4. SAFETY CLAMPS ---
+            final double MAX_MOTOR_RPM = 6000.0; // Adjust based on your motor specs
+            if (required_RPM > MAX_MOTOR_RPM) return MAX_MOTOR_RPM;
+            if (required_RPM < 0) return 0.0;
+        
+            return required_RPM;
+        }
 }
