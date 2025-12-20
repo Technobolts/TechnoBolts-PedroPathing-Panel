@@ -234,7 +234,7 @@ public class TechnoBolts extends OpMode {
 
             upperTServo.setDirection(Servo.Direction.REVERSE);
             if(gamepad2.right_bumper ==true){
-            upperTServo.setPosition(0.6); //Originally 0.5
+            upperTServo.setPosition(0.65); //Originally 0.5
         }
         else{
             upperTServo.setPosition(0);
