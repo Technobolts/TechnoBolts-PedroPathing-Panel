@@ -11,10 +11,11 @@ public class HuskyTest extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         Servo huskyServo = hardwareMap.get(Servo.class, "huskyServo");
         TechnoBoltsHuskyLensDistance distance = new TechnoBoltsHuskyLensDistance();
+        CalculateShooterAngle calculator = new CalculateShooterAngle();
         while (opModeIsActive()) {
 
             while(gamepad2.left_bumper) {
-                //while(!apriltagNotDetected){
+                //while(){
                 //  servo spins around
                 // }
                 //use distance(var) and get a distance from april tag
