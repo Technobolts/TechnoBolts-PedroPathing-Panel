@@ -3,7 +3,6 @@ package TechnoBolts;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
-import
 
 @TeleOp(name="HuskyTest")
 public class HuskyTest extends LinearOpMode{
