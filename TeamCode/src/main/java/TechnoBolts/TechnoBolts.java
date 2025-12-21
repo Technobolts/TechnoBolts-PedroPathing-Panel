@@ -190,14 +190,9 @@ public class TechnoBolts extends OpMode {
 //                        power = 0.25;
 //                    }
                 if(gamepad2.dpad_up){
-                    myMotorRight.setPower(-0.84);
-                    myMotorLeft.setPower(0.84);
+                    myMotorRight.setPower(-0.75);
+                    myMotorLeft.setPower(0.75);
                 }
-                if(gamepad2.dpad_down){
-                    myMotorRight.setPower(0);
-                    myMotorLeft.setPower(0);
-                }
-
                 ledDepo.setPower(0);
                 myMotorLeft.setPower(0); // Set the motor power
                 myMotorRight.setPower(0);

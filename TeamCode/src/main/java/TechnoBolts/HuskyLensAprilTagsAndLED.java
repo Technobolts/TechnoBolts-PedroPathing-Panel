@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
-@TeleOp(name = "LED + Dual RPM + HuskyLens")
+@TeleOp(name = "LED + HuskyLens")
 public class HuskyLensAprilTagsAndLED extends LinearOpMode {
 
     // ===================== LED =====================
