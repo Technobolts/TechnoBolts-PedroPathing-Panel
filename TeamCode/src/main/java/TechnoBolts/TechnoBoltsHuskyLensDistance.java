@@ -4,7 +4,7 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "HuskyLens Distance & Angle Test", group = "Sensor")
+@TeleOp(name = "HuskyLens Distance & Angle Test")
 public class TechnoBoltsHuskyLensDistance extends LinearOpMode {
 
     // ====== CAMERA RESOLUTION ======
