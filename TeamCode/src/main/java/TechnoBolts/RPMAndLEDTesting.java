@@ -52,6 +52,7 @@ public class RPMAndLEDTesting extends LinearOpMode {
             double leftVelocity = leftDeposit.getVelocity();
             double rightVelocity = rightDeposit.getVelocity();
             telemetry.addData("leftVelocity" + leftVelocity + ", rightVelocity" + rightVelocity, null);
+            telemetry.update();
 
 //            long leftCurrentPosition = leftDeposit.getCurrentPosition();
 //            // Calculate difference since last loop
