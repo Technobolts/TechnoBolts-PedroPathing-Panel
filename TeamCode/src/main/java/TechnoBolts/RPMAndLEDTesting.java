@@ -57,7 +57,13 @@ public class RPMAndLEDTesting extends LinearOpMode {
             telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
-//            if(leftVelocity<0.4 && rightVelocity<0.4){
+            if(leftVelocity>=940 && leftVelocity<=1000 && rightVelocity<=-940 && rightVelocity>=-1000){
+                ledDepo.setPosition(COLOR_GREEN);
+            }else{
+              ledDepo.setPosition(COLOR_RED);
+            }
+
+//            if(leftVelocity<0.4 && rightVelocity>-0.4){
 //              ledDepo.setPosition(COLOR_RED);
 //            }else{
 //               ledDepo.setPosition(COLOR_GREEN);
