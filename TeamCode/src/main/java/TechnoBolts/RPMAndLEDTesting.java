@@ -2,6 +2,7 @@ package TechnoBolts;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo; // Changed from CRServo
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -29,9 +30,12 @@ public class RPMAndLEDTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        leftDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
+        rightDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Ensure "ledDepo" is configured as a Servo in the Robot Configuration
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
+
 
         waitForStart();
         timer.reset();
