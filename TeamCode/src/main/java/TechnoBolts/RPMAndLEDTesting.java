@@ -48,10 +48,9 @@ public class RPMAndLEDTesting extends LinearOpMode {
                 leftDeposit.setPower(0); // Set the motor power
                 rightDeposit.setPower(0);
             }
-
             double leftVelocity = leftDeposit.getVelocity();
             double rightVelocity = rightDeposit.getVelocity();
-            telemetry.addData("leftVelocity" + leftVelocity + ", rightVelocity" + rightVelocity, null);
+            telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
 //            long leftCurrentPosition = leftDeposit.getCurrentPosition();
