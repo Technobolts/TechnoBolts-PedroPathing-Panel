@@ -57,7 +57,7 @@ public class RPMAndLEDTesting extends LinearOpMode {
             double leftTicksPerSecond = leftDeltaTicks / leftElapsedTime;
             lastLeftPos = leftCurrentPosition;
 
-            double leftRpm = leftTicksPerSecond / leftDeposit.getMotorType().getTicksPerRev();
+            double leftRpm = leftTicksPerSecond / leftDeposit.getMotorType().getTicksPerRev() * 60; //to turn into true RPM, must multiply by 60
 
             long rightCurrentPosition = rightDeposit.getCurrentPosition();
             // Calculate difference since last loop
