@@ -48,15 +48,15 @@ public class RPMAndLEDTesting extends LinearOpMode {
                 leftDeposit.setPower(0); // Set the motor power
                 rightDeposit.setPower(0);
             }
-            double leftVelocity = leftDeposit.getPower();
-            double rightVelocity = rightDeposit.getPower();
+            double leftVelocity = leftDeposit.getVelocity();
+            double rightVelocity = rightDeposit.getVelocity();
             telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
 //            if(leftVelocity<0.4 && rightVelocity<0.4){
-//
-//
-//
+//              ledDepo.setPosition(COLOR_RED);
+//            }else{
+//               ledDepo.setPosition(COLOR_GREEN);
 //            }
 
 //            long leftCurrentPosition = leftDeposit.getCurrentPosition();
