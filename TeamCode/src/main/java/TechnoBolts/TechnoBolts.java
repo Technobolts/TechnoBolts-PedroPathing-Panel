@@ -1,6 +1,8 @@
 package TechnoBolts;
 
 
+import static android.os.SystemClock.sleep;
+
 import com.pedropathing.geometry.BezierCurve;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -70,12 +72,16 @@ public class TechnoBolts extends OpMode {
                 .build();
     }
 
+
     @Override
     public final void start() {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
         follower.startTeleopDrive();
+        // Wait for the game to start (driver presses PLAY)
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
@@ -118,9 +124,8 @@ public class TechnoBolts extends OpMode {
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
-        // Wait for the game to start (driver presses PLAY)
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+
+
         // runtime.reset();
 
 //        while (gamepad1.right_bumper){
@@ -246,6 +251,7 @@ public class TechnoBolts extends OpMode {
         }
 
         //Transfer system code
+
 
 
         if(gamepad2.dpad_right){
