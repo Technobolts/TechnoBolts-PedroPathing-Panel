@@ -41,9 +41,9 @@ public class RPMAndLEDTesting extends LinearOpMode {
         timer.reset();
 
 //        int i = 0;
-//        boolean isGreen = false;
+        boolean wasReady = false;
         while (opModeIsActive()) {
-            ledDepo.setPosition(COLOR_RED);
+//          ledDepo.setPosition(COLOR_RED);
 
             if(gamepad2.left_bumper){
                 rightDeposit.setPower(-0.4);
@@ -58,10 +58,19 @@ public class RPMAndLEDTesting extends LinearOpMode {
             telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
-            if(leftVelocity>=820 && leftVelocity<=1000 && rightVelocity<=-820 && rightVelocity>=-1000){
-                ledDepo.setPosition(COLOR_GREEN);
-            }else{
-              ledDepo.setPosition(COLOR_RED);
+            // 1. Determine the current state
+            boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
+                    rightVelocity <= -820 && rightVelocity >= -1000);
+
+            // 2. Only update the LED if the state has CHANGED
+            if (isReady != wasReady) {
+                if (isReady) {
+                    ledDepo.setPosition(COLOR_GREEN);
+                } else {
+                    ledDepo.setPosition(COLOR_RED);
+                }
+                // 3. Update the tracker so we don't send the command again next loop
+                wasReady = isReady;
             }
 
 //            if(leftVelocity<0.4 && rightVelocity>-0.4){
