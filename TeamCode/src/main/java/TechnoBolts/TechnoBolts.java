@@ -92,7 +92,9 @@ public class TechnoBolts extends OpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
         Intake = hardwareMap.get(CRServo.class, "intake");
         DcMotorEx myMotorLeft = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        myMotorLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         DcMotorEx myMotorRight = hardwareMap.get(DcMotorEx.class, "rightDeposit");
+        myMotorRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         //RevBlinkinLedDriver ledDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDepo");
         Servo ledDepo = hardwareMap.get(Servo.class, "ledDepo");
         Servo upperTServo = hardwareMap.get(Servo.class, "upperTServo");
@@ -263,7 +265,6 @@ public class TechnoBolts extends OpMode {
         } else {
             upperTServo.setPosition(0);
         }
-
 
 
         //telemetry.addData("Status", "Run Time: " + runtime.toString());
