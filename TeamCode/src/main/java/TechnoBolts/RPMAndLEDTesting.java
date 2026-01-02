@@ -49,25 +49,29 @@ public class RPMAndLEDTesting extends LinearOpMode {
                 rightDeposit.setPower(0);
             }
 
-            long leftCurrentPosition = leftDeposit.getCurrentPosition();
-            // Calculate difference since last loop
-            long leftDeltaTicks = leftCurrentPosition - lastLeftPos;
-            double leftElapsedTime = (System.nanoTime() - lastTime) / 1_000_000_000.0; // seconds
-            // Ticks per second
-            double leftTicksPerSecond = leftDeltaTicks / leftElapsedTime;
-            lastLeftPos = leftCurrentPosition;
+            double leftVelocity = leftDeposit.getVelocity();
+            double rightVelocity = rightDeposit.getVelocity();
+            telemetry.addData("leftVelocity" + leftVelocity + ", rightVelocity" + rightVelocity, null);
 
-            double leftRpm = leftTicksPerSecond / leftDeposit.getMotorType().getTicksPerRev() * 60; //to turn into true RPM, must multiply by 60
-
-            long rightCurrentPosition = rightDeposit.getCurrentPosition();
-            // Calculate difference since last loop
-            long rightDeltaTicks = rightCurrentPosition - lastRightPos;
-            double rightElapsedTime = (System.nanoTime() - lastTime) / 1_000_000_000.0; // seconds
-            // Ticks per second
-            double rightTicksPerSecond = rightDeltaTicks / rightElapsedTime;
-            lastRightPos = rightCurrentPosition;
-
-            double rightRpm = rightTicksPerSecond / rightDeposit.getMotorType().getTicksPerRev();
+//            long leftCurrentPosition = leftDeposit.getCurrentPosition();
+//            // Calculate difference since last loop
+//            long leftDeltaTicks = leftCurrentPosition - lastLeftPos;
+//            double leftElapsedTime = (System.nanoTime() - lastTime) / 1_000_000_000.0; // seconds
+//            // Ticks per second
+//            double leftTicksPerSecond = leftDeltaTicks / leftElapsedTime;
+//            lastLeftPos = leftCurrentPosition;
+//
+//            double leftRpm = leftTicksPerSecond / leftDeposit.getMotorType().getTicksPerRev() * 60; //to turn into true RPM, must multiply by 60
+//
+//            long rightCurrentPosition = rightDeposit.getCurrentPosition();
+//            // Calculate difference since last loop
+//            long rightDeltaTicks = rightCurrentPosition - lastRightPos;
+//            double rightElapsedTime = (System.nanoTime() - lastTime) / 1_000_000_000.0; // seconds
+//            // Ticks per second
+//            double rightTicksPerSecond = rightDeltaTicks / rightElapsedTime;
+//            lastRightPos = rightCurrentPosition;
+//
+//            double rightRpm = rightTicksPerSecond / rightDeposit.getMotorType().getTicksPerRev();
 
             lastTime = System.nanoTime();
 
