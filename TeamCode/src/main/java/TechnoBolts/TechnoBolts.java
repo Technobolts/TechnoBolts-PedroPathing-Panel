@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.bylazar.configurables.annotations.Configurable;
@@ -53,6 +54,9 @@ public class TechnoBolts extends OpMode {
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
 
+    final double COLOR_RED = 0.05;
+    final double COLOR_GREEN = 0.45;
+
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
@@ -77,7 +81,6 @@ public class TechnoBolts extends OpMode {
     @Override
     public void loop() {
 
-
         follower.update();
         telemetryM.update();
 
@@ -88,13 +91,14 @@ public class TechnoBolts extends OpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
         Intake = hardwareMap.get(CRServo.class, "intake");
-        DcMotor myMotorLeft = hardwareMap.get(DcMotor.class, "leftDeposit");
-        DcMotor myMotorRight = hardwareMap.get(DcMotor.class, "rightDeposit");
+        DcMotorEx myMotorLeft = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        DcMotorEx myMotorRight = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         //RevBlinkinLedDriver ledDepo = hardwareMap.get(RevBlinkinLedDriver.class, "ledDepo");
         Servo ledDepo = hardwareMap.get(Servo.class, "ledDepo");
         Servo upperTServo = hardwareMap.get(Servo.class, "upperTServo");
         CRServo lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         CRServo middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
+        ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
         // ########################################################################################
         // !!!!            IMPORTANT Drive Information. Test your motor directions.            !!!!
@@ -199,6 +203,29 @@ public class TechnoBolts extends OpMode {
             myMotorLeft.setPower(0); // Set the motor power
             myMotorRight.setPower(0);
         }
+
+        //TODO
+        boolean wasReady = false;
+        double leftVelocity = myMotorLeft.getVelocity();
+        double rightVelocity = myMotorRight.getVelocity();
+        telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
+        telemetry.update();
+
+        // 1. Determine the current state
+        boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
+                rightVelocity <= -820 && rightVelocity >= -1000);
+
+        // 2. Only update the LED if the state has CHANGED
+        if (isReady != wasReady) {
+            if (isReady) {
+                ledDepo.setPosition(COLOR_GREEN);
+            } else {
+                ledDepo.setPosition(COLOR_RED);
+            }
+            // 3. Update the tracker so we don't send the command again next loop
+            wasReady = isReady;
+        }
+
 
 //                    else {
 //                    myMotorLeft.setPower(0);
