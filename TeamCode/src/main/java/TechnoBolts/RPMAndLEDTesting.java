@@ -4,11 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo; // Changed from CRServo
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="RPM and LED Testing")
 public class RPMAndLEDTesting extends LinearOpMode {
-    public DcMotor leftDeposit, rightDeposit;
+    public DcMotorEx leftDeposit, rightDeposit;
     public Servo ledDepo; // Changed to Servo for precise color control
 
     final double TICKS_PER_REV = 28.0;
@@ -28,8 +29,8 @@ public class RPMAndLEDTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        leftDeposit = hardwareMap.get(DcMotor.class, "leftDeposit");
-        rightDeposit = hardwareMap.get(DcMotor.class, "rightDeposit");
+        leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         // Ensure "ledDepo" is configured as a Servo in the Robot Configuration
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
