@@ -30,9 +30,9 @@ public class RPMAndLEDTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
-        leftDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
-        rightDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         // Ensure "ledDepo" is configured as a Servo in the Robot Configuration
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
