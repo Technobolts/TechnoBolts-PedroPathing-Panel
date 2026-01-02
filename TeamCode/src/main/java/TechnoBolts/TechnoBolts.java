@@ -45,7 +45,7 @@ public class TechnoBolts extends OpMode {
     public CRServo Intake = null;
 
     public Servo ledDepo;
-
+    boolean wasReady = false;
     private Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
@@ -205,7 +205,6 @@ public class TechnoBolts extends OpMode {
             myMotorLeft.setPower(0); // Set the motor power
             myMotorRight.setPower(0);
         }
-            boolean wasReady = false;
             double leftVelocity = myMotorLeft.getVelocity();
             double rightVelocity = myMotorRight.getVelocity();
             telemetry.update();
