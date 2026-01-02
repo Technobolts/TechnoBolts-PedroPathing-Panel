@@ -208,7 +208,6 @@ public class TechnoBolts extends OpMode {
             boolean wasReady = false;
             double leftVelocity = myMotorLeft.getVelocity();
             double rightVelocity = myMotorRight.getVelocity();
-            telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
             // 1. Determine the current state
@@ -271,6 +270,7 @@ public class TechnoBolts extends OpMode {
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
        // telemetry.addData("Outtake left/Right", "%4.2f, %4.2f", myMotorLeft, myMotorRight);
+        telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
         telemetry.update();
 
     }
