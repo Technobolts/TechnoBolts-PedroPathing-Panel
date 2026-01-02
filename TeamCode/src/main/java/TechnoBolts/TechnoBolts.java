@@ -202,28 +202,27 @@ public class TechnoBolts extends OpMode {
         else {
             myMotorLeft.setPower(0); // Set the motor power
             myMotorRight.setPower(0);
-        }
 
-        //TODO
-        boolean wasReady = false;
-        double leftVelocity = myMotorLeft.getVelocity();
-        double rightVelocity = myMotorRight.getVelocity();
-        telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
-        telemetry.update();
+            boolean wasReady = false;
+            double leftVelocity = myMotorLeft.getVelocity();
+            double rightVelocity = myMotorRight.getVelocity();
+            telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
+            telemetry.update();
 
-        // 1. Determine the current state
-        boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
-                rightVelocity <= -820 && rightVelocity >= -1000);
+            // 1. Determine the current state
+            boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
+                    rightVelocity <= -820 && rightVelocity >= -1000);
 
-        // 2. Only update the LED if the state has CHANGED
-        if (isReady != wasReady) {
-            if (isReady) {
-                ledDepo.setPosition(COLOR_GREEN);
-            } else {
-                ledDepo.setPosition(COLOR_RED);
+            // 2. Only update the LED if the state has CHANGED
+            if (isReady != wasReady) {
+                if (isReady) {
+                    ledDepo.setPosition(COLOR_GREEN);
+                } else {
+                    ledDepo.setPosition(COLOR_RED);
+                }
+                // 3. Update the tracker so we don't send the command again next loop
+                wasReady = isReady;
             }
-            // 3. Update the tracker so we don't send the command again next loop
-            wasReady = isReady;
         }
 
 
