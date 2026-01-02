@@ -202,7 +202,7 @@ public class TechnoBolts extends OpMode {
         else {
             myMotorLeft.setPower(0); // Set the motor power
             myMotorRight.setPower(0);
-
+        }
             boolean wasReady = false;
             double leftVelocity = myMotorLeft.getVelocity();
             double rightVelocity = myMotorRight.getVelocity();
@@ -223,7 +223,6 @@ public class TechnoBolts extends OpMode {
                 // 3. Update the tracker so we don't send the command again next loop
                 wasReady = isReady;
             }
-        }
 
 
 //                    else {
