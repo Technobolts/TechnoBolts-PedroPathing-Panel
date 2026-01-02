@@ -43,6 +43,7 @@ public class RPMAndLEDTesting extends LinearOpMode {
 //        int i = 0;
 //        boolean isGreen = false;
         while (opModeIsActive()) {
+            ledDepo.setPosition(COLOR_RED);
 
             if(gamepad2.left_bumper){
                 rightDeposit.setPower(-0.4);
@@ -57,7 +58,7 @@ public class RPMAndLEDTesting extends LinearOpMode {
             telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
             telemetry.update();
 
-            if(leftVelocity>=940 && leftVelocity<=1000 && rightVelocity<=-940 && rightVelocity>=-1000){
+            if(leftVelocity>=820 && leftVelocity<=1000 && rightVelocity<=-820 && rightVelocity>=-1000){
                 ledDepo.setPosition(COLOR_GREEN);
             }else{
               ledDepo.setPosition(COLOR_RED);
