@@ -56,8 +56,12 @@ public class TechnoBolts extends OpMode {
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
 
-    final double COLOR_RED = 0.1;
+    final double COLOR_RED = 0.05;
+    final double COLOR_ORANGE = 0.13;
+    final double COLOR_YELLOW = 0.25;
     final double COLOR_GREEN = 0.45;
+    final double COLOR_BLUE = 0.65;
+    final double COLOR_PURPLE = 0.85;
 
     @Override
     public void init() {
@@ -223,7 +227,7 @@ public class TechnoBolts extends OpMode {
                 if (isReady) {
                     ledDepo.setPosition(COLOR_GREEN);
                 } else {
-                    ledDepo.setPosition(COLOR_RED);
+                    ledDepo.setPosition(COLOR_YELLOW);
                 }
                 // 3. Update the tracker so we don't send the command again next loop
                 wasReady = isReady;
