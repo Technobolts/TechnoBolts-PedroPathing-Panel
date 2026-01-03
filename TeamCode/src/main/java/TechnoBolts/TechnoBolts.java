@@ -258,13 +258,17 @@ public class TechnoBolts extends OpMode {
 
 
 
-        if(gamepad2.dpad_right){
+        if(gamepad2.b){
             middleTServo.setPower(1);
             lowerTServo.setPower(-1);
         }
-        if(gamepad2.dpad_left){
+        if(gamepad2.a){
             middleTServo.setPower(0);
             lowerTServo.setPower(0);
+        }
+        if(gamepad2.x){
+            middleTServo.setPower(-1);
+            lowerTServo.setPower(1);
         }
 
         upperTServo.setDirection(Servo.Direction.FORWARD);
