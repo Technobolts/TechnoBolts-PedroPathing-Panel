@@ -7,8 +7,6 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,7 +23,7 @@ public class AutoTopRed {
     public final CRServo intake;
     public final DcMotor leftDeposit;
     public final DcMotor rightDeposit;
-    public final Servo upperTServo;
+    public final Servo kickerServo;
     public final CRServo lowerTServo;
     public final CRServo middleTServo;
     public final Servo ledDepo;
@@ -40,9 +38,14 @@ public class AutoTopRed {
 
     private final double lowerRampOff = 0;
     private final double middleRampOff = 0;
-    private final double intakePower = -1;
+    private final double intakePowerOn = -1;
+    private final double intakePowerOff = 0;
     private final double kickerAngleUp = 0;
     private final double kickerAngleDown = 0.8;
+    // Define the motor at the top of your OpMode class
+
+
+
 
     Telemetry telemetry;
 
@@ -53,7 +56,7 @@ public class AutoTopRed {
         this.intake = intake;
         this.leftDeposit = leftDeposit;
         this.rightDeposit = rightDeposit;
-        this.upperTServo = upperTServo;
+        this.kickerServo = upperTServo;
         this.lowerTServo = lowerTServo;
         this.middleTServo = middleTServo;
         this.ledDepo = ledDepo;
@@ -83,6 +86,48 @@ public class AutoTopRed {
     public void setPathState (PathState newState){
         pathState = newState;
         pathTimer.resetTimer();
+    }
+
+    public void doIntakePowerOn() {
+        intake.setPower(intakePowerOn);
+    }
+
+    public void doIntakePowerOff() {
+        intake.setPower(intakePowerOff);
+    }
+
+    public void doRampOn() {
+        lowerTServo.setPower(lowerRampOn);
+        middleTServo.setPower(middleRampOn);
+    }
+
+    public void doRampOff() {
+        lowerTServo.setPower(lowerRampOff);
+        middleTServo.setPower(middleRampOff);
+    }
+
+    public void doKickerOn() {
+        kickerServo.setPosition(kickerAngleDown);
+    }
+
+    public void doKickerOff() {
+        kickerServo.setPosition(kickerAngleUp);
+    }
+
+    public void doDepositOn() {
+        leftDeposit.setPower(leftPowerOn);
+        rightDeposit.setPower(rightPowerOn);
+    }
+
+    public void doDepositOff() {
+        leftDeposit.setPower(leftPowerOff);
+        rightDeposit.setPower(rightPowerOff);
+    }
+
+    public void shoot() {
+        doKickerOn();
+        sleep(1500);
+        doKickerOff();
     }
 
     public enum PathState {
@@ -181,60 +226,28 @@ public class AutoTopRed {
 
                 case DRIVE_STARTPOS_SHOOT_POS:
                     follower.followPath(driveStartPosShootPos, true);
-
-
-                    leftDeposit.setPower(leftPowerOn);
-                    rightDeposit.setPower(rightPowerOn);
-
-                    sleep(500);
-
-
-                    upperTServo.setPosition(kickerAngleUp);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleDown);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleUp);
-
-                    intake.setPower(intakePower);
-
-                    lowerTServo.setPower(lowerRampOn);
-                    middleTServo.setPower(middleRampOn);
-
-                    sleep(500);
-
-                    upperTServo.setPosition(kickerAngleUp);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleDown);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleUp);
-
-
-                    sleep(500);
-
-                    upperTServo.setPosition(kickerAngleUp);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleDown);
-                    sleep(100);
-                    upperTServo.setPosition(kickerAngleUp);
-
-//                    if (!follower.isBusy()) {
-
-
-
-                        upperTServo.setPosition(kickerAngleUp);
-//                    }
+                    doDepositOn();
                     setPathState(PathState.SHOOT_PRELOAD); //reset the timer & make new state
                     break;
 
                 case SHOOT_PRELOAD:
                     //check is follower done its path?
-                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5 ) {
+                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2 ) {
+                        sleep(500);
+                        shoot();
+                        sleep (1500);
 
-                        intake.setPower(intakePower);
+                        doRampOn();
 
+                        doIntakePowerOn();
 
+                        sleep(3500);
 
-                        telemetry.addLine("Shooting");
+                        shoot();
+
+                        doDepositOff();
+
+                        telemetry.addLine("Shooting Preload");
                         follower.followPath(driveShootPosPreset1Pos, true);
                         setPathState(PathState.SHOOT_PRELOAD_PRESET1);
 
@@ -242,8 +255,8 @@ public class AutoTopRed {
                     break;
 
                 case SHOOT_PRELOAD_PRESET1:
-                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3 ) {
-                        telemetry.addLine("Aligning to preset");
+                    if (!follower.isBusy()) {
+                        telemetry.addLine("Aligning to preset1");
                         follower.followPath(drivePreset1PosIntakePose, true);
                         setPathState(PathState.INTAKE_PRESET1);
                     }
@@ -251,43 +264,58 @@ public class AutoTopRed {
 
                 case INTAKE_PRESET1:
                     if (!follower.isBusy()) {
-                        telemetry.addLine("Intaking Artifacts");
+                        telemetry.addLine("Intaking Artifacts of Preset 1");
                         follower.followPath(driveIntakePoseShootPosePreset1, true);
                         setPathState(PathState.SHOOT_PRESET1_PRESET3);
                     }
                     break;
 
                 case SHOOT_PRESET1_PRESET3:
-                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5 ) {
-                        telemetry.addLine("Aligning to preset");
+                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2 ) {
+                        telemetry.addLine("Shooting Preset 1");
+
+                        doDepositOn();
+                        sleep(2000);
+                        shoot();
+                        sleep (3500);
+                        shoot();
+
+
                         follower.followPath(driveShootPosPreset3Pos , true);
                         setPathState(PathState.INTAKE_PRESET3);
                     }
                     break;
                 case INTAKE_PRESET3:
-                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
-                        telemetry.addLine("Intaking Artifacts");
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
+                        telemetry.addLine("Aligning Artifacts");
                         follower.followPath(drivePreset3PosIntakePose, true);
                         setPathState(PathState.SHOOT_PRESET3);
                     }
                     break;
                 case SHOOT_PRESET3:
                     if(!follower.isBusy()) {
-                        telemetry.addLine("Shooting Artifacts");
+                        doDepositOff();
+                        telemetry.addLine("Intaking Artifacts");
                         follower.followPath(driveIntakePoseShootPosePreset3, true);
                         setPathState(PathState.SHOOT_PRESET3_PRESET2);
                     }
                     break;
                 case SHOOT_PRESET3_PRESET2:
-                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) {
-                        telemetry.addLine("Aligning to preset");
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
+                        doDepositOn();
+                        sleep(2000);
+                        shoot();
+                        sleep (3500);
+                        shoot();
+
+                        telemetry.addLine("Shooting Preset 3");
                         follower.followPath(drivePreset2PosIntakePose, true);
                        setPathState(PathState.INTAKE_PRESET2);
                     }
                     break;
                 case INTAKE_PRESET2:
-                    if(!follower.isBusy()&& pathTimer.getElapsedTimeSeconds() >5) {
-                        telemetry.addLine("Intaking artifacts");
+                    if(!follower.isBusy()&& pathTimer.getElapsedTimeSeconds() > 2) {
+                        telemetry.addLine("Aligning to artifacts");
                         follower.followPath(driveIntakePoseShootPosePreset2, true);
                             setPathState(PathState.PRESET2_EMPTY_RAMP);
                     }

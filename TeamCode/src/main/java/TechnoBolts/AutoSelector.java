@@ -22,8 +22,10 @@ public class AutoSelector extends OpMode {
 
     Follower follower;
 
-    CRServo intake;
-    DcMotorEx rightDeposit, leftDeposit;
+    public CRServo intake, lowerTServo, middleTServo;
+    public DcMotorEx rightDeposit, leftDeposit;
+    public Servo upperTServo, ledDepo;
+
 
     AutoTopRed topRedAuto;   // the bottom blue auto
 
@@ -35,10 +37,10 @@ public class AutoSelector extends OpMode {
         intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
-        Servo upperTServo = hardwareMap.get(Servo.class, "upperTServo");
-        CRServo lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
-        CRServo middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
-        Servo ledDepo = hardwareMap.get(Servo.class, "ledDepo");
+        upperTServo = hardwareMap.get(Servo.class, "upperTServo");
+        lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
+        middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
+        ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
 
 //        bottomBlueAuto = new AutoBottomBlue(follower, flip1, intake, launcher1, launcher2);
