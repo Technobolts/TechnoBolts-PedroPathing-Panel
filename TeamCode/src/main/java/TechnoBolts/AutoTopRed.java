@@ -1,5 +1,7 @@
 package TechnoBolts;
 
+import static android.os.SystemClock.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -12,35 +14,75 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-@Autonomous
-public class TechnoBoltsAuto extends OpMode {
+public class AutoTopRed {
     private Follower follower;
     private Timer pathTimer, opModeTimer;
-
-//    private final CRServo intake;
-//    private final DcMotor leftDeposit;
-//    private final DcMotor rightDeposit;
 
 
     public final CRServo intake;
     public final DcMotor leftDeposit;
     public final DcMotor rightDeposit;
+    public final Servo upperTServo;
+    public final CRServo lowerTServo;
+    public final CRServo middleTServo;
+    public final Servo ledDepo;
 
-    private final double leftPower = 0.4;
-    private final double rightPower = -0.4;
+
+    private final double leftPowerOn = -0.4;
+    private final double rightPowerOn = 0.4;
+    private final double leftPowerOff = 0;
+    private final double rightPowerOff = 0;
+    private final double lowerRampOn = -1;
+    private final double middleRampOn = 1;
+
+    private final double lowerRampOff = 0;
+    private final double middleRampOff = 0;
+    private final double intakePower = -1;
     private final double kickerAngleUp = 0;
     private final double kickerAngleDown = 0.8;
 
-    public TechnoBoltsAuto(Follower follower, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit) {
+    Telemetry telemetry;
+
+    public AutoTopRed(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
+        this.telemetry = telemetry;
         this.intake = intake;
         this.leftDeposit = leftDeposit;
         this.rightDeposit = rightDeposit;
+        this.upperTServo = upperTServo;
+        this.lowerTServo = lowerTServo;
+        this.middleTServo = middleTServo;
+        this.ledDepo = ledDepo;
 
+
+        pathTimer = new Timer();
+    }
+
+    public void start () {
+//        opModeTimer.resetTimer();
+
+        follower.setPose(startPose);
+        buildPaths();
+
+        pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
+        setPathState(pathState);
+
+        pathTimer = new Timer();
+        opModeTimer = new Timer();
+    }
+
+    public void update() {
+        follower.update();
+        autonomousPathUpdate();
+    }
+
+    public void setPathState (PathState newState){
+        pathState = newState;
+        pathTimer.resetTimer();
     }
 
     public enum PathState {
@@ -60,31 +102,30 @@ public class TechnoBoltsAuto extends OpMode {
 
         EMPTY_RAMP_SHOOT,
         DONE
-
     }
 
-        PathState pathState;
+    PathState pathState;
 
-        private final Pose startPose = new Pose(122.31111111111112, 122.4888888888889, Math.toRadians(225));
+    private final Pose startPose = new Pose(122.31111111111112, 122.4888888888889, Math.toRadians(225));
 
-        private final Pose shootPose = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
+    private final Pose shootPose = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
 
-        private final Pose shootPosePresetPose = new Pose(79.644,95.111);
+    private final Pose shootPosePresetPose = new Pose(79.644,95.111);
 
-        private final Pose presetPose = new Pose(100.26666666666667, 96.35555555555555, Math.toRadians(0));
+    private final Pose presetPose = new Pose(100.26666666666667, 96.35555555555555, Math.toRadians(0));
 
-        private final Pose Preset1PosIntakePose = new Pose(111.28888888888889, 96.17777777777778, Math.toRadians(0));
-        private final Pose IntakePoseShootPosePreset1 = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
-        private final Pose ShootPosPreset3Pos = new Pose(100.26666666666667, 49.95555555555555, Math.toRadians(0));
-        private final Pose Preset3PosIntakePose = new Pose(112.71111111111111, 49.95555555555555, Math.toRadians(0));
-        private final Pose IntakePoseShootPosePreset3 = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
-        private final Pose Preset2PosIntakePose = new Pose(102.4, 71.82222222222222, Math.toRadians(0));
-        private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
-        private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
+    private final Pose Preset1PosIntakePose = new Pose(111.28888888888889, 96.17777777777778, Math.toRadians(0));
+    private final Pose IntakePoseShootPosePreset1 = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
+    private final Pose ShootPosPreset3Pos = new Pose(100.26666666666667, 49.95555555555555, Math.toRadians(0));
+    private final Pose Preset3PosIntakePose = new Pose(112.71111111111111, 49.95555555555555, Math.toRadians(0));
+    private final Pose IntakePoseShootPosePreset3 = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
+    private final Pose Preset2PosIntakePose = new Pose(102.4, 71.82222222222222, Math.toRadians(0));
+    private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
+    private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
 
-        private final Pose EmptyRampShootingPos = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
+    private final Pose EmptyRampShootingPos = new Pose(74.84444444444443, 79.11111111111111, Math.toRadians(225));
 
-        private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, drivePreset2PosIntakePose, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, drivePreset2PosIntakePose, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
 
 
         public void buildPaths () {
@@ -135,25 +176,67 @@ public class TechnoBoltsAuto extends OpMode {
                     .build();
         }
 
-        public void statePathUpdate () {
+        public void autonomousPathUpdate() {
             switch (pathState) {
 
                 case DRIVE_STARTPOS_SHOOT_POS:
                     follower.followPath(driveStartPosShootPos, true);
+
+
+                    leftDeposit.setPower(leftPowerOn);
+                    rightDeposit.setPower(rightPowerOn);
+
+                    sleep(500);
+
+                    upperTServo.setPosition(kickerAngleUp);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleDown);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleUp);
+
+                    intake.setPower(intakePower);
+
+                    lowerTServo.setPower(lowerRampOn);
+                    middleTServo.setPower(middleRampOn);
+
+                    sleep(500);
+
+                    upperTServo.setPosition(kickerAngleUp);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleDown);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleUp);
+
+
+                    sleep(500);
+
+                    upperTServo.setPosition(kickerAngleUp);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleDown);
+                    sleep(100);
+                    upperTServo.setPosition(kickerAngleUp);
+
+//                    if (!follower.isBusy()) {
+
+
+
+                        upperTServo.setPosition(kickerAngleUp);
+//                    }
                     setPathState(PathState.SHOOT_PRELOAD); //reset the timer & make new state
                     break;
 
                 case SHOOT_PRELOAD:
                     //check is follower done its path?
                     if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5 ) {
-                        // TODO add logic to flywheel shooter
 
-                        leftDeposit.setPower(leftPower);
-                        rightDeposit.setPower(rightPower);
+                        intake.setPower(intakePower);
+
+
 
                         telemetry.addLine("Shooting");
                         follower.followPath(driveShootPosPreset1Pos, true);
                         setPathState(PathState.SHOOT_PRELOAD_PRESET1);
+
                     }
                     break;
 
@@ -232,41 +315,35 @@ public class TechnoBoltsAuto extends OpMode {
 
         }
 
-        public void setPathState (PathState newState){
-            pathState = newState;
-            pathTimer.resetTimer();
-        }
 
 
-        @Override
-        public void init () {
-            pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
-            pathTimer = new Timer();
-            opModeTimer = new Timer();
-            follower = Constants.createFollower(hardwareMap);
-            //TODO add in any other init mechanisms
 
-            buildPaths();
-            follower.setPose(startPose);
-        }
+//        @Override
+//        public void init () {
+//            pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
+//            pathTimer = new Timer();
+//            opModeTimer = new Timer();
+//            follower = Constants.createFollower(hardwareMap);
+//            //TODO add in any other init mechanisms
+//
+//            buildPaths();
+//            follower.setPose(startPose);
+//        }
 
-        public void start () {
-            opModeTimer.resetTimer();
-            setPathState(pathState);
-        }
 
-        @Override
-        public void loop () {
 
-            follower.update();
-            statePathUpdate();
-
-            telemetry.addData("path state", pathState.toString());
-            telemetry.addData("x", follower.getPose().getX());
-            telemetry.addData("y", follower.getPose().getY());
-            telemetry.addData("heading", follower.getPose().getHeading());
-            telemetry.addData("Path time", pathTimer.getElapsedTimeSeconds());
-        }
+//        @Override
+//        public void loop () {
+//
+//            follower.update();
+//            statePathUpdate();
+//
+//            telemetry.addData("path state", pathState.toString());
+//            telemetry.addData("x", follower.getPose().getX());
+//            telemetry.addData("y", follower.getPose().getY());
+//            telemetry.addData("heading", follower.getPose().getHeading());
+//            telemetry.addData("Path time", pathTimer.getElapsedTimeSeconds());
+//        }
 
 
 }
