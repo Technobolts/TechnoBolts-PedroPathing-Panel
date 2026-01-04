@@ -188,6 +188,7 @@ public class AutoTopRed {
 
                     sleep(500);
 
+
                     upperTServo.setPosition(kickerAngleUp);
                     sleep(100);
                     upperTServo.setPosition(kickerAngleDown);
