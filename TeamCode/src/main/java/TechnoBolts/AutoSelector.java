@@ -27,7 +27,8 @@ public class AutoSelector extends OpMode {
     public Servo upperTServo, ledDepo;
 
 
-    AutoTopRed topRedAuto;   // the bottom blue auto
+    AutoTopRed topRedAuto;   // the top red auto
+    AutoTopBlue topBlueAuto;   // the top blue auto
 
 
     @Override
@@ -46,7 +47,7 @@ public class AutoSelector extends OpMode {
 //        bottomBlueAuto = new AutoBottomBlue(follower, flip1, intake, launcher1, launcher2);
 //        bottomRedAuto = new AutoBottomRed(follower, flip1, intake, launcher1, launcher2);
         topRedAuto = new AutoTopRed(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
-//        topBlueAuto = new AutoTopBlue(follower, flip1, intake, launcher1, launcher2);
+        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
     }
 
     @Override
@@ -81,9 +82,9 @@ public class AutoSelector extends OpMode {
         if (alliance == Alliance.RED && startPos == StartPos.TOP) {
             topRedAuto.start();
         }
-//        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-//            topBlueAuto.start();
-//        }
+        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+            topBlueAuto.start();
+        }
     }
 
     @Override
@@ -97,8 +98,8 @@ public class AutoSelector extends OpMode {
         if (alliance == Alliance.RED && startPos == StartPos.TOP) {
             topRedAuto.update();
         }
-//        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-//            topBlueAuto.update();
-//        }
+        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+            topBlueAuto.update();
+        }
     }
 }
