@@ -1,7 +1,6 @@
 package TechnoBolts;
 
 import static android.os.SystemClock.sleep;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -17,15 +16,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
-
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.function.Supplier;
-
-
 @TeleOp
 @Configurable
 public class TeleOpRed extends OpMode {
@@ -48,12 +42,10 @@ public class TeleOpRed extends OpMode {
     private CRServo Intake, middleTServo, lowerTServo;
     private Servo upperTServo, ledDepo;  // servos
     private DcMotorEx rightDeposit, leftDeposit;  // DcMotors
-
     int intakeflag = 0;   // these are the flags
     int launchflag = 0;
     int parkflag = 0;
     int limeflag = 0;
-
     private double leftOn = 0.4;
     private double rightOn = -0.4;
     private int launcherOff = 0;
@@ -67,18 +59,13 @@ public class TeleOpRed extends OpMode {
     private int lightOff = 0;
     private int rampOn = 1;
     private double rampOff = 0;
-
     double endGameStart;
     boolean isEndGame = false;
     double trackTimer;
-
-
-
     // --- PID constants ---
     public static double P = 0.02;    // these are the PID controls for the turret and limelight
     public static double I = 0.0;
     public static double D = 0.0;
-
     private double integral = 0;
     private double lastError = 0;
 
@@ -99,10 +86,6 @@ public class TeleOpRed extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
                 .build();
 
-
-
-
-
         Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         rightDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -113,11 +96,7 @@ public class TeleOpRed extends OpMode {
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
-
         telemetry.addLine("Initialized");
-
-
-
 
     }
 
@@ -127,11 +106,8 @@ public class TeleOpRed extends OpMode {
         endGameStart = getRuntime() + 103;
         trackTimer = getRuntime() + 15;
     }
-
     @Override
     public void loop() {
-
-
         follower.update();
         telemetryM.update();
         if (!automatedDrive) {
@@ -274,6 +250,11 @@ public class TeleOpRed extends OpMode {
         if(gamepad2.dpad_left){
             middleTServo.setPower(-1);
             lowerTServo.setPower(1);
+        }
+        if(gamepad2.leftBumperWasPressed()){
+            double neededRPM = CalculateShooterAngle.redCalculateShooterRPM(follower.getPose().getX(), follower.getPose().getY());
+            rightDeposit.setPower(neededRPM);
+            leftDeposit.setPower(neededRPM);
         }
 
         telemetry.addData("Y", follower.getPose().getY());

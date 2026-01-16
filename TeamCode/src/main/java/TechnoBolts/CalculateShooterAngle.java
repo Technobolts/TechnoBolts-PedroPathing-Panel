@@ -89,7 +89,7 @@ public static double calculateShooterAngle(double distance_x) {
         
         return servoPosition; // Now returning the servo value instead of degrees
     }
-    public static double calculateShooterRPM(double distance_x, double distance_y) {
+    public static double redCalculateShooterRPM(double distance_x, double distance_y) {
 
             // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
             // !!! IMPORTANT: ENSURE ALL UNITS ARE METERS !!!
