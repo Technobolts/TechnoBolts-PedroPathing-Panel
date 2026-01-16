@@ -89,7 +89,7 @@ public static double calculateShooterAngle(double distance_x) {
         
         return servoPosition; // Now returning the servo value instead of degrees
     }
-    public static double calculateShooterRPM(double distance_x) {
+    public static double calculateShooterRPM(double distance_x, double distance_y) {
 
             // --- 1. DEFINE YOUR ROBOT AND FIELD CONSTANTS HERE ---
             // !!! IMPORTANT: ENSURE ALL UNITS ARE METERS !!!
@@ -100,11 +100,14 @@ public static double calculateShooterAngle(double distance_x) {
             final double ROBOT_HEIGHT = 0.27305;       // 10.75in in meters
             final double TARGET_HEIGHT = 1.143;        // 45in in meters
             final double SHOOTER_EFFICIENCY = 0.6;     // Start at 0.6 and tune (1.0 is "perfect")
+            final double x2 = 197.84;
+            final double y2 = 134.03;
         
             // --- 2. PHYSICS CALCULATIONS (Solving for V0) ---
-        
+
             double theta_rad = Math.toRadians(FIXED_ANGLE_DEG);
             double delta_h = TARGET_HEIGHT - ROBOT_HEIGHT;
+            double distance =Math.hypot(x2 - distance_x, y2 - distance_y);
         
             /* * Formula derived from: y = h0 + x*tan(theta) - (g*x^2) / (2 * V0^2 * cos^2(theta))
              * Solving for V0 gives:
@@ -115,11 +118,11 @@ public static double calculateShooterAngle(double distance_x) {
             double tanTheta = Math.tan(theta_rad);
         
             // The denominator part: 2 * cos(theta)^2 * (x * tan(theta) - delta_h)
-            double denominator = 2.0 * Math.pow(cosTheta, 2) * (distance_x * tanTheta - delta_h);
+            double denominator = 2.0 * Math.pow(cosTheta, 2) * (distance * tanTheta - delta_h);
         
             // We use Math.abs(GRAVITY) because the formula expects a positive magnitude here 
             // to avoid taking the square root of a negative number.
-            double v0_required = Math.sqrt((Math.abs(GRAVITY) * Math.pow(distance_x, 2)) / denominator);
+            double v0_required = Math.sqrt((Math.abs(GRAVITY) * Math.pow(distance, 2)) / denominator);
         
             // Check if the math failed (happens if the target is physically impossible)
             if (Double.isNaN(v0_required)) {
