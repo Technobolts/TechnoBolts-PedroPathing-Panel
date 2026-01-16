@@ -251,11 +251,6 @@ public class TeleOpRed extends OpMode {
             middleTServo.setPower(-1);
             lowerTServo.setPower(1);
         }
-        if(gamepad2.leftBumperWasPressed()){
-            double neededRPM = CalculateShooterAngle.redCalculateShooterRPM(follower.getPose().getX(), follower.getPose().getY());
-            rightDeposit.setPower(neededRPM);
-            leftDeposit.setPower(neededRPM);
-        }
 
         telemetry.addData("Y", follower.getPose().getY());
 //        if (trackTimer <= getRuntime()) {
