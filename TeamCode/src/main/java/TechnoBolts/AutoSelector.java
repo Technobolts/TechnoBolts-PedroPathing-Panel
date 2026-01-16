@@ -14,8 +14,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Autonomous (name = "Auto Selector")
 public class AutoSelector extends OpMode {
 
-    enum Alliance { BLUE, RED }
-    enum StartPos { TOP, BOTTOM }
+    enum Alliance {BLUE, RED}
+
+    enum StartPos {TOP, BOTTOM}
 
     Alliance alliance = Alliance.BLUE;
     StartPos startPos = StartPos.BOTTOM;
@@ -29,6 +30,8 @@ public class AutoSelector extends OpMode {
 
     AutoTopRed topRedAuto;   // the top red auto
     AutoTopBlue topBlueAuto;   // the top blue auto
+    AutoBottomBlue bottomBlueAuto; // the bottom blue auto
+    AutoBottomRed bottomRedAuto;
 
 
     @Override
@@ -48,6 +51,8 @@ public class AutoSelector extends OpMode {
 //        bottomRedAuto = new AutoBottomRed(follower, flip1, intake, launcher1, launcher2);
         topRedAuto = new AutoTopRed(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
         topBlueAuto = new AutoTopBlue(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
+        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
+        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
     }
 
     @Override
@@ -73,33 +78,33 @@ public class AutoSelector extends OpMode {
 
     @Override
     public void start() {
-//        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {   // starts the selected auto
-//            bottomBlueAuto.start();
-//        }
-//        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
-//            bottomRedAuto.start();
-//        }
-        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
-            topRedAuto.start();
+        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {   // starts the selected auto
+            bottomBlueAuto.start();
         }
-        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-            topBlueAuto.start();
+        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
+            bottomRedAuto.start();
         }
-    }
+            if (alliance == Alliance.RED && startPos == StartPos.TOP) {
+                topRedAuto.start();
+            }
+            if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+                topBlueAuto.start();
+            }
+        }
 
-    @Override
-    public void loop() {
-//        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
-//            bottomBlueAuto.update();
-//        }
-//        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
-//            bottomRedAuto.update();
-//        }
-        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
-            topRedAuto.update();
+        @Override
+        public void loop() {
+                if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
+                bottomBlueAuto.update();
         }
-        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-            topBlueAuto.update();
+        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
+            bottomRedAuto.update();
         }
-    }
-}
+                if (alliance == Alliance.RED && startPos == StartPos.TOP) {
+                    topRedAuto.update();
+                }
+                if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+                    topBlueAuto.update();
+                }
+            }
+        }

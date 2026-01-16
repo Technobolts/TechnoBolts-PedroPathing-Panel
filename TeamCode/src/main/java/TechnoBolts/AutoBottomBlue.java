@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-public class AutoTopBlue {
+public class AutoBottomBlue {
     private Follower follower;
     private Timer pathTimer, opModeTimer;
 
@@ -50,7 +50,7 @@ public class AutoTopBlue {
 
     Telemetry telemetry;
 
-    public AutoTopBlue(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoBottomBlue(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -69,7 +69,7 @@ public class AutoTopBlue {
     public void start () {
 //        opModeTimer.resetTimer();
 
-        telemetry.addLine("Starting TOP BLUE Auto");
+        telemetry.addLine("Starting BOTTOM BLUE Auto");
         telemetry.update();
 
         follower.setPose(startPose);
@@ -166,7 +166,7 @@ public class AutoTopBlue {
     private final Pose IntakePoseShootPosePreset1 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
     private final Pose ShootPosPreset3Pos = new Pose(48, 18.133333333333326, Math.toRadians(180));
     private final Pose Preset3PosIntakePose = new Pose(23.822222222222223, 17.955555555555552, Math.toRadians(180));
-    private final Pose IntakePoseShootPosePreset3 = new Pose(64.35555555555555, 66.3111111111111, Math.toRadians(320));
+    private final Pose IntakePoseShootPosePreset3 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
 //    private final Pose Preset2PosIntakePose = new Pose(41.6, 71.82222222222222, Math.toRadians(360));
 //    private final Pose IntakePoseShootPosePreset2 = new Pose(31.64444444444445, 72, Math.toRadians(360));
 //    private final Pose Preset2IntakeEmptyRamp = new Pose(22.93333333333332, 83.73333333333333, Math.toRadians(360));
@@ -268,7 +268,7 @@ public class AutoTopBlue {
                 break;
 
             case INTAKE_PRESET1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                if (!follower.isBusy()) {
                     doDepositOn();
                     telemetry.addLine("Intaking Artifacts of Preset 1");
                     follower.followPath(driveIntakePoseShootPosePreset1, true);
@@ -298,7 +298,7 @@ public class AutoTopBlue {
                 break;
             case SHOOT_PRESET3:
                 if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                        doDepositOff();
+                    doDepositOff();
                     telemetry.addLine("Intaking Artifacts");
                     follower.followPath(driveIntakePoseShootPosePreset3, true);
                     setPathState(PathState.SHOOT_PRESET3);

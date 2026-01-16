@@ -142,7 +142,8 @@ public class AutoTopRed {
         INTAKE_PRESET3 , //Intaking preset 3
         SHOOT_PRESET3 , // Shooting preset 3
         SHOOT_PRESET3_PRESET2 , //From shooting preset 3 to preset 2
-        INTAKE_PRESET2, //Intake preset 2
+        INTAKE_PRESET2,
+        STRAFE_OUT, //Intake preset 2
         PRESET2_EMPTY_RAMP,
 
         EMPTY_RAMP_SHOOT,
@@ -163,14 +164,15 @@ public class AutoTopRed {
     private final Pose IntakePoseShootPosePreset1 = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(225));
     private final Pose ShootPosPreset3Pos = new Pose(100.26666666666667, 49.95555555555555, Math.toRadians(0));
     private final Pose Preset3PosIntakePose = new Pose(112.71111111111111, 49.95555555555555, Math.toRadians(0));
-    private final Pose IntakePoseShootPosePreset3 = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(240));
-    private final Pose Preset2PosIntakePose = new Pose(102.4, 71.82222222222222, Math.toRadians(0));
-    private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
-    private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
+    private final Pose IntakePoseShootPosePreset3 = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(220));
+//    private final Pose Preset2PosIntakePose = new Pose(102.4, 71.82222222222222, Math.toRadians(0));
+//    private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
+//    private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
+//
+//    private final Pose EmptyRampShootingPos = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(225));
+//    private final Pose StrafeOut = new Pose(100.97777777777779, 65.42222222222222, Math.toRadians(225));
 
-    private final Pose EmptyRampShootingPos = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(225));
-
-    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, drivePreset2PosIntakePose, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
 
 
         public void buildPaths () {
@@ -203,22 +205,27 @@ public class AutoTopRed {
                     .addPath(new BezierLine(Preset3PosIntakePose, IntakePoseShootPosePreset3))
                     .setLinearHeadingInterpolation(Preset3PosIntakePose.getHeading(), IntakePoseShootPosePreset3.getHeading())
                     .build();
-            drivePreset2PosIntakePose = follower.pathBuilder()
-                    .addPath(new BezierLine(IntakePoseShootPosePreset3, Preset2PosIntakePose))
-                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
-                    .build();
-            driveIntakePoseShootPosePreset2 = follower.pathBuilder()
-                    .addPath(new BezierLine(Preset2PosIntakePose, IntakePoseShootPosePreset2))
-                    .setLinearHeadingInterpolation(Preset2PosIntakePose.getHeading(), IntakePoseShootPosePreset2.getHeading())
-                    .build();
-            drivePreset2IntakeEmptyRamp = follower.pathBuilder()
-                    .addPath(new BezierLine(IntakePoseShootPosePreset2, Preset2IntakeEmptyRamp))
-                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset2.getHeading(), Preset2IntakeEmptyRamp.getHeading())
-                    .build();
-            driveEmptyRampShootPos = follower.pathBuilder()
-                    .addPath(new BezierLine(Preset2IntakeEmptyRamp, EmptyRampShootingPos))
-                    .setLinearHeadingInterpolation(Preset2IntakeEmptyRamp.getHeading(), EmptyRampShootingPos.getHeading())
-                    .build();
+//            driveStrafeOut = follower.pathBuilder()
+//                    .addPath(new BezierLine(IntakePoseShootPosePreset3, StrafeOut))
+//                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), StrafeOut.getHeading())
+//                    .build();
+//            drivePreset2PosIntakePose = follower.pathBuilder()
+//                    .addPath(new BezierLine(IntakePoseShootPosePreset3, Preset2PosIntakePose))
+//                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
+//                    .build();
+//            driveIntakePoseShootPosePreset2 = follower.pathBuilder()
+//                    .addPath(new BezierLine(Preset2PosIntakePose, IntakePoseShootPosePreset2))
+//                    .setLinearHeadingInterpolation(Preset2PosIntakePose.getHeading(), IntakePoseShootPosePreset2.getHeading())
+//                    .build();
+//            drivePreset2IntakeEmptyRamp = follower.pathBuilder()
+//                    .addPath(new BezierLine(IntakePoseShootPosePreset2, Preset2IntakeEmptyRamp))
+//                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset2.getHeading(), Preset2IntakeEmptyRamp.getHeading())
+//                    .build();
+//            driveEmptyRampShootPos = follower.pathBuilder()
+//                    .addPath(new BezierLine(Preset2IntakeEmptyRamp, EmptyRampShootingPos))
+//                    .setLinearHeadingInterpolation(Preset2IntakeEmptyRamp.getHeading(), EmptyRampShootingPos.getHeading())
+//                    .build();
+
         }
 
         public void autonomousPathUpdate() {
@@ -248,7 +255,7 @@ public class AutoTopRed {
                         doDepositOff();
 
                         telemetry.addLine("Shooting Preload");
-                        follower.followPath(driveShootPosPreset1Pos, true);
+                        follower.followPath(driveShootPosPreset1Pos,true);
                         setPathState(PathState.SHOOT_PRELOAD_PRESET1);
 
                     }
@@ -258,7 +265,7 @@ public class AutoTopRed {
                     if (!follower.isBusy()) {
                         doDepositOff();
                         telemetry.addLine("Aligning to preset1");
-                        follower.followPath(drivePreset1PosIntakePose, true);
+                        follower.followPath(drivePreset1PosIntakePose, 0.2,true);
                         setPathState(PathState.INTAKE_PRESET1);
                     }
                     break;
@@ -267,10 +274,11 @@ public class AutoTopRed {
                     if (!follower.isBusy()) {
                         doDepositOn();
                         telemetry.addLine("Intaking Artifacts of Preset 1");
-                        follower.followPath(driveIntakePoseShootPosePreset1, true);
+                        follower.followPath(driveIntakePoseShootPosePreset1,true);
                         setPathState(PathState.SHOOT_PRESET1_PRESET3);
                     }
                     break;
+
 
                 case SHOOT_PRESET1_PRESET3:
                     if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
@@ -281,7 +289,7 @@ public class AutoTopRed {
 
                         doDepositOff();
 
-                        follower.followPath(driveShootPosPreset3Pos , true);
+                        follower.followPath(driveShootPosPreset3Pos,  true);
                         setPathState(PathState.INTAKE_PRESET3);
                     }
                     break;
@@ -289,7 +297,7 @@ public class AutoTopRed {
                     if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
                         doDepositOff();
                         telemetry.addLine("Aligning Artifacts");
-                        follower.followPath(drivePreset3PosIntakePose, true);
+                        follower.followPath(drivePreset3PosIntakePose,0.2,true);
                         setPathState(PathState.SHOOT_PRESET3);
                     }
                     break;
@@ -310,35 +318,42 @@ public class AutoTopRed {
                         shoot();
 
                         telemetry.addLine("Shooting Preset 3");
-                        follower.followPath(drivePreset2PosIntakePose, true);
-                       setPathState(PathState.INTAKE_PRESET2);
+//                        follower.followPath(drivePreset2PosIntakePose, true);
+                       setPathState(PathState.SHOOT_PRESET3_PRESET2);
                     }
-                    break;
-                case INTAKE_PRESET2:
-                    if(!follower.isBusy()&& pathTimer.getElapsedTime() > 1500) {
-                        telemetry.addLine("Aligning to artifacts");
-                        follower.followPath(driveIntakePoseShootPosePreset2, true);
-                            setPathState(PathState.PRESET2_EMPTY_RAMP);
-                    }
-                    break;
-                case PRESET2_EMPTY_RAMP:
-                    if(!follower.isBusy()&& pathTimer.getElapsedTime() > 2500) {
-                        telemetry.addLine("Emptying Ramp");
-                        follower.followPath(drivePreset2IntakeEmptyRamp, true);
-                            setPathState(PathState.EMPTY_RAMP_SHOOT);
-                    }
-                    break;
-                case EMPTY_RAMP_SHOOT:
-                    if(!follower.isBusy() && pathTimer.getElapsedTime() > 4500) {
-                        telemetry.addLine("Shooting");
-                        follower.followPath(driveEmptyRampShootPos, true);
-                        setPathState(PathState.EMPTY_RAMP_SHOOT);
-                    }
-                    break;
-                case DONE:
-                    if(!follower.isBusy()){
-                        telemetry.addLine("Auto Done");
-                    }
+//                    break;
+//                case STRAFE_OUT:
+//                    if (!follower.isBusy()) {
+//                        telemetry.addLine("Strafing out");
+//                        follower.followPath(driveStrafeOut, true);
+//                        setPathState(PathState.STRAFE_OUT);
+//                    }
+//                    break;
+//                case INTAKE_PRESET2:
+//                    if(!follower.isBusy()&& pathTimer.getElapsedTime() > 1500) {
+//                        telemetry.addLine("Aligning to artifacts");
+//                        follower.followPath(driveIntakePoseShootPosePreset2, true);
+//                            setPathState(PathState.PRESET2_EMPTY_RAMP);
+//                    }
+//                    break;
+//                case PRESET2_EMPTY_RAMP:
+//                    if(!follower.isBusy()2&& pathTimer.getElapsedTime() > 2500) {
+//                        telemetry.addLine("Emptying Ramp");
+//                        follower.followPath(drivePreset2IntakeEmptyRamp, true);
+//                            setPathState(PathState.EMPTY_RAMP_SHOOT);
+//                    }
+//                    break;
+//                case EMPTY_RAMP_SHOOT:
+//                    if(!follower.isBusy() && pathTimer.getElapsedTime() > 4500) {
+//                        telemetry.addLine("Shooting");
+//                        follower.followPath(driveEmptyRampShootPos, true);
+//                        setPathState(PathState.EMPTY_RAMP_SHOOT);
+//                    }
+//                    break;
+//                case DONE:
+//                    if(!follower.isBusy()){
+//                        telemetry.addLine("Auto Done");
+//                    }
                 default:
                     telemetry.addLine("No State Commanded");
             }
