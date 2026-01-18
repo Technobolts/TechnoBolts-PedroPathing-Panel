@@ -29,8 +29,9 @@ public class TeleOpRed extends OpMode {
     public static Pose startingPose;    //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
     private Supplier<PathChain> Center;
-
+    private Supplier<PathChain> CloseRed;
     private Supplier<PathChain> FarRed;
+    private Supplier<PathChain> InTri;
     private TelemetryManager telemetryM;
     private boolean slowMode = false;
     boolean wasReady = false;
@@ -73,7 +74,7 @@ public class TeleOpRed extends OpMode {
     public void init() {
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(225)) : startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(90.48888888888891, 70.17777777777778, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -81,10 +82,19 @@ public class TeleOpRed extends OpMode {
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(74.84444444444443, 78.11111111111111))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
                 .build();
-        FarRed = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(74.84444444444443, 78.11111111111111))))
+        CloseRed = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(85.13333333333333, 84.91111111111108))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
                 .build();
+        FarRed = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(96.66228888888888, 10.955555555555538))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(240), 0.8))
+                .build();
+        InTri = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(68.0616, 97.7673))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(250), 0.8))
+                .build();
+
 
         Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
@@ -158,6 +168,17 @@ public class TeleOpRed extends OpMode {
             automatedDrive = false;
         }
 
+        if (gamepad1.xWasPressed()){
+            follower.followPath(CloseRed.get());
+            automatedDrive = true;
+        }
+
+
+        if(gamepad1.yWasPressed()) {
+            follower.followPath(FarRed.get());
+            automatedDrive = true;
+        }
+
         //Slow Mode
         if (gamepad1.rightBumperWasPressed()) {
             slowMode = !slowMode;
@@ -211,21 +232,8 @@ public class TeleOpRed extends OpMode {
         }
 
 
+
         if (gamepad2.dpadUpWasPressed()) {
-            if (launchflag == 0) {
-                rightDeposit.setPower(rightOn);
-                leftDeposit.setPower(leftOn);
-                launchflag = 1;
-                limeflag = 1;
-            }
-            else if (launchflag == 1) {
-                rightDeposit.setPower(launcherOff);
-                leftDeposit.setPower(launcherOff);
-                launchflag = 0;
-                limeflag = 0;
-            }
-        }
-        if (gamepad2.dpadDownWasPressed()) {
             if (launchflag == 0) {
                 rightDeposit.setPower(rightOn);
                 leftDeposit.setPower(leftOn);

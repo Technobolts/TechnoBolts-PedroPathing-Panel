@@ -106,5 +106,12 @@ public class AutoSelector extends OpMode {
                 if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
                     topBlueAuto.update();
                 }
+
+            telemetry.addData("Y", follower.getPose().getY());
+
+            telemetry.addData("X", follower.getPose().getX());
+
+            telemetry.addData("Heading", follower.getPose().getHeading());
+
             }
         }

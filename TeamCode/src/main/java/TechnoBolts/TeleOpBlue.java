@@ -1,7 +1,6 @@
 package TechnoBolts;
 
 import static android.os.SystemClock.sleep;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -16,62 +15,58 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
-
-
 @TeleOp
 @Configurable
 public class TeleOpBlue extends OpMode {
 
-
+    private static final Logger log = LoggerFactory.getLogger(TechnoBolts.class);
     private Follower follower;
     public static Pose startingPose;    //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
-    private Supplier<PathChain> pathChain;
+    private Supplier<PathChain> Center;
+    private Supplier<PathChain> CloseBlue;
+    private Supplier<PathChain> FarBlue;
+    private Supplier<PathChain> InTri;
     private TelemetryManager telemetryM;
     private boolean slowMode = false;
+    boolean wasReady = false;
+
+    final double COLOR_YELLOW = 0.25;
+    final double COLOR_GREEN = 0.45;
     private double slowModeMultiplier = 0.5;  // we don't use this
 
     private CRServo Intake, middleTServo, lowerTServo;
     private Servo upperTServo, ledDepo;  // servos
-    private DcMotor rightDeposit, leftDeposit;  // DcMotors
-
+    private DcMotorEx rightDeposit, leftDeposit;  // DcMotors
     int intakeflag = 0;   // these are the flags
     int launchflag = 0;
     int parkflag = 0;
     int limeflag = 0;
-
-    private double leftOn = -0.4;
-    private double rightOn = 0.4;
+    private double leftOn = 0.4;
+    private double rightOn = -0.4;
     private int launcherOff = 0;
     private int intakeOn = 1;
     private int intakeOff = 0;
     private int intakeReverse = -1;
-    private double flickUp = 0.8;
-    private double flickDown = 0;
+    private double flickDown = 0.8;
+    private double flickUp = 0;
     private double lightGreen = 0.5;
     private double lightPurple = 0.722;
     private int lightOff = 0;
     private int rampOn = 1;
     private double rampOff = 0;
-
     double endGameStart;
     boolean isEndGame = false;
     double trackTimer;
-
-
-
     // --- PID constants ---
     public static double P = 0.02;    // these are the PID controls for the turret and limelight
     public static double I = 0.0;
     public static double D = 0.0;
-
     private double integral = 0;
     private double lastError = 0;
 
@@ -79,32 +74,39 @@ public class TeleOpBlue extends OpMode {
     public void init() {
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(64.35555555555555, 66.3111111111111, Math.toRadians(320)) : startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(23.822222222222223, 17.955555555555552, Math.toRadians(180)) : startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(64.35555555555555, 66.3111111111111))))
+        Center = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(74.84444444444443, 78.11111111111111))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(320), 0.8))
                 .build();
-
+        CloseBlue = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(38.06666666666667, 105.24444444444444))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
+                .build();
+        FarBlue = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(62.773, 5.0301))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(295), 0.8))
+                .build();
+        InTri = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(67.9588, 98.1942))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(340), 0.8))
+                .build();
 
 
         Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
+        rightDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        leftDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         upperTServo = hardwareMap.get(Servo.class, "upperTServo");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
 
-
         telemetry.addLine("Initialized");
-
-
-        telemetry.addLine("Initialized");
-
-
 
     }
 
@@ -114,21 +116,8 @@ public class TeleOpBlue extends OpMode {
         endGameStart = getRuntime() + 103;
         trackTimer = getRuntime() + 15;
     }
-
     @Override
     public void loop() {
-        telemetry.addData("Y", follower.getPose().getY());
-        if (trackTimer <= getRuntime()) {
-            gamepad2.rumbleBlips(1);
-            trackTimer = getRuntime() + 15;
-        }
-        telemetry.addData("Runtime", getRuntime());
-        if (endGameStart <= getRuntime() && !isEndGame) {
-            gamepad1.rumble(5000);
-            gamepad2.rumble(5000);
-            isEndGame = true;
-        }
-
         follower.update();
         telemetryM.update();
         if (!automatedDrive) {
@@ -149,17 +138,50 @@ public class TeleOpBlue extends OpMode {
                     true // Robot Centric
             );
         }
-        //Automated PathFollowing
-          if (gamepad1.aWasPressed()) {
-               follower.followPath(pathChain.get());
-              automatedDrive = true;
-          }
-        //Stop automated following if the follower is done
-             if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
-               follower.startTeleopDrive();
-               automatedDrive = false;
-          }
 
+        double leftVelocity = leftDeposit.getVelocity();
+        double rightVelocity = rightDeposit.getVelocity();
+        telemetry.update();
+
+        // 1. Determine the current state
+        boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
+                rightVelocity <= -820 && rightVelocity >= -1000);
+
+        // 2. Only update the LED if the state has CHANGED
+        if (isReady != wasReady) {
+            if (isReady) {
+                ledDepo.setPosition(COLOR_GREEN);
+            } else {
+                ledDepo.setPosition(COLOR_YELLOW);
+            }
+            // 3. Update the tracker so we don't send the command again next loop
+            wasReady = isReady;
+        }
+        //Automated PathFollowing
+        if (gamepad1.aWasPressed()) {
+            follower.followPath(Center.get());
+            automatedDrive = true;
+        }
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+
+        if (gamepad1.xWasPressed()){
+            follower.followPath(CloseBlue.get());
+            automatedDrive = true;
+        }
+
+        if(gamepad1.yWasPressed()) {
+            follower.followPath(FarBlue.get());
+            automatedDrive = true;
+        }
+
+        if(gamepad1.leftBumperWasPressed()) {
+            follower.followPath(InTri.get());
+            automatedDrive = true;
+        }
         //Slow Mode
         if (gamepad1.rightBumperWasPressed()) {
             slowMode = !slowMode;
@@ -173,16 +195,16 @@ public class TeleOpBlue extends OpMode {
         //         slowModeMultiplier -= 0.25;
         //     }
 
-        if (gamepad1.yWasPressed()) {
-            if (follower.getPose().getY() >= 87 || follower.getPose().getY() <= 35) {
-                upperTServo.setPosition(flickUp);
-                sleep(200);
-                upperTServo.setPosition(flickDown);
-                gamepad1.rumbleBlips(1);
-            }
+        upperTServo.setDirection(Servo.Direction.FORWARD);
+        if (gamepad2.right_bumper) {
+            upperTServo.setPosition(0.8); //Originally 0.5
+        } else {
+            upperTServo.setPosition(0);
         }
 
-        if (gamepad1.aWasPressed()){
+
+
+        if (gamepad2.aWasPressed()){
             if (intakeflag == 0){
                 Intake.setPower(intakeOn);
                 intakeflag = 1;
@@ -197,7 +219,7 @@ public class TeleOpBlue extends OpMode {
             }
         }
 
-        if (gamepad1.bWasPressed()) {
+        if (gamepad2.bWasPressed()) {
             if (intakeflag == 0){
                 Intake.setPower(intakeReverse);
                 intakeflag = -1;
@@ -213,21 +235,8 @@ public class TeleOpBlue extends OpMode {
         }
 
 
-        if (gamepad1.dpadUpWasPressed()) {
-            if (launchflag == 0) {
-                rightDeposit.setPower(rightOn);
-                leftDeposit.setPower(leftOn);
-                launchflag = 1;
-                limeflag = 1;
-            }
-            else if (launchflag == 1) {
-                rightDeposit.setPower(launcherOff);
-                leftDeposit.setPower(launcherOff);
-                launchflag = 0;
-                limeflag = 0;
-            }
-        }
-        if (gamepad1.dpadDownWasPressed()) {
+
+        if (gamepad2.dpadUpWasPressed()) {
             if (launchflag == 0) {
                 rightDeposit.setPower(rightOn);
                 leftDeposit.setPower(leftOn);
@@ -241,25 +250,35 @@ public class TeleOpBlue extends OpMode {
             }
         }
 
-        if (gamepad2.yWasPressed()) {
-            if (parkflag == 0){
-                middleTServo.setPower(rampOn);
-                lowerTServo.setPower(rampOn);
-                parkflag = 1;
-            }
-            else if (parkflag == 1){
-                middleTServo.setPower(rampOff);
-                lowerTServo.setPower(rampOff);
-                parkflag = 0;
-            }
+        if(gamepad2.dpad_right){
+            middleTServo.setPower(1);
+            lowerTServo.setPower(-1);
+        }
+        if(gamepad2.dpad_down){
+            middleTServo.setPower(0);
+            lowerTServo.setPower(0);
+        }
+        if(gamepad2.dpad_left){
+            middleTServo.setPower(-1);
+            lowerTServo.setPower(1);
         }
 
+        telemetry.addData("Y", follower.getPose().getY());
+//        if (trackTimer <= getRuntime()) {
+//            gamepad2.rumbleBlips(1);
+//            trackTimer = getRuntime() + 15;
+//        }
+        telemetry.addData("X", follower.getPose().getX());
 
+        telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
 
-        telemetryM.debug("position", follower.getPose());
-        telemetryM.debug("velocity", follower.getVelocity());
-        telemetryM.debug("automatedDrive", automatedDrive);
-
+        telemetry.addData("Runtime", getRuntime());
+        if (endGameStart <= getRuntime() && !isEndGame) {
+//            gamepad1.rumble(5000);
+//            gamepad2.rumble(5000);
+            isEndGame = true;
+        }
 
     }
+
 }
