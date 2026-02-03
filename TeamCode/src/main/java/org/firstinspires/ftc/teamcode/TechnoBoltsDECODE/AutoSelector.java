@@ -1,4 +1,4 @@
-package TechnoBolts;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.pedropathing.follower.Follower;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -17,6 +19,12 @@ public class AutoSelector extends OpMode {
     enum Alliance {BLUE, RED}
 
     enum StartPos {TOP, BOTTOM}
+
+    double FR = 11.873;
+    double PR = 36.131;
+
+    double FL = 12.62;
+    double PL = 100.85;
 
     Alliance alliance = Alliance.BLUE;
     StartPos startPos = StartPos.BOTTOM;
@@ -41,6 +49,13 @@ public class AutoSelector extends OpMode {
         intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
+        leftDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDeposit.setDirection(DcMotorSimple.Direction.REVERSE);
+        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
+        PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
+        leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
+        rightDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
         upperTServo = hardwareMap.get(Servo.class, "upperTServo");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");

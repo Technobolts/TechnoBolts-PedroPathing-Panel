@@ -1,16 +1,15 @@
-package TechnoBolts;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
-import static android.os.SystemClock.elapsedRealtime;
 import static android.os.SystemClock.sleep;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -22,16 +21,15 @@ public class AutoTopBlue {
 
 
     public final CRServo intake;
-    public final DcMotor leftDeposit;
-    public final DcMotor rightDeposit;
+    public final DcMotorEx leftDeposit;
+    public final DcMotorEx rightDeposit;
     public final Servo kickerServo;
     public final CRServo lowerTServo;
     public final CRServo middleTServo;
     public final Servo ledDepo;
 
 
-    private final double leftPowerOn = -0.36;
-    private final double rightPowerOn = 0.36;
+    private final double ShooterOn = 840;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -1;
@@ -50,7 +48,7 @@ public class AutoTopBlue {
 
     Telemetry telemetry;
 
-    public AutoTopBlue(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoTopBlue(Follower follower, Telemetry telemetry, CRServo intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -119,8 +117,8 @@ public class AutoTopBlue {
     }
 
     public void doDepositOn() {
-        leftDeposit.setPower(leftPowerOn);
-        rightDeposit.setPower(rightPowerOn);
+        leftDeposit.setVelocity(ShooterOn);
+        rightDeposit.setVelocity(ShooterOn);
     }
 
     public void doDepositOff() {

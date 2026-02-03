@@ -1,6 +1,5 @@
-package TechnoBolts;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
-import static android.os.SystemClock.sleep;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -15,8 +14,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
@@ -24,6 +26,7 @@ import java.util.function.Supplier;
 @Configurable
 public class TeleOpBlue extends OpMode {
 
+    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     private static final Logger log = LoggerFactory.getLogger(TechnoBolts.class);
     private Follower follower;
     public static Pose startingPose;    //See ExampleAuto to understand how to use this
@@ -47,8 +50,7 @@ public class TeleOpBlue extends OpMode {
     int launchflag = 0;
     int parkflag = 0;
     int limeflag = 0;
-    private double leftOn = 0.4;
-    private double rightOn = -0.4;
+    private double ShooterOn = 840;
     private int launcherOff = 0;
     private int intakeOn = 1;
     private int intakeOff = 0;
@@ -64,11 +66,12 @@ public class TeleOpBlue extends OpMode {
     boolean isEndGame = false;
     double trackTimer;
     // --- PID constants ---
-    public static double P = 0.02;    // these are the PID controls for the turret and limelight
-    public static double I = 0.0;
-    public static double D = 0.0;
-    private double integral = 0;
-    private double lastError = 0;
+    double FR = 11.873;
+    double PR = 36.131;
+
+    double FL = 12.62;
+    double PL = 100.85;
+
 
     @Override
     public void init() {
@@ -95,17 +98,21 @@ public class TeleOpBlue extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(340), 0.8))
                 .build();
 
-
+        aprilTagWebcam.init(hardwareMap,telemetry);
         Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         rightDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        rightDeposit.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
         leftDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         upperTServo = hardwareMap.get(Servo.class, "upperTServo");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
-
+        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
+        PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
+        leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
+        rightDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
         telemetry.addLine("Initialized");
 
     }
@@ -120,6 +127,11 @@ public class TeleOpBlue extends OpMode {
     public void loop() {
         follower.update();
         telemetryM.update();
+
+        aprilTagWebcam.update();
+        AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20);
+
+
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors
@@ -144,8 +156,8 @@ public class TeleOpBlue extends OpMode {
         telemetry.update();
 
         // 1. Determine the current state
-        boolean isReady = (leftVelocity >= 820 && leftVelocity <= 1000 &&
-                rightVelocity <= -820 && rightVelocity >= -1000);
+        boolean isReady = (leftVelocity >= 780 && leftVelocity <= 900 &&
+                rightVelocity <= -780 && rightVelocity >= -900);
 
         // 2. Only update the LED if the state has CHANGED
         if (isReady != wasReady) {
@@ -186,14 +198,6 @@ public class TeleOpBlue extends OpMode {
         if (gamepad1.rightBumperWasPressed()) {
             slowMode = !slowMode;
         }
-        //Optional way to change slow mode strength
-        //      if (gamepad1.xWasPressed()) {
-        //         slowModeMultiplier += 0.25;
-        //     }
-        //Optional way to change slow mode strength
-        //     if (gamepad2.yWasPressed()) {
-        //         slowModeMultiplier -= 0.25;
-        //     }
 
         upperTServo.setDirection(Servo.Direction.FORWARD);
         if (gamepad2.right_bumper) {
@@ -235,21 +239,6 @@ public class TeleOpBlue extends OpMode {
         }
 
 
-
-        if (gamepad2.dpadUpWasPressed()) {
-            if (launchflag == 0) {
-                rightDeposit.setPower(rightOn);
-                leftDeposit.setPower(leftOn);
-                launchflag = 1;
-                limeflag = 1;
-            } else if (launchflag == 1) {
-                rightDeposit.setPower(launcherOff);
-                leftDeposit.setPower(launcherOff);
-                launchflag = 0;
-                limeflag = 0;
-            }
-        }
-
         if(gamepad2.dpad_right){
             middleTServo.setPower(1);
             lowerTServo.setPower(-1);
@@ -262,6 +251,26 @@ public class TeleOpBlue extends OpMode {
             middleTServo.setPower(-1);
             lowerTServo.setPower(1);
         }
+        if (gamepad2.dpadUpWasPressed()) {
+            if (launchflag == 0) {
+                rightDeposit.setVelocity(ShooterOn);
+                leftDeposit.setVelocity(ShooterOn);
+                launchflag = 1;
+            }
+            else if (launchflag == 1) {
+                rightDeposit.setPower(launcherOff);
+                leftDeposit.setPower(launcherOff);
+                launchflag = 0;
+            }
+        }
+
+        double curVelocity2 = leftDeposit.getVelocity();
+        double curVelocity1 = rightDeposit.getVelocity();
+
+        double errorLeft = ShooterOn - curVelocity2;
+        double errorRight = ShooterOn - curVelocity1;
+
+
 
         telemetry.addData("Y", follower.getPose().getY());
 //        if (trackTimer <= getRuntime()) {
@@ -270,9 +279,18 @@ public class TeleOpBlue extends OpMode {
 //        }
         telemetry.addData("X", follower.getPose().getX());
 
+        telemetry.addData("Heading", follower.getPose().getHeading());
+
         telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
 
         telemetry.addData("Runtime", getRuntime());
+
+        telemetry.addData( "Error Right",  "%.2f", errorRight);
+
+        telemetry.addData( "Error Left",  "%.2f", errorLeft);
+
+        aprilTagWebcam.displayDetectionTelemetry(id20);
+
         if (endGameStart <= getRuntime() && !isEndGame) {
 //            gamepad1.rumble(5000);
 //            gamepad2.rumble(5000);

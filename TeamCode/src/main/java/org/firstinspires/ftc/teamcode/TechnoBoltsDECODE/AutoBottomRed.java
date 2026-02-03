@@ -1,10 +1,8 @@
-package TechnoBolts;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
-import static android.os.SystemClock.elapsedRealtime;
 import static android.os.SystemClock.sleep;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -30,8 +28,8 @@ public class AutoBottomRed {
     public final Servo ledDepo;
 
 
-    private final double leftPowerOn = -0.36;
-    private final double rightPowerOn = 0.36;
+    private final double leftPowerOn = -0.4;
+    private final double rightPowerOn = 0.4;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -1;
@@ -157,7 +155,7 @@ public class AutoBottomRed {
 
     private final Pose startPose = new Pose(25.066666666666666, 122.66666666666667, Math.toRadians(320));
 
-    private final Pose shootPose = new Pose(69.15555555555557, 78.11111111111111, Math.toRadians(320));
+    private final Pose shootPose = new Pose(90.8655666, 24.48555, Math.toRadians(225));
 
     private final Pose presetPose = new Pose(47.644444444444446, 66.3111111111111, Math.toRadians(180));
 

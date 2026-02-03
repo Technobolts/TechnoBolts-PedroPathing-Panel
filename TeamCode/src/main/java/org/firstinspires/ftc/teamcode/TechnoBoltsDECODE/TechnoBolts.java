@@ -1,16 +1,10 @@
-package TechnoBolts;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
 
-import static android.os.SystemClock.sleep;
-
-import com.pedropathing.geometry.BezierCurve;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -18,14 +12,8 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.LED;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -207,8 +195,8 @@ public class TechnoBolts extends OpMode {
 //                        power = 0.25;
 //                    }
         if(gamepad2.left_bumper){
-            myMotorRight.setPower(-0.4);
-            myMotorLeft.setPower(0.4);
+            myMotorRight.setVelocity(-900);
+            myMotorLeft.setVelocity(900);
         }
         else {
             myMotorLeft.setPower(0); // Set the motor power
