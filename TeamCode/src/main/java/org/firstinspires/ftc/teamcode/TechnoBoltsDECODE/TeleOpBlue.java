@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.slf4j.Logger;
@@ -26,15 +28,13 @@ import java.util.function.Supplier;
 @Configurable
 public class TeleOpBlue extends OpMode {
 
-    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private final AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+
     private static final Logger log = LoggerFactory.getLogger(TechnoBolts.class);
     private Follower follower;
     public static Pose startingPose;    //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
-    private Supplier<PathChain> Center;
-    private Supplier<PathChain> CloseBlue;
-    private Supplier<PathChain> FarBlue;
-    private Supplier<PathChain> InTri;
+    private Supplier<PathChain> Center, CloseBlue, FarBlue, InTri;
     private TelemetryManager telemetryM;
     private boolean slowMode = false;
     boolean wasReady = false;
@@ -72,9 +72,22 @@ public class TeleOpBlue extends OpMode {
     double FL = 12.62;
     double PL = 100.85;
 
+    double kP = 0.03;
+    double error = 0;
+    double lastError = 0;
+    double goalX = 0; //offset here
+    double angleTolerance = 0.4;
+    double kD = 0.0002;
+    double curTime = 0;
+    double lastTime = 0;
+
+    double forward, strafe, rotate;
+
+    public DcMotor leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive;
 
     @Override
     public void init() {
+
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose(23.822222222222223, 17.955555555555552, Math.toRadians(180)) : startingPose);   // set where the robot starts in TeleOp
@@ -98,6 +111,7 @@ public class TeleOpBlue extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(340), 0.8))
                 .build();
 
+
         aprilTagWebcam.init(hardwareMap,telemetry);
         Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
@@ -109,6 +123,14 @@ public class TeleOpBlue extends OpMode {
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "leftBack");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
         PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
         leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
@@ -119,37 +141,73 @@ public class TeleOpBlue extends OpMode {
 
     @Override
     public void start() {
+        resetRuntime();
+        curTime = getRuntime();
         follower.startTeleopDrive();  // starts the driving
         endGameStart = getRuntime() + 103;
         trackTimer = getRuntime() + 15;
     }
     @Override
     public void loop() {
+
         follower.update();
         telemetryM.update();
+
+        forward = gamepad1.left_stick_y;
+        strafe = gamepad1.left_stick_x;
+        rotate = -gamepad1.right_stick_x;
+
+
 
         aprilTagWebcam.update();
         AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20);
 
+        if (gamepad2.left_bumper == true) {
+            if (id20 != null) {
+                error = goalX - id20.ftcPose.bearing; // tx
 
+                if (Math.abs(error) < angleTolerance){
+                    rotate = 0;
+                } else {
+                    double pTerm = error * kP;
+
+                    curTime = getRuntime();
+                    double dT = curTime - lastTime;
+                    double dTerm = ((error - lastError) / dT) * kD;
+
+                    rotate = -(Range.clip(pTerm + dTerm, -0.4, 0.4));
+
+                    lastError = error;
+                    lastTime = curTime;
+                }
+            }
+            else {
+                lastTime = getRuntime();
+                lastTime = 0;
+
+            }
+        }
+        else {
+            lastError = 0;
+            lastTime = getRuntime();
+        }
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors
             //This is the normal version to use in the TeleOp
-            if (!slowMode) follower.setTeleOpDrive(
-                    gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
+            if (!slowMode) follower.setTeleOpDrive(forward, strafe, rotate,
                     true // Robot Centric
             );
                 //This is how it looks with slowMode on
             else follower.setTeleOpDrive(
-                    gamepad1.left_stick_y * slowModeMultiplier,
-                    gamepad1.left_stick_x * slowModeMultiplier,
-                    -gamepad1.right_stick_x * slowModeMultiplier,
+                    forward * slowModeMultiplier,
+                    strafe * slowModeMultiplier,
+                    rotate * slowModeMultiplier,
                     true // Robot Centric
             );
         }
+
+
 
         double leftVelocity = leftDeposit.getVelocity();
         double rightVelocity = rightDeposit.getVelocity();
@@ -205,6 +263,7 @@ public class TeleOpBlue extends OpMode {
         } else {
             upperTServo.setPosition(0);
         }
+
 
 
 
@@ -270,26 +329,24 @@ public class TeleOpBlue extends OpMode {
         double errorLeft = ShooterOn - curVelocity2;
         double errorRight = ShooterOn - curVelocity1;
 
-
-
         telemetry.addData("Y", follower.getPose().getY());
-//        if (trackTimer <= getRuntime()) {
-//            gamepad2.rumbleBlips(1);
-//            trackTimer = getRuntime() + 15;
-//        }
         telemetry.addData("X", follower.getPose().getX());
-
         telemetry.addData("Heading", follower.getPose().getHeading());
-
         telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
-
         telemetry.addData("Runtime", getRuntime());
-
         telemetry.addData( "Error Right",  "%.2f", errorRight);
-
         telemetry.addData( "Error Left",  "%.2f", errorLeft);
-
-        aprilTagWebcam.displayDetectionTelemetry(id20);
+        telemetry.addLine("-------------------------------------------");
+        if (id20 != null){
+            if(gamepad2.left_trigger > 0.3){
+                telemetry.addLine("AUTO ALIGN");
+            }
+            aprilTagWebcam.displayDetectionTelemetry(id20);
+            telemetry.addData("Error", error);
+        }
+        else {
+            telemetry.addLine("MANUAL Rotate Mode");
+        }
 
         if (endGameStart <= getRuntime() && !isEndGame) {
 //            gamepad1.rumble(5000);
