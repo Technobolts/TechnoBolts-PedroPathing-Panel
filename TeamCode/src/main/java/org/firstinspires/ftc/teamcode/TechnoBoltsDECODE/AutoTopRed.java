@@ -21,7 +21,7 @@ public class AutoTopRed {
     private Timer pathTimer, opModeTimer;
 
 
-    public final CRServo intake;
+    public final DcMotor intake;
     public final DcMotorEx leftDeposit;
     public final DcMotorEx rightDeposit;
     public final Servo kickerServo;
@@ -35,10 +35,9 @@ public class AutoTopRed {
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -1;
     private final double middleRampOn = 1;
-
     private final double lowerRampOff = 0;
     private final double middleRampOff = 0;
-    private final double intakePowerOn = -1;
+    private final double intakePowerOn = -0.65;
     private final double intakePowerOff = 0;
     private final double kickerAngleUp = 0;
     private final double kickerAngleDown = 0.8;
@@ -49,7 +48,7 @@ public class AutoTopRed {
 
     Telemetry telemetry;
 
-    public AutoTopRed(Follower follower, Telemetry telemetry, CRServo intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoTopRed(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -336,7 +335,7 @@ public class AutoTopRed {
 
                         telemetry.addLine("Leaving Launch Zone");
 //                        follower.followPath(drivePreset2PosIntakePose, true);
-                        setPathState(PathState.STRAFE_OUT);
+                        setPathState(PathState.LEAVE_LAUNCH_ZONE);
                     }
                     break;
 //                case STRAFE_OUT:
