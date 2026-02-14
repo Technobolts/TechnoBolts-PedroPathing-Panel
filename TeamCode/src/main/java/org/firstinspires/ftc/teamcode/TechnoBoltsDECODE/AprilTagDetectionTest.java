@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Autonomous
 public class AprilTagDetectionTest extends OpMode {
-    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
 
     @Override
     public void init() {

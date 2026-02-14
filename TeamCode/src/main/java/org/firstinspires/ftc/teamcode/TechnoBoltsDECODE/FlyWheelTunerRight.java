@@ -95,5 +95,5 @@ FlyWheelTunerRight extends OpMode {
     }
 }
 
-// P = 36.131
-// F = 11.8730
+// P = 100.5
+// F = 12.22

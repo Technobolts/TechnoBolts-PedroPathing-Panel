@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+@Disabled
 @TeleOp(name="DecodeIntakeTest", group="TechnoBolts - OpMode")
 public class IntakeTest extends LinearOpMode {
     //private ElapsedTime runtime = new ElapsedTime();

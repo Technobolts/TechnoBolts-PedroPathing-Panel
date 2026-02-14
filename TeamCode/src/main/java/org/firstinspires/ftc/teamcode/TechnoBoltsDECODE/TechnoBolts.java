@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
 @Configurable
 
+
 @TeleOp(name="Chassis - TechnoBolts Manual Run - Final", group="TechnoBolts - OpMode")
 public class TechnoBolts extends OpMode {
     private static final Logger log = LoggerFactory.getLogger(TechnoBolts.class);
@@ -32,7 +33,7 @@ public class TechnoBolts extends OpMode {
     public DcMotor rightFrontDrive = null;
     public DcMotor rightBackDrive = null;
 
-    public CRServo Intake = null;
+    public DcMotor Intake = null;
 
     public Servo ledDepo;
     boolean wasReady = false;
@@ -88,7 +89,7 @@ public class TechnoBolts extends OpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftBack");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
-        Intake = hardwareMap.get(CRServo.class, "intake");
+        Intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotorEx myMotorLeft = hardwareMap.get(DcMotorEx.class, "leftDeposit");
         myMotorLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         DcMotorEx myMotorRight = hardwareMap.get(DcMotorEx.class, "rightDeposit");

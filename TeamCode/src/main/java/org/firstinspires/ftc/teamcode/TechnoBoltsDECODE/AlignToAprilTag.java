@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @TeleOp(name = "Align To AprilTag", group = "Test")
 public class AlignToAprilTag extends OpMode {
-    private final AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private final TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
 
     public DcMotor leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive;
 

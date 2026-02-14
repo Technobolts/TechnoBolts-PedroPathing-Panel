@@ -4,6 +4,7 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -44,7 +45,7 @@ public class TechnoBoltsHuskyLens extends LinearOpMode {
     private Servo upperTServo;
     private CRServo lowerTServo;
     private CRServo middleTServo;
-    private CRServo Intake;
+    private DcMotor Intake;
     // ====== STATE ======
     private double smoothLeftRPM = 0;
     private double smoothRightRPM = 0;
@@ -61,7 +62,7 @@ public class TechnoBoltsHuskyLens extends LinearOpMode {
         upperTServo = hardwareMap.get(Servo.class, "upperTServo");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
-        Intake = hardwareMap.get(CRServo.class, "intake");
+        Intake = hardwareMap.get(DcMotor.class, "intake");
         // HuskyLens
         HuskyLens huskyLens = hardwareMap.get(HuskyLens.class, "HuskyLens");
         huskyLens.initialize();

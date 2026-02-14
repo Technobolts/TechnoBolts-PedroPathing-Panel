@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
 import android.util.Size;
 
+import com.pedropathing.math.MathFunctions;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AprilTagWebcam {
+public class TechnoBoltsAprilTagWebcam {
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
 
@@ -32,6 +33,10 @@ public class AprilTagWebcam {
             telemetry.addLine(String.format("\n==== (ID %d) Unknown", detectedId.id));
             telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detectedId.center.x, detectedId.center.y));
         }
+    }
+
+    public static double flywheelSpeed (double goalDist){
+        return  MathFunctions.clamp(-0.00000459229 * Math.pow(goalDist, 4)  +0.0022458 * Math.pow(goalDist, 3) -0.411268 * Math.pow(goalDist, 2) +34.10407 * (goalDist) -286.11769, 770, 920);
     }
 
     private Telemetry telemetry;

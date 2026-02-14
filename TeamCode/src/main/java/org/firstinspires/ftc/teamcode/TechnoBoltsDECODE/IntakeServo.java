@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Example OpMode to control a Servo to specific positions.
  * The positions are defined as constants between 0.0 and 1.0.
  */
+@Disabled
 @TeleOp(name = "IntakeServo")
 public class IntakeServo extends OpMode {
 

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx; // Use Ex for velocity control
 import com.qualcomm.robotcore.hardware.LED;
 
+@Disabled
 @TeleOp(name="OutakeTest", group = "Linear Opmode")
 public class OutakeTest extends LinearOpMode {
 

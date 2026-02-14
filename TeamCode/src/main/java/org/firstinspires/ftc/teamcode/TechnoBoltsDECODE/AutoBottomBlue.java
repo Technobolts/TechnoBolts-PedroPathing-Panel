@@ -19,10 +19,10 @@ public class AutoBottomBlue {
     private Timer pathTimer, opModeTimer;
 
 
-    public final CRServo intake;
+    public final DcMotor intake;
     public final DcMotor leftDeposit;
     public final DcMotor rightDeposit;
-    public final Servo kickerServo;
+    public final CRServo kickerServo;
     public final CRServo lowerTServo;
     public final CRServo middleTServo;
     public final Servo ledDepo;
@@ -37,7 +37,7 @@ public class AutoBottomBlue {
 
     private final double lowerRampOff = 0;
     private final double middleRampOff = 0;
-    private final double intakePowerOn = -1;
+    private final double intakePowerOn = -0.65;
     private final double intakePowerOff = 0;
     private final double kickerAngleUp = 0;
     private final double kickerAngleDown = 0.8;
@@ -48,14 +48,14 @@ public class AutoBottomBlue {
 
     Telemetry telemetry;
 
-    public AutoBottomBlue(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoBottomBlue(Follower follower, Telemetry telemetry, DcMotor intake, DcMotor leftDeposit, DcMotor rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
         this.intake = intake;
         this.leftDeposit = leftDeposit;
         this.rightDeposit = rightDeposit;
-        this.kickerServo = upperTServo;
+        this.kickerServo = Kicker;
         this.lowerTServo = lowerTServo;
         this.middleTServo = middleTServo;
         this.ledDepo = ledDepo;
@@ -109,11 +109,11 @@ public class AutoBottomBlue {
     }
 
     public void doKickerOn() {
-        kickerServo.setPosition(kickerAngleDown);
+        kickerServo.setPower(kickerAngleDown);
     }
 
     public void doKickerOff() {
-        kickerServo.setPosition(kickerAngleUp);
+        kickerServo.setPower(kickerAngleUp);
     }
 
     public void doDepositOn() {

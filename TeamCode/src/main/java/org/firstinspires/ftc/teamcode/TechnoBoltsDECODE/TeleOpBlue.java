@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
+import static org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam.flywheelSpeed;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -28,7 +30,7 @@ import java.util.function.Supplier;
 @Configurable
 public class TeleOpBlue extends OpMode {
 
-    private final AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private final TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
 
     private static final Logger log = LoggerFactory.getLogger(TechnoBolts.class);
     private Follower follower;
@@ -43,31 +45,30 @@ public class TeleOpBlue extends OpMode {
     final double COLOR_GREEN = 0.45;
     private double slowModeMultiplier = 0.5;  // we don't use this
 
-    private CRServo Intake, middleTServo, lowerTServo;
-    private Servo upperTServo, ledDepo;  // servos
+    private CRServo upperTServo, middleTServo, lowerTServo;
+    private DcMotor Intake;
+    private Servo ledDepo;  // servos
     private DcMotorEx rightDeposit, leftDeposit;  // DcMotors
     int intakeflag = 0;   // these are the flags
     int launchflag = 0;
     int parkflag = 0;
     int limeflag = 0;
-    private double ShooterOn = 840;
     private int launcherOff = 0;
-    private int intakeOn = 1;
+    private double intakeOn = -0.3;
     private int intakeOff = 0;
-    private int intakeReverse = -1;
+    private double intakeReverse = 0.1;
     private double flickDown = 0.8;
     private double flickUp = 0;
     private double lightGreen = 0.5;
     private double lightPurple = 0.722;
     private int lightOff = 0;
-    private int rampOn = 1;
-    private double rampOff = 0;
+
     double endGameStart;
     boolean isEndGame = false;
     double trackTimer;
     // --- PID constants ---
-    double FR = 11.873;
-    double PR = 36.131;
+    double FR = 12.22;
+    double PR = 100.5;
 
     double FL = 12.62;
     double PL = 100.85;
@@ -111,15 +112,15 @@ public class TeleOpBlue extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(340), 0.8))
                 .build();
 
-
         aprilTagWebcam.init(hardwareMap,telemetry);
-        Intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
+        Intake = hardwareMap.get(DcMotor.class, "intake");// Hardware map names
+        Intake.setDirection(DcMotorSimple.Direction.REVERSE);
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         rightDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightDeposit.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
         leftDeposit.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        upperTServo = hardwareMap.get(Servo.class, "upperTServo");
+        upperTServo = hardwareMap.get(CRServo.class, "Kicker");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
@@ -158,7 +159,6 @@ public class TeleOpBlue extends OpMode {
         rotate = -gamepad1.right_stick_x;
 
 
-
         aprilTagWebcam.update();
         AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20);
 
@@ -166,7 +166,7 @@ public class TeleOpBlue extends OpMode {
             if (id20 != null) {
                 error = goalX - id20.ftcPose.bearing; // tx
 
-                if (Math.abs(error) < angleTolerance){
+                if (Math.abs(error) < angleTolerance) {
                     rotate = 0;
                 } else {
                     double pTerm = error * kP;
@@ -180,14 +180,12 @@ public class TeleOpBlue extends OpMode {
                     lastError = error;
                     lastTime = curTime;
                 }
-            }
-            else {
+            } else {
                 lastTime = getRuntime();
                 lastTime = 0;
 
             }
-        }
-        else {
+        } else {
             lastError = 0;
             lastTime = getRuntime();
         }
@@ -209,24 +207,10 @@ public class TeleOpBlue extends OpMode {
 
 
 
-        double leftVelocity = leftDeposit.getVelocity();
-        double rightVelocity = rightDeposit.getVelocity();
-        telemetry.update();
 
-        // 1. Determine the current state
-        boolean isReady = (leftVelocity >= 780 && leftVelocity <= 900 &&
-                rightVelocity <= -780 && rightVelocity >= -900);
 
-        // 2. Only update the LED if the state has CHANGED
-        if (isReady != wasReady) {
-            if (isReady) {
-                ledDepo.setPosition(COLOR_GREEN);
-            } else {
-                ledDepo.setPosition(COLOR_YELLOW);
-            }
-            // 3. Update the tracker so we don't send the command again next loop
-            wasReady = isReady;
-        }
+
+
         //Automated PathFollowing
         if (gamepad1.aWasPressed()) {
             follower.followPath(Center.get());
@@ -257,11 +241,11 @@ public class TeleOpBlue extends OpMode {
             slowMode = !slowMode;
         }
 
-        upperTServo.setDirection(Servo.Direction.FORWARD);
-        if (gamepad2.right_bumper) {
-            upperTServo.setPosition(0.8); //Originally 0.5
-        } else {
-            upperTServo.setPosition(0);
+        if(gamepad2.right_bumper) {
+            upperTServo.setPower(1);
+        }
+        else {
+            upperTServo.setPower(-0.3);
         }
 
 
@@ -311,9 +295,14 @@ public class TeleOpBlue extends OpMode {
             lowerTServo.setPower(1);
         }
         if (gamepad2.dpadUpWasPressed()) {
-            if (launchflag == 0) {
-                rightDeposit.setVelocity(ShooterOn);
-                leftDeposit.setVelocity(ShooterOn);
+            if (launchflag == 0  && id20 != null) {
+                rightDeposit.setVelocity(flywheelSpeed(id20.ftcPose.y));
+                leftDeposit.setVelocity(flywheelSpeed(id20.ftcPose.y));
+                launchflag = 1;
+            }
+            else if (launchflag == 0 && id20 == null){
+                rightDeposit.setVelocity(840);
+                leftDeposit.setVelocity(840);
                 launchflag = 1;
             }
             else if (launchflag == 1) {
@@ -326,25 +315,79 @@ public class TeleOpBlue extends OpMode {
         double curVelocity2 = leftDeposit.getVelocity();
         double curVelocity1 = rightDeposit.getVelocity();
 
-        double errorLeft = ShooterOn - curVelocity2;
-        double errorRight = ShooterOn - curVelocity1;
+
+        if (id20 != null) {
+            double errorLeft = flywheelSpeed(id20.ftcPose.y) - curVelocity2;
+            double errorRight = flywheelSpeed(id20.ftcPose.y) - curVelocity1;
+
+            telemetry.update();
+
+            // 1. Determine the current state
+            boolean isReady = (errorLeft >= -20 && errorLeft <= 40 &&
+                    errorRight >= -20 && errorRight <= 40);
+
+            // 2. Only update the LED if the state has CHANGED
+            if (isReady != wasReady) {
+                if (isReady) {
+                    ledDepo.setPosition(COLOR_GREEN);
+                } else {
+                    ledDepo.setPosition(COLOR_YELLOW);
+                }
+                // 3. Update the tracker so we don't send the command again next loop
+                wasReady = isReady;
+            }
+            telemetry.addData("Error Right", "%6.1f", errorRight);
+            telemetry.addData("Error Left", "%6.1f", errorLeft);
+
+        }
+        else if (id20 == null){
+            double errorLeft = 840 - curVelocity2;
+            double errorRight = 840 - curVelocity1;
+
+            telemetry.update();
+
+            boolean isReady = (errorLeft >= -20 && errorLeft <= 40 &&
+                    errorRight >= -20 && errorRight <= 40);
+
+            // 2. Only update the LED if the state has CHANGED
+            if (isReady != wasReady) {
+                if (isReady) {
+                    ledDepo.setPosition(COLOR_GREEN);
+                } else {
+                    ledDepo.setPosition(COLOR_YELLOW);
+                }
+                // 3. Update the tracker so we don't send the command again next loop
+                wasReady = isReady;
+            }
+
+            telemetry.addData("Error Right", "%6.1f", errorRight);
+            telemetry.addData("Error Left", "%6.1f", errorLeft);
+        }
+
+        else {
+            double errorLeft = 0;
+            double errorRight = 0;
+            telemetry.addData("Error Right", "%6.1f", errorRight);
+            telemetry.addData("Error Left", "%6.1f", errorLeft);
+        }
+
+
+        double leftVelocity = leftDeposit.getVelocity();
+        double rightVelocity = rightDeposit.getVelocity();
 
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Heading", follower.getPose().getHeading());
-        telemetry.addData("Velocity left/Right", "%4.2f, %4.2f", leftVelocity, rightVelocity);
+        telemetry.addData("Velocity left/Right", "%6.1f, %6.1f", leftVelocity, rightVelocity);
         telemetry.addData("Runtime", getRuntime());
-        telemetry.addData( "Error Right",  "%.2f", errorRight);
-        telemetry.addData( "Error Left",  "%.2f", errorLeft);
         telemetry.addLine("-------------------------------------------");
-        if (id20 != null){
-            if(gamepad2.left_trigger > 0.3){
+        if (id20 != null) {
+            if (gamepad2.left_trigger > 0.3) {
                 telemetry.addLine("AUTO ALIGN");
             }
             aprilTagWebcam.displayDetectionTelemetry(id20);
             telemetry.addData("Error", error);
-        }
-        else {
+        } else {
             telemetry.addLine("MANUAL Rotate Mode");
         }
 

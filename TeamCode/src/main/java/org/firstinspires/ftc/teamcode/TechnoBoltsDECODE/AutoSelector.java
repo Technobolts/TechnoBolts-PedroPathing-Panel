@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 //import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous (name = "Auto Selector")
@@ -31,9 +32,10 @@ public class AutoSelector extends OpMode {
 
     Follower follower;
 
-    public CRServo intake, lowerTServo, middleTServo;
+    public CRServo Kicker, lowerTServo, middleTServo;
+    public DcMotor intake;
     public DcMotorEx rightDeposit, leftDeposit;
-    public Servo upperTServo, ledDepo;
+    public Servo ledDepo;
 
 
     AutoTopRed topRedAuto;   // the top red auto
@@ -46,7 +48,8 @@ public class AutoSelector extends OpMode {
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
-        intake = hardwareMap.get(CRServo.class, "intake");     // Hardware map names
+        intake = hardwareMap.get(DcMotor.class, "intake");     // Hardware map names
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
         leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
         leftDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -56,7 +59,7 @@ public class AutoSelector extends OpMode {
         PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
         leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
         rightDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
-        upperTServo = hardwareMap.get(Servo.class, "upperTServo");
+        Kicker = hardwareMap.get(CRServo.class, "Kicker");
         lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
         middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
         ledDepo = hardwareMap.get(Servo.class, "ledDepo");
@@ -64,10 +67,10 @@ public class AutoSelector extends OpMode {
 
 //        bottomBlueAuto = new AutoBottomBlue(follower, flip1, intake, launcher1, launcher2);
 //        bottomRedAuto = new AutoBottomRed(follower, flip1, intake, launcher1, launcher2);
-        topRedAuto = new AutoTopRed(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
-        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
-        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
-        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, rightDeposit, leftDeposit, upperTServo, lowerTServo, middleTServo, ledDepo);
+        topRedAuto = new AutoTopRed(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
+        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
+        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
+        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
     }
 
     @Override
@@ -88,6 +91,8 @@ public class AutoSelector extends OpMode {
 
         telemetry.addData("Alliance", alliance);
         telemetry.addData("Start Position", startPos);
+        telemetry.addLine("-------------------");
+        telemetry.addLine("Version 1");
         telemetry.update();
     }
 
@@ -99,28 +104,30 @@ public class AutoSelector extends OpMode {
         if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
             bottomRedAuto.start();
         }
-            if (alliance == Alliance.RED && startPos == StartPos.TOP) {
+        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
                 topRedAuto.start();
             }
-            if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
                 topBlueAuto.start();
             }
         }
 
         @Override
         public void loop() {
-                if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
+
+
+        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
                 bottomBlueAuto.update();
         }
         if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
             bottomRedAuto.update();
         }
-                if (alliance == Alliance.RED && startPos == StartPos.TOP) {
+        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
                     topRedAuto.update();
-                }
-                if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
+        }
+        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
                     topBlueAuto.update();
-                }
+        }
 
             telemetry.addData("Y", follower.getPose().getY());
 

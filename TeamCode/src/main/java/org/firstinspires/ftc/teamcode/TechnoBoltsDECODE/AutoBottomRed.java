@@ -19,10 +19,10 @@ public class AutoBottomRed {
     private Timer pathTimer, opModeTimer;
 
 
-    public final CRServo intake;
+    public final DcMotor intake;
     public final DcMotor leftDeposit;
     public final DcMotor rightDeposit;
-    public final Servo kickerServo;
+    public final CRServo kickerServo;
     public final CRServo lowerTServo;
     public final CRServo middleTServo;
     public final Servo ledDepo;
@@ -37,7 +37,7 @@ public class AutoBottomRed {
 
     private final double lowerRampOff = 0;
     private final double middleRampOff = 0;
-    private final double intakePowerOn = -1;
+    private final double intakePowerOn = -0.65;
     private final double intakePowerOff = 0;
     private final double kickerAngleUp = 0;
     private final double kickerAngleDown = 0.8;
@@ -48,14 +48,14 @@ public class AutoBottomRed {
 
     Telemetry telemetry;
 
-    public AutoBottomRed(Follower follower, Telemetry telemetry, CRServo intake, DcMotor leftDeposit, DcMotor rightDeposit, Servo upperTServo, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoBottomRed(Follower follower, Telemetry telemetry, DcMotor intake, DcMotor leftDeposit, DcMotor rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
         this.intake = intake;
         this.leftDeposit = leftDeposit;
         this.rightDeposit = rightDeposit;
-        this.kickerServo = upperTServo;
+        this.kickerServo = Kicker;
         this.lowerTServo = lowerTServo;
         this.middleTServo = middleTServo;
         this.ledDepo = ledDepo;
@@ -109,11 +109,11 @@ public class AutoBottomRed {
     }
 
     public void doKickerOn() {
-        kickerServo.setPosition(kickerAngleDown);
+        kickerServo.setPower(kickerAngleDown);
     }
 
     public void doKickerOff() {
-        kickerServo.setPosition(kickerAngleUp);
+        kickerServo.setPower(kickerAngleUp);
     }
 
     public void doDepositOn() {
@@ -143,6 +143,7 @@ public class AutoBottomRed {
         SHOOT_PRESET1_PRESET3 , //From shooting to preset 3
         INTAKE_PRESET3 , //Intaking preset 3
         SHOOT_PRESET3 , // Shooting preset 3
+        LEAVE_TRIANGLE,
         SHOOT_PRESET3_PRESET2 , //From shooting preset 3 to preset 2
         INTAKE_PRESET2, //Intake preset 2
         PRESET2_EMPTY_RAMP,
@@ -153,24 +154,25 @@ public class AutoBottomRed {
 
     PathState pathState;
 
-    private final Pose startPose = new Pose(25.066666666666666, 122.66666666666667, Math.toRadians(320));
+    private final Pose startPose = new Pose(87.64444444444445, 8.17777777777777, Math.toRadians(90));
 
     private final Pose shootPose = new Pose(90.8655666, 24.48555, Math.toRadians(225));
 
-    private final Pose presetPose = new Pose(47.644444444444446, 66.3111111111111, Math.toRadians(180));
+    private final Pose presetPose = new Pose(100.26666666666667, 96.17777777777778, Math.toRadians(0));
 
-    private final Pose Preset1PosIntakePose = new Pose(23.822222222222223, 65.60000000000001, Math.toRadians(180));
+    private final Pose Preset1PosIntakePose = new Pose(111.28888888888889, 96.17777777777778, Math.toRadians(0));
 
-    private final Pose IntakePoseShootPosePreset1 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
-    private final Pose ShootPosPreset3Pos = new Pose(48, 18.133333333333326, Math.toRadians(180));
-    private final Pose Preset3PosIntakePose = new Pose(23.822222222222223, 17.955555555555552, Math.toRadians(180));
-    private final Pose IntakePoseShootPosePreset3 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
+    private final Pose IntakePoseShootPosePreset1 = new Pose(90.8655666, 24.48555, Math.toRadians(225));
+    private final Pose ShootPosPreset3Pos = new Pose(100.26666666666667, 49.95555555555555, Math.toRadians(0));
+    private final Pose Preset3PosIntakePose = new Pose(112.71111111111111, 49.95555555555555, Math.toRadians(0));
+    private final Pose IntakePoseShootPosePreset3 = new Pose(90.8655666, 24.48555, Math.toRadians(225));
+    private final Pose LeaveTriangle = new Pose(98.44444444444446, 36.99999999999999, Math.toRadians(225));
 //    private final Pose Preset2PosIntakePose = new Pose(41.6, 71.82222222222222, Math.toRadians(360));
 //    private final Pose IntakePoseShootPosePreset2 = new Pose(31.64444444444445, 72, Math.toRadians(360));
 //    private final Pose Preset2IntakeEmptyRamp = new Pose(22.93333333333332, 83.73333333333333, Math.toRadians(360));
 //    private final Pose EmptyRampShootingPos = new Pose(69.15555555555557, 78.11111111111111, Math.toRadians(135));
 
-    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, drivePreset2PosIntakePose, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveLeaveTriangle, drivePreset2PosIntakePose, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
 
 
     public void buildPaths () {
@@ -203,6 +205,11 @@ public class AutoBottomRed {
                 .addPath(new BezierLine(Preset3PosIntakePose, IntakePoseShootPosePreset3))
                 .setLinearHeadingInterpolation(Preset3PosIntakePose.getHeading(), IntakePoseShootPosePreset3.getHeading())
                 .build();
+        driveLeaveTriangle = follower.pathBuilder()
+                .addPath(new BezierLine(IntakePoseShootPosePreset3, LeaveTriangle))
+                .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), LeaveTriangle.getHeading())
+                .build();
+
 //        drivePreset2PosIntakePose = follower.pathBuilder()
 //                .addPath(new BezierLine(IntakePoseShootPosePreset3, Preset2PosIntakePose))
 //                .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
@@ -289,7 +296,7 @@ public class AutoBottomRed {
             case INTAKE_PRESET3:
                 if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
                     doDepositOff();
-                    telemetry.addLine("Aligning Artifacts");
+                    telemetry.addLine("Aligning Artifacts to Preset 3");
                     follower.followPath(drivePreset3PosIntakePose, true);
                     setPathState(PathState.SHOOT_PRESET3);
                 }
@@ -297,10 +304,21 @@ public class AutoBottomRed {
             case SHOOT_PRESET3:
                 if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
                     doDepositOff();
-                    telemetry.addLine("Intaking Artifacts");
+                    telemetry.addLine("Intaking Artifacts of Preset 3");
                     follower.followPath(driveIntakePoseShootPosePreset3, true);
                     setPathState(PathState.SHOOT_PRESET3);
                 }
+            case LEAVE_TRIANGLE:
+                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
+                    doDepositOff();
+                    doIntakePowerOff();
+                    doRampOff();
+                    telemetry.addLine("Leaving Triangle");
+                    follower.followPath(driveLeaveTriangle, true);
+                    setPathState(PathState.SHOOT_PRESET3);
+                }
+                break;
+
 //                break;
 //            case SHOOT_PRESET3_PRESET2:
 //                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
