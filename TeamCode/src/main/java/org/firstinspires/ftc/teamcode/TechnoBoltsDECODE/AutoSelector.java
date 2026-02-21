@@ -17,18 +17,23 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Autonomous (name = "Auto Selector")
 public class AutoSelector extends OpMode {
 
+
     enum Alliance {BLUE, RED}
 
     enum StartPos {TOP, BOTTOM}
 
-    double FR = 11.873;
-    double PR = 36.131;
+    enum Preset {ZERO, ONE, TWO, THREE}
+
+    double FR = 12.22;
+    double PR = 100.5;
 
     double FL = 12.62;
     double PL = 100.85;
 
     Alliance alliance = Alliance.BLUE;
     StartPos startPos = StartPos.BOTTOM;
+
+    Preset preset = Preset.ZERO;
 
     Follower follower;
 
@@ -41,13 +46,12 @@ public class AutoSelector extends OpMode {
     AutoTopRed topRedAuto;   // the top red auto
     AutoTopBlue topBlueAuto;   // the top blue auto
     AutoBottomBlue bottomBlueAuto; // the bottom blue auto
-    AutoBottomRed bottomRedAuto;
+    AutoBottomRed bottomRedAuto; // the bottom red auto
 
 
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-
         intake = hardwareMap.get(DcMotor.class, "intake");     // Hardware map names
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
         rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
@@ -88,11 +92,16 @@ public class AutoSelector extends OpMode {
         if (gamepad2.a) startPos = StartPos.BOTTOM;
         if (gamepad2.y) startPos = StartPos.TOP;
 
+        if(gamepad2.dpadUpWasPressed()) preset = Preset.ZERO;
+        if(gamepad2.dpadLeftWasPressed()) preset = Preset.ONE;
+        if(gamepad2.dpadRightWasPressed()) preset = Preset.TWO;
+        if(gamepad2.dpadDownWasPressed()) preset = Preset.THREE;
+
 
         telemetry.addData("Alliance", alliance);
         telemetry.addData("Start Position", startPos);
+        telemetry.addData("Number of Preset", preset);
         telemetry.addLine("-------------------");
-        telemetry.addLine("Version 1");
         telemetry.update();
     }
 
@@ -105,10 +114,10 @@ public class AutoSelector extends OpMode {
             bottomRedAuto.start();
         }
         if (alliance == Alliance.RED && startPos == StartPos.TOP) {
-                topRedAuto.start();
+            topRedAuto.start();
             }
         if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-                topBlueAuto.start();
+            topBlueAuto.start();
             }
         }
 
@@ -117,10 +126,10 @@ public class AutoSelector extends OpMode {
 
 
         if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
-                bottomBlueAuto.update();
+                    bottomBlueAuto.update();
         }
         if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
-            bottomRedAuto.update();
+                    bottomRedAuto.update();
         }
         if (alliance == Alliance.RED && startPos == StartPos.TOP) {
                     topRedAuto.update();

@@ -31,17 +31,19 @@ public class AutoTopRed {
     public final Servo ledDepo;
 
 
-    private final double ShooterOn = 800;
+    private final double ShooterOn = 760;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -0.5;
     private final double middleRampOn = 0.5;
-    private final double lowerRampOff = 0;
-    private final double middleRampOff = 0;
-    private final double intakePowerOn = -0.65;
+    private final double lowerRampSlow = 0.2;
+    private final double middleRampSlow = 0.2;
+    private final double intakePowerOn = -0.6;
+    private final double intakeHalfPower = -0.4;
     private final double intakePowerOff = 0;
-    private final double kickerStopPower = -0.5;
+    private final double kickerStopPower = -0.7;
     private final double kickerLaunchPower = 1;
+    private final double kickerHalfLaunchPower = 0.3;
     // Define the motor at the top of your OpMode class
 
 
@@ -101,13 +103,28 @@ public class AutoTopRed {
         middleTServo.setPower(middleRampOn);
     }
 
-    public void doRampOff() {
-        lowerTServo.setPower(lowerRampOff);
-        middleTServo.setPower(middleRampOff);
+    public void doRampSlow() {
+        lowerTServo.setPower(lowerRampSlow);
+        middleTServo.setPower(middleRampSlow);
     }
 
     public void kickerStop() {
         kickerServo.setPower(kickerStopPower);
+    }
+
+    public void kickerHalfLaunch(){
+        kickerServo.setPower(kickerHalfLaunchPower);
+    }
+
+    public void doIntakeHalfPower() {
+        intake.setPower(intakeHalfPower);
+    }
+
+    public void halfPowerAll() {
+        doIntakeHalfPower();
+        doRampSlow();
+        kickerStop();
+
     }
 
     public void kickerLaunch() {
@@ -163,13 +180,15 @@ public class AutoTopRed {
 
     private final Pose presetPose = new Pose(100.26666666666667, 96.35555555555555, Math.toRadians(0));
 
-    private final Pose Preset1PosIntakePose = new Pose(111.28888888888889, 96.17777777777778, Math.toRadians(0));
+    private final Pose Preset1PosIntakePose = new Pose(119.28888888888889, 96.17777777777778, Math.toRadians(0)); // CHANGED
     private final Pose IntakePoseShootPosePreset1 = new Pose(86.48888888888891, 76.17777777777778, Math.toRadians(235));
     private final Pose ShootPosPreset3Pos = new Pose(100.26666666666667, 49.95555555555555, Math.toRadians(0));
-    private final Pose Preset3PosIntakePose = new Pose(112.71111111111111, 49.95555555555555, Math.toRadians(0));
+    private final Pose Preset3PosIntakePose = new Pose(124.71111111111111, 49.95555555555555, Math.toRadians(0)); // CHANGED
     private final Pose IntakePoseShootPosePreset3 = new Pose(86.48888888888891, 76.17777777777778, Math.toRadians(235));
     private final Pose leaveLaunchZone = new Pose(90.48888888888891, 70.17777777777778, Math.toRadians(235));
-//    private final Pose Preset2PosIntakePose = new Pose(102.4, 71.82222222222222, Math.toRadians(0));
+//    private final Pose Preset2PosIntakePose = new Pose(108.4, 84.08888888888887, Math.toRadians(0));
+
+//    private final Pose shootPosePreset2Pose = new Pose(76.244, 83.24444444444444);
 //    private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
 //    private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
 //
@@ -177,7 +196,7 @@ public class AutoTopRed {
 //    private final Pose StrafeOut = new Pose(100.97777777777779, 65.42222222222222, Math.toRadians(225));
 
 
-    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveleaveLaunchZone,  drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveLeaveLaunchZone,  drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
 
 
         public void buildPaths () {
@@ -210,7 +229,7 @@ public class AutoTopRed {
                     .addPath(new BezierLine(Preset3PosIntakePose, IntakePoseShootPosePreset3))
                     .setLinearHeadingInterpolation(Preset3PosIntakePose.getHeading(), IntakePoseShootPosePreset3.getHeading())
                     .build();
-            driveleaveLaunchZone = follower.pathBuilder()
+            driveLeaveLaunchZone = follower.pathBuilder()
                     .addPath(new BezierLine(IntakePoseShootPosePreset3, leaveLaunchZone))
                     .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), leaveLaunchZone.getHeading())
                     .build();
@@ -219,7 +238,7 @@ public class AutoTopRed {
 //                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), StrafeOut.getHeading())
 //                    .build();
 //            drivePreset2PosIntakePose = follower.pathBuilder()
-//                    .addPath(new BezierLine(IntakePoseShootPosePreset3, Preset2PosIntakePose))
+//                    .addPath(new BezierCurve(IntakePoseShootPosePreset3, shootPosePreset2Pose,Preset2PosIntakePose))
 //                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
 //                    .build();
 //            driveIntakePoseShootPosePreset2 = follower.pathBuilder()
@@ -243,6 +262,7 @@ public class AutoTopRed {
                 case DRIVE_STARTPOS_SHOOT_POS:
                     follower.followPath(driveStartPosShootPos, true);
                     doDepositOn();
+                    kickerHalfLaunch();
                     setPathState(PathState.SHOOT_PRELOAD); //reset the timer & make new state
                     break;
 
@@ -252,7 +272,8 @@ public class AutoTopRed {
                         kickerLaunch();
                         doRampOn();
                         doIntakePowerOn();
-                        sleep(4500);
+                        sleep(4700);
+                        kickerStop();
                         telemetry.addLine("Shooting Preload");
                         follower.followPath(driveShootPosPreset1Pos,true);
                         setPathState(PathState.SHOOT_PRELOAD_PRESET1);
@@ -261,7 +282,7 @@ public class AutoTopRed {
 
                 case SHOOT_PRELOAD_PRESET1:
                     if (!follower.isBusy()) {
-                        kickerStop();
+                       halfPowerAll();
                         telemetry.addLine("Aligning to preset1");
                         follower.followPath(drivePreset1PosIntakePose, 0.5,true);
                         setPathState(PathState.INTAKE_PRESET1);
@@ -270,6 +291,7 @@ public class AutoTopRed {
 
                 case INTAKE_PRESET1:
                     if (!follower.isBusy()) {
+                        doRampSlow();
                         telemetry.addLine("Intaking Artifacts of Preset 1");
                         follower.followPath(driveIntakePoseShootPosePreset1,true);
                         setPathState(PathState.SHOOT_PRESET1_PRESET3);
@@ -281,23 +303,18 @@ public class AutoTopRed {
                 case SHOOT_PRESET1_PRESET3:
                     if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
                         telemetry.addLine("Shooting Preset 1");
-                        sleep(50);
+                        doRampOn();
+                        doIntakePowerOn();
                         kickerLaunch();
-                        sleep(4000);
-//                        kickerStop();
-//                        sleep(1000);
-                        //shoot();
-
-//                        sleep (1000);
-//                        shoot();
-
+                        sleep(5300);
+                        halfPowerAll();
                         follower.followPath(driveShootPosPreset3Pos,  true);
                         setPathState(PathState.INTAKE_PRESET3);
                     }
                     break;
                 case INTAKE_PRESET3:
                     if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                        kickerStop();
+                        halfPowerAll();
                         telemetry.addLine("Aligning Artifacts");
                         follower.followPath(drivePreset3PosIntakePose,0.5,true);
                         setPathState(PathState.SHOOT_PRESET3);
@@ -306,7 +323,7 @@ public class AutoTopRed {
                     break;
                 case SHOOT_PRESET3:
                     if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-//                        doDepositOff();
+                        halfPowerAll();
                         telemetry.addLine("Intaking Artifacts");
                         follower.followPath(driveIntakePoseShootPosePreset3, true);
                         setPathState(PathState.SHOOT_PRESET3_PRESET2);
@@ -314,14 +331,13 @@ public class AutoTopRed {
                     break;
                 case SHOOT_PRESET3_PRESET2:
                     if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-//                        sleep (1500);
-//                        shoot();
-                        sleep(50);
+                        doRampOn();
+                        doIntakePowerOn();
                         kickerLaunch();
-                        sleep(4000);
-
+                        sleep(5300);
+                        halfPowerAll();
                         telemetry.addLine("Shooting Preset 3");
-                        follower.followPath(driveleaveLaunchZone, true);
+                        follower.followPath(drivePreset2PosIntakePose, true);
                        setPathState(PathState.LEAVE_LAUNCH_ZONE);
 
 //                        shoot();
@@ -331,7 +347,7 @@ public class AutoTopRed {
                 case LEAVE_LAUNCH_ZONE:
                     if(!follower.isBusy() ) {
                         telemetry.addLine("Leaving Launch Zone");
-//                        follower.followPath(drivePreset2PosIntakePose, true);
+                        follower.followPath(driveLeaveLaunchZone, true);
                         setPathState(PathState.LEAVE_LAUNCH_ZONE);
                     }
 //                    break;

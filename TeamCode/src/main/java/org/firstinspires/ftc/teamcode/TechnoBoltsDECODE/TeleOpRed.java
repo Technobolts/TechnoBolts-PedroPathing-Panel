@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
-import static org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam.flywheelSpeed;
+//import static org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam.flywheelSpeed;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -39,6 +39,7 @@ public class TeleOpRed extends OpMode {
     private Supplier<PathChain> Center, CloseRed, FarRed, InTri;
     private TelemetryManager telemetryM;
     private boolean slowMode = false;
+
     boolean wasReady = false;
 
     final double COLOR_YELLOW = 0.25;
@@ -54,7 +55,7 @@ public class TeleOpRed extends OpMode {
     int parkflag = 0;
     int limeflag = 0;
     private int launcherOff = 0;
-    private double intakeOn = -0.5;
+    private double intakeOn = -0.3;
     private int intakeOff = 0;
     private double intakeReverse = 0.1;
     private double flickDown = 0.8;
@@ -78,7 +79,7 @@ public class TeleOpRed extends OpMode {
     double lastError = 0;
     double goalX = 0; //offset here
     double angleTolerance = 0.4;
-    double kD = 0.0002;
+    double kD = 0.0004;
     double curTime = 0;
     double lastTime = 0;
 
@@ -88,6 +89,7 @@ public class TeleOpRed extends OpMode {
 
     @Override
     public void init() {
+
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose(90.48888888888891, 70.17777777777778, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
@@ -132,10 +134,16 @@ public class TeleOpRed extends OpMode {
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
         PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
         leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
         rightDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
+
+
         telemetry.addLine("Initialized");
 
     }
@@ -241,15 +249,18 @@ public class TeleOpRed extends OpMode {
             slowMode = !slowMode;
         }
 
+// __________________________________________________
+
+
+
+
+
         if(gamepad2.right_bumper) {
             upperTServo.setPower(1);
         }
         else {
             upperTServo.setPower(-0.3);
         }
-
-
-
 
         if (gamepad2.aWasPressed()){
             if (intakeflag == 0){
@@ -294,18 +305,15 @@ public class TeleOpRed extends OpMode {
             middleTServo.setPower(-1);
             lowerTServo.setPower(1);
         }
-
         if (gamepad2.dpadUpWasPressed()) {
             if (launchflag == 0  && id24 != null) {
-                double curDistance = id24.ftcPose.y;
-                aprilTagWebcam.update();
-                rightDeposit.setVelocity(flywheelSpeed(curDistance));
-                leftDeposit.setVelocity(flywheelSpeed(curDistance));
+                rightDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id24.ftcPose.y));
+                leftDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id24.ftcPose.y));
                 launchflag = 1;
             }
             else if (launchflag == 0 && id24 == null){
-                rightDeposit.setVelocity(820);
-                leftDeposit.setVelocity(820);
+                rightDeposit.setVelocity(780);
+                leftDeposit.setVelocity(780);
                 launchflag = 1;
             }
             else if (launchflag == 1) {
@@ -320,8 +328,11 @@ public class TeleOpRed extends OpMode {
 
 
         if (id24 != null) {
-            double errorLeft = flywheelSpeed(id24.ftcPose.y) - curVelocity2;
-            double errorRight = flywheelSpeed(id24.ftcPose.y) - curVelocity1;
+            double errorLeft = aprilTagWebcam.flywheelSpeed(id24.ftcPose.y) - curVelocity2;
+            double errorRight = aprilTagWebcam.flywheelSpeed(id24.ftcPose.y) - curVelocity1;
+
+            leftDeposit.setVelocity(leftDeposit.getVelocity() + errorLeft);
+            rightDeposit.setVelocity(rightDeposit.getVelocity() + errorRight);
 
             telemetry.update();
 
@@ -346,6 +357,9 @@ public class TeleOpRed extends OpMode {
         else if (id24 == null){
             double errorLeft = 840 - curVelocity2;
             double errorRight = 840 - curVelocity1;
+
+            leftDeposit.setVelocity(leftDeposit.getVelocity() + errorLeft);
+            rightDeposit.setVelocity(rightDeposit.getVelocity() + errorRight);
 
             telemetry.update();
 
@@ -378,27 +392,27 @@ public class TeleOpRed extends OpMode {
         double leftVelocity = leftDeposit.getVelocity();
         double rightVelocity = rightDeposit.getVelocity();
 
-            telemetry.addData("Y", follower.getPose().getY());
-            telemetry.addData("X", follower.getPose().getX());
-            telemetry.addData("Heading", follower.getPose().getHeading());
-            telemetry.addData("Velocity left/Right", "%6.1f, %6.1f", leftVelocity, rightVelocity);
-            telemetry.addData("Runtime", getRuntime());
-            telemetry.addLine("-------------------------------------------");
-            if (id24 != null) {
-                if (gamepad2.left_trigger > 0.3) {
-                    telemetry.addLine("AUTO ALIGN");
-                }
-                aprilTagWebcam.displayDetectionTelemetry(id24);
-                telemetry.addData("Error", error);
-            } else {
-                telemetry.addLine("MANUAL Rotate Mode");
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Heading", follower.getPose().getHeading());
+        telemetry.addData("Velocity left/Right", "%6.1f, %6.1f", leftVelocity, rightVelocity);
+        telemetry.addData("Runtime", getRuntime());
+        telemetry.addLine("-------------------------------------------");
+        if (id24 != null) {
+            if (gamepad2.left_trigger > 0.3) {
+                telemetry.addLine("AUTO ALIGN");
             }
+            aprilTagWebcam.displayDetectionTelemetry(id24);
+            telemetry.addData("Error", error);
+        } else {
+            telemetry.addLine("MANUAL Rotate Mode");
+        }
 
-            if (endGameStart <= getRuntime() && !isEndGame) {
+        if (endGameStart <= getRuntime() && !isEndGame) {
 //            gamepad1.rumble(5000);
 //            gamepad2.rumble(5000);
-                isEndGame = true;
-            }
+            isEndGame = true;
+        }
 
     }
 

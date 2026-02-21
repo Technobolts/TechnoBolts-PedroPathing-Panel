@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
 @TeleOp
 @Configurable
-public class TeleOpBlue extends OpMode {
+public class TeleOpRedFar extends OpMode {
 
     private final TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
 
@@ -36,7 +36,7 @@ public class TeleOpBlue extends OpMode {
     private Follower follower;
     public static Pose startingPose;    //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
-    private Supplier<PathChain> Center, CloseBlue, FarBlue, InTri;
+    private Supplier<PathChain> Center, CloseRed, FarRed, InTri;
     private TelemetryManager telemetryM;
     private boolean slowMode = false;
 
@@ -92,25 +92,25 @@ public class TeleOpBlue extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(129.6, 11.7333333333333, 0): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         Center = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(74.84444444444443, 78.11111111111111))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(320), 0.8))
-                .build();
-        CloseBlue = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(38.06666666666667, 105.24444444444444))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
                 .build();
-        FarBlue = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(62.773, 5.0301))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(295), 0.8))
+        CloseRed = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(85.13333333333333, 84.91111111111108))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
+                .build();
+        FarRed = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(90.8655666, 24.48555))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(255), 0.8))
                 .build();
         InTri = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(67.9588, 98.1942))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(340), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(50.2232412, 117.251333334))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(200), 0.8))
                 .build();
 
 
@@ -168,11 +168,11 @@ public class TeleOpBlue extends OpMode {
 
 
         aprilTagWebcam.update();
-        AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20);
+        AprilTagDetection id24 = aprilTagWebcam.getTagBySpecificId(24);
 
         if (gamepad2.left_bumper == true) {
-            if (id20 != null) {
-                error = goalX - id20.ftcPose.bearing; // tx
+            if (id24 != null) {
+                error = goalX - id24.ftcPose.bearing; // tx
 
                 if (Math.abs(error) < angleTolerance) {
                     rotate = 0;
@@ -231,12 +231,12 @@ public class TeleOpBlue extends OpMode {
         }
 
         if (gamepad1.xWasPressed()){
-            follower.followPath(CloseBlue.get());
+            follower.followPath(CloseRed.get());
             automatedDrive = true;
         }
 
         if(gamepad1.yWasPressed()) {
-            follower.followPath(FarBlue.get());
+            follower.followPath(FarRed.get());
             automatedDrive = true;
         }
 
@@ -306,12 +306,12 @@ public class TeleOpBlue extends OpMode {
             lowerTServo.setPower(1);
         }
         if (gamepad2.dpadUpWasPressed()) {
-            if (launchflag == 0  && id20 != null) {
-                rightDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id20.ftcPose.y));
-                leftDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id20.ftcPose.y));
+            if (launchflag == 0  && id24 != null) {
+                rightDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id24.ftcPose.y));
+                leftDeposit.setVelocity(aprilTagWebcam.flywheelSpeed(id24.ftcPose.y));
                 launchflag = 1;
             }
-            else if (launchflag == 0 && id20 == null){
+            else if (launchflag == 0 && id24 == null){
                 rightDeposit.setVelocity(780);
                 leftDeposit.setVelocity(780);
                 launchflag = 1;
@@ -327,9 +327,9 @@ public class TeleOpBlue extends OpMode {
         double curVelocity1 = rightDeposit.getVelocity();
 
 
-        if (id20 != null) {
-            double errorLeft = aprilTagWebcam.flywheelSpeed(id20.ftcPose.y) - curVelocity2;
-            double errorRight = aprilTagWebcam.flywheelSpeed(id20.ftcPose.y) - curVelocity1;
+        if (id24 != null) {
+            double errorLeft = aprilTagWebcam.flywheelSpeed(id24.ftcPose.y) - curVelocity2;
+            double errorRight = aprilTagWebcam.flywheelSpeed(id24.ftcPose.y) - curVelocity1;
 
             leftDeposit.setVelocity(leftDeposit.getVelocity() + errorLeft);
             rightDeposit.setVelocity(rightDeposit.getVelocity() + errorRight);
@@ -354,7 +354,7 @@ public class TeleOpBlue extends OpMode {
             telemetry.addData("Error Left", "%6.1f", errorLeft);
 
         }
-        else if (id20 == null){
+        else if (id24 == null){
             double errorLeft = 840 - curVelocity2;
             double errorRight = 840 - curVelocity1;
 
@@ -398,11 +398,11 @@ public class TeleOpBlue extends OpMode {
         telemetry.addData("Velocity left/Right", "%6.1f, %6.1f", leftVelocity, rightVelocity);
         telemetry.addData("Runtime", getRuntime());
         telemetry.addLine("-------------------------------------------");
-        if (id20 != null) {
+        if (id24 != null) {
             if (gamepad2.left_trigger > 0.3) {
                 telemetry.addLine("AUTO ALIGN");
             }
-            aprilTagWebcam.displayDetectionTelemetry(id20);
+            aprilTagWebcam.displayDetectionTelemetry(id24);
             telemetry.addData("Error", error);
         } else {
             telemetry.addLine("MANUAL Rotate Mode");

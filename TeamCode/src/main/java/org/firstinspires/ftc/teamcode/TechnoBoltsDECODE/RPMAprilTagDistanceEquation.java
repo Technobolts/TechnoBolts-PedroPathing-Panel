@@ -29,6 +29,9 @@ public class RPMAprilTagDistanceEquation {
     public static double DepoSpeed6 (double goalDist){
         return  MathFunctions.clamp(-0.00000459229 * Math.pow(goalDist, 4)  +0.0022458 * Math.pow(goalDist, 3) -0.411268 * Math.pow(goalDist, 2) +34.10407 * (goalDist) -256.11769, 770, 920);
     }
+    public static double DepoSpeed7 (double goalDist){
+        return  MathFunctions.clamp(- 0.00000569338 * Math.pow(goalDist, 4)  +0.00246149 * Math.pow(goalDist, 3) -0.375414 * Math.pow(goalDist, 2) +24.62591 * (goalDist) +179.82739, 750, 900);
+    }
 }
 
 
@@ -46,3 +49,5 @@ public class RPMAprilTagDistanceEquation {
 // y = -0.0000018442x^{4}+0.000870702x^{3}-0.156681x^{2}+13.46395x+361.23254
 
 // y = -0.00000459229x^{4}+0.0022458x^{3}-0.411268x^{2}+34.10407x-256.11769
+
+// y= -0.00000569338x^{4}+0.00246149x^{3}-0.375414x^{2}+24.62591x+179.82739

@@ -14,12 +14,12 @@ public class AlignToAprilTag extends OpMode {
     public DcMotor leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive;
 
     // ------------------------ PD Controller -------------------------
-    double kP = 0.002;
+    double kP = 0.03;
     double error = 0;
     double lastError = 0;
     double goalX = 0; //offset here
     double angleTolerance = 0.4;
-    double kD = 0.0001;
+    double kD = 0.0004;
     double curTime = 0;
     double lastTime = 0;
 

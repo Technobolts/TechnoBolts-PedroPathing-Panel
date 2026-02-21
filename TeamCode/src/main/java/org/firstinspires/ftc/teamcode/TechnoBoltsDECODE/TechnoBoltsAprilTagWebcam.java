@@ -35,8 +35,8 @@ public class TechnoBoltsAprilTagWebcam {
         }
     }
 
-    public static double flywheelSpeed (double goalDist){
-        return  MathFunctions.clamp(-0.00000459229 * Math.pow(goalDist, 4)  +0.0022458 * Math.pow(goalDist, 3) -0.411268 * Math.pow(goalDist, 2) +34.10407 * (goalDist) -286.11769, 770, 920);
+    public double flywheelSpeed (double goalDist ){
+        return  MathFunctions.clamp(- 0.00000569338 * Math.pow(goalDist, 4)  +0.00246149 * Math.pow(goalDist, 3) -0.375414 * Math.pow(goalDist, 2) +24.62591 * (goalDist) +179.82739, 750, 900) - 40;
     }
 
     private Telemetry telemetry;
