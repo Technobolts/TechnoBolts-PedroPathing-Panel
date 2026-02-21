@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class FlyWheelTunerLeft extends OpMode {
     public DcMotorEx ShooterRight, ShooterLeft;
 
-    public double zero = 0;
     public double highVelocity = 1500;
 
     public double lowVelocity = 900;
