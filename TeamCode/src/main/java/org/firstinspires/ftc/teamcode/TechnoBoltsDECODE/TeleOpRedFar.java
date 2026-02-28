@@ -78,7 +78,7 @@ public class TeleOpRedFar extends OpMode {
     double error = 0;
     double lastError = 0;
     double goalX = 0; //offset here
-    double angleTolerance = 0.4;
+    double angleTolerance = 0.1;
     double kD = 0.0004;
     double curTime = 0;
     double lastTime = 0;
@@ -92,7 +92,7 @@ public class TeleOpRedFar extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(129.6, 11.7333333333333, 0): startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(100.26666666666667, 24.53333333333334, 0): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -312,8 +312,8 @@ public class TeleOpRedFar extends OpMode {
                 launchflag = 1;
             }
             else if (launchflag == 0 && id24 == null){
-                rightDeposit.setVelocity(780);
-                leftDeposit.setVelocity(780);
+                rightDeposit.setVelocity(760);
+                leftDeposit.setVelocity(760);
                 launchflag = 1;
             }
             else if (launchflag == 1) {

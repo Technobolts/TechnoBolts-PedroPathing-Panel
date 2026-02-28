@@ -43,7 +43,6 @@ public class AutoTopBlue {
     private final double intakePowerOff = 0;
     private final double kickerStopPower = -0.7;
     private final double kickerLaunchPower = 1;
-
     private final double kickerHalfLaunchPower = 0.3;
     // Define the motor at the top of your OpMode class
 
@@ -91,18 +90,10 @@ public class AutoTopBlue {
         pathTimer.resetTimer();
     }
 
-    public void halfPowerAll() {
-        doIntakeHalfPower();
-        doRampSlow();
-        kickerStop();
-
-    }
     public void doIntakePowerOn() {
         intake.setPower(intakePowerOn);
     }
-    public void doIntakeHalfPower() {
-        intake.setPower(intakeHalfPower);
-}
+
     public void doIntakePowerOff() {
         intake.setPower(intakePowerOff);
     }
@@ -123,6 +114,17 @@ public class AutoTopBlue {
 
     public void kickerHalfLaunch(){
         kickerServo.setPower(kickerHalfLaunchPower);
+    }
+
+    public void doIntakeHalfPower() {
+        intake.setPower(intakeHalfPower);
+    }
+
+    public void halfPowerAll() {
+        doIntakeHalfPower();
+        doRampSlow();
+        kickerStop();
+
     }
 
     public void kickerLaunch() {
@@ -171,28 +173,31 @@ public class AutoTopBlue {
 
     private final Pose startPose = new Pose(25.066666666666666, 122.66666666666667, Math.toRadians(320));
 
-    private final Pose shootPose = new Pose(69.15555555555557, 78.11111111111111, Math.toRadians(320));
+    private final Pose shootPose = new Pose(58.15555555555557, 78.11111111111111, Math.toRadians(307));
 
     private final Pose presetPose = new Pose(47.644444444444446, 72.3111111111111, Math.toRadians(180));
 
-    private final Pose Preset1PosIntakePose = new Pose(23.822222222222223, 72.60000000000001, Math.toRadians(180));
+    private final Pose Preset1PosIntakePose = new Pose(15.822222222222223, 72.60000000000001, Math.toRadians(180));
 
-    private final Pose IntakePoseShootPosePreset1 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
+    private final Pose IntakePoseShootPosePreset1 = new Pose(58.15555555555557, 78.11111111111111, Math.toRadians(307));
     private final Pose ShootPosPreset3Pos = new Pose(48, 24.133333333333326, Math.toRadians(180));
     private final Pose Preset3PosIntakePose = new Pose(23.822222222222223, 24.955555555555552, Math.toRadians(180));
-    private final Pose IntakePoseShootPosePreset3 = new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(320));
-//    private final Pose leaveLaunchZone = new Pose(, Math.toRadians(235));
+    private final Pose IntakePoseShootPosePreset3 = new Pose(58.15555555555557, 78.11111111111111, Math.toRadians(307));
+    //    private final Pose leaveLaunchZone = new Pose(, Math.toRadians(235));
     private final Pose Preset2PosIntakePose = new Pose(26.31111111111111, 90.31111111111109, Math.toRadians(0));
 
     private final Pose shootPosePreset2Pose = new Pose(76.42222222222226, 101.19999999999999);
+//    private final Pose Preset2PosIntakePose = new Pose(108.4, 84.08888888888887, Math.toRadians(0));
+
+//    private final Pose shootPosePreset2Pose = new Pose(76.244, 83.24444444444444);
 //    private final Pose IntakePoseShootPosePreset2 = new Pose(112.35555555555555, 72, Math.toRadians(0));
 //    private final Pose Preset2IntakeEmptyRamp = new Pose(121.06666666666668, 83.73333333333333, Math.toRadians(0));
 //
 //    private final Pose EmptyRampShootingPos = new Pose(74.84444444444443, 78.11111111111111, Math.toRadians(225));
-//    private final Pose StrafeOut = new Pose(100.97777777777779, 65.42222222222222, Math.toRadians(225));
+    private final Pose StrafeOut = new Pose(55.46666666666667, 75.19999999999999, Math.toRadians(320));
 
 
-    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveleaveLaunchZone,  drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private PathChain driveStartPosShootPos, driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveLeaveLaunchZone,  drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
 
 
     public void buildPaths () {
@@ -225,10 +230,10 @@ public class AutoTopBlue {
                 .addPath(new BezierLine(Preset3PosIntakePose, IntakePoseShootPosePreset3))
                 .setLinearHeadingInterpolation(Preset3PosIntakePose.getHeading(), IntakePoseShootPosePreset3.getHeading())
                 .build();
-//        driveleaveLaunchZone = follower.pathBuilder()
-//                .addPath(new BezierLine(IntakePoseShootPosePreset3, leaveLaunchZone))
-//                .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), leaveLaunchZone.getHeading())
-//                .build();
+        driveLeaveLaunchZone = follower.pathBuilder()
+                .addPath(new BezierLine(IntakePoseShootPosePreset3, StrafeOut))
+                .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), StrafeOut.getHeading())
+                .build();
 //            driveStrafeOut = follower.pathBuilder()
 //                    .addPath(new BezierLine(IntakePoseShootPosePreset3, StrafeOut))
 //                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), StrafeOut.getHeading())
@@ -237,6 +242,14 @@ public class AutoTopBlue {
                 .addPath(new BezierCurve(IntakePoseShootPosePreset3, shootPosePreset2Pose,Preset2PosIntakePose))
                 .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
                 .build();
+//            driveStrafeOut = follower.pathBuilder()
+//                    .addPath(new BezierLine(IntakePoseShootPosePreset3, StrafeOut))
+//                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), StrafeOut.getHeading())
+//                    .build();
+//            drivePreset2PosIntakePose = follower.pathBuilder()
+//                    .addPath(new BezierCurve(IntakePoseShootPosePreset3, shootPosePreset2Pose,Preset2PosIntakePose))
+//                    .setLinearHeadingInterpolation(IntakePoseShootPosePreset3.getHeading(), Preset2PosIntakePose.getHeading())
+//                    .build();
 //            driveIntakePoseShootPosePreset2 = follower.pathBuilder()
 //                    .addPath(new BezierLine(Preset2PosIntakePose, IntakePoseShootPosePreset2))
 //                    .setLinearHeadingInterpolation(Preset2PosIntakePose.getHeading(), IntakePoseShootPosePreset2.getHeading())
@@ -270,7 +283,6 @@ public class AutoTopBlue {
                     doIntakePowerOn();
                     sleep(4700);
                     kickerStop();
-                    doIntakePowerOff();
                     telemetry.addLine("Shooting Preload");
                     follower.followPath(driveShootPosPreset1Pos,true);
                     setPathState(PathState.SHOOT_PRELOAD_PRESET1);
@@ -303,7 +315,7 @@ public class AutoTopBlue {
                     doRampOn();
                     doIntakePowerOn();
                     kickerLaunch();
-                    sleep(5300);
+                    sleep(5000);
                     halfPowerAll();
                     follower.followPath(driveShootPosPreset3Pos,  true);
                     setPathState(PathState.INTAKE_PRESET3);
@@ -331,17 +343,20 @@ public class AutoTopBlue {
                     doRampOn();
                     doIntakePowerOn();
                     kickerLaunch();
-                    sleep(5300);
+                    sleep(5000);
                     halfPowerAll();
                     telemetry.addLine("Shooting Preset 3");
-                    follower.followPath(drivePreset2PosIntakePose, true);
+                    follower.followPath(driveLeaveLaunchZone, true);
                     setPathState(PathState.LEAVE_LAUNCH_ZONE);
+
+//                        shoot();
+//                        doDepositOff();
                 }
                 break;
             case LEAVE_LAUNCH_ZONE:
                 if(!follower.isBusy() ) {
                     telemetry.addLine("Leaving Launch Zone");
-                        follower.followPath(driveleaveLaunchZone, true);
+//                        follower.followPath(driveLeaveLaunchZone, true);
                     setPathState(PathState.LEAVE_LAUNCH_ZONE);
                 }
 //                    break;

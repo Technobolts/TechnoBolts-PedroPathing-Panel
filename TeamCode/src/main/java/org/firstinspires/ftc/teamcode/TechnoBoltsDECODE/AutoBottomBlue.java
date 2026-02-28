@@ -31,7 +31,7 @@ public class AutoBottomBlue {
     public final Servo ledDepo;
 
 
-    private final double ShooterOn = 820;
+    private final double ShooterOn = 800;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -0.5;
@@ -165,9 +165,9 @@ public class AutoBottomBlue {
     private final Pose startPose = new Pose(50.93333333333336, 9.689999999999999999, Math.toRadians(270));
 //    private final Pose startShootPose = new Pose(38.06666666666667, 105.24444444444444, Math.toRadians(225));
 
-    private final Pose startShootPose = new Pose(60, 24, Math.toRadians(300));
+    private final Pose startShootPose = new Pose(60, 24, Math.toRadians(295));
 //    private final Pose startHumanPose = new Pose(55.7777777777778,25.466666666666647, Math.toRadians(180));
-    private final Pose humanZone = new Pose(14.933333333333335, 11.7333333333333, 0);
+    private final Pose humanZone = new Pose(40.82222222222222,24.711111111111112, 0);
     private PathChain driveStartPosShootPos, drivehumanZone ;
 
 
@@ -199,7 +199,7 @@ public class AutoBottomBlue {
 
             case SHOOT_PRELOAD:
                 //check is follower done its path?
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
+                if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
                     doDepositOn();
                     sleep(1500);
                     kickerLaunch();
@@ -217,21 +217,22 @@ public class AutoBottomBlue {
                 if (!follower.isBusy()) {
                     doRampSlow();
                     kickerStop();
+                    doIntakePowerOff();
                     telemetry.addLine("Aligning to human position");
                     follower.followPath(drivehumanZone, 0.5,true);
                     setPathState(PathState.TURN_OFF);
                 }
                 break;
             case TURN_OFF:
-                doRampSlow();
-                kickerStop();
-                doDepositOff();
-                telemetry.addLine("Turning-Off");
-                break;
+                if (!follower.isBusy()) {
+                    doRampSlow();
+                    kickerStop();
+                    doDepositOff();
+                    telemetry.addLine("Turning-Off");
+                }
 
             default:
                 telemetry.addLine("No State Commanded");
-                break;
         }
 
     }

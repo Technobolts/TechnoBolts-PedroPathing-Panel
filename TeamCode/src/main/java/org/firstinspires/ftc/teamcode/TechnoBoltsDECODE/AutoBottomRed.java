@@ -73,7 +73,7 @@ public class AutoBottomRed {
         follower.setPose(startPose);
         buildPaths();
 
-        pathState = PathState.SHOOT_PRELOAD;
+        pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
         setPathState(pathState);
 
         pathTimer = new Timer();
@@ -143,7 +143,9 @@ public class AutoBottomRed {
         // SHOOT > ATTEMPT TO SCORE
         DRIVE_STARTPOS_SHOOT_POS, //From start to shoot position
         SHOOT_PRELOAD,
-        SHOOT_PRELOAD_HUMAN //Shoot to start intake preset
+        SHOOT_PRELOAD_HUMAN,
+        TURN_OFF
+        //Shoot to start intake preset
 //        INTAKE_PRESET1, //aligned preset to fully intake preset
 //        SHOOT_PRESET1_PRESET3 , //From shooting to preset 3
 //        INTAKE_PRESET3 , //Intaking preset 3
@@ -161,11 +163,11 @@ public class AutoBottomRed {
     PathState pathState;
 
     private final Pose startPose = new Pose(92, 9.689999999999999999, Math.toRadians(270));
-    private final Pose startShootPose = new Pose(95, 9.689999999999999999, Math.toRadians(240));
+    private final Pose startShootPose = new Pose(92, 12.689999999999999999, Math.toRadians(245));
 
-    private final Pose humanZone = new Pose(129.6, 11.7333333333333, 0);
-
-    private PathChain driveStartPosHumanPos, driveStartPosShootPos,driveShootPosPreset1Pos, drivePreset1PosIntakePose, driveIntakePoseShootPosePreset1 , driveShootPosPreset3Pos, drivePreset3PosIntakePose, driveIntakePoseShootPosePreset3, driveleaveLaunchZone,  drivePreset2PosIntakePose, driveStrafeOut, driveIntakePoseShootPosePreset2, drivePreset2IntakeEmptyRamp, driveEmptyRampShootPos;
+    private final Pose ShootPosehumanPos = new Pose(85.5111111111111, 23.999999999999993);
+    private final Pose humanZone = new Pose(100.26666666666667, 24.53333333333334, 0);
+    private PathChain driveStartPosShootPos, drivehumanZone;
 
 
     public void buildPaths () {
@@ -174,9 +176,10 @@ public class AutoBottomRed {
                 .addPath(new BezierLine(startPose, startShootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), startShootPose.getHeading())
                 .build();
-        driveStartPosHumanPos = follower.pathBuilder()
-                .addPath(new BezierLine(startPose,humanZone))
-                .setLinearHeadingInterpolation(startPose.getHeading(), humanZone.getHeading())
+
+        drivehumanZone = follower.pathBuilder()
+                .addPath(new BezierCurve(startShootPose,ShootPosehumanPos,humanZone))
+                .setLinearHeadingInterpolation(startShootPose.getHeading(), ShootPosehumanPos.getHeading(),humanZone.getHeading())
                 .build();
     }
 
@@ -184,10 +187,13 @@ public class AutoBottomRed {
         switch (pathState) {
 
             case DRIVE_STARTPOS_SHOOT_POS:
-                follower.followPath(driveStartPosShootPos, true);
-                doDepositOn();
-                kickerHalfLaunch();
-                setPathState(PathState.SHOOT_PRELOAD); //reset the timer & make new state
+                if (!follower.isBusy()) {
+                    doDepositOn();
+                    kickerStop();
+                    doIntakePowerOn();
+                    follower.followPath(driveStartPosShootPos, true);
+                    setPathState(PathState.SHOOT_PRELOAD);
+                }//reset the timer & make new state
                 break;
 
             case SHOOT_PRELOAD:
@@ -197,11 +203,11 @@ public class AutoBottomRed {
                     sleep(1500);
                     kickerLaunch();
                     doRampOn();
-                    doIntakePowerOn();
+                    //doIntakePowerOn();
                     sleep(6000);
                     kickerStop();
                     telemetry.addLine("Shooting Preload");
-                    follower.followPath(driveStartPosHumanPos);
+                    follower.followPath(drivehumanZone);
                     setPathState(PathState.SHOOT_PRELOAD_HUMAN);
                 }
                 break;
@@ -210,149 +216,22 @@ public class AutoBottomRed {
                 if (!follower.isBusy()) {
                     doRampSlow();
                     kickerStop();
-                    telemetry.addLine("Aligning to preset1");
-//                    follower.followPath(drivePreset1PosIntakePose, 0.5,true);
-                    setPathState(PathState.SHOOT_PRELOAD_HUMAN);
+                    telemetry.addLine("Aligning to human position");
+                    follower.followPath(drivehumanZone, 0.5,true);
+                    setPathState(PathState.TURN_OFF);
                 }
-//                break;
-//
-//            case INTAKE_PRESET1:
-//                if (!follower.isBusy()) {
-//                    doRampOn();
-//                    telemetry.addLine("Intaking Artifacts of Preset 1");
-//                    follower.followPath(driveIntakePoseShootPosePreset1,true);
-//                    setPathState(PathState.SHOOT_PRESET1_PRESET3);
-//
-//                }
-//                break;
-//
-//
-//            case SHOOT_PRESET1_PRESET3:
-//                if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
-//                    telemetry.addLine("Shooting Preset 1");
-//                    kickerLaunch();
-//                    sleep(5200);
-//                        kickerStop();
-//                        sleep(1000);
-//                    //shoot();
-//                    kickerStop();
-//
-//                        sleep (1000);
-//                        shoot();
-//
-//                    follower.followPath(driveShootPosPreset3Pos,  true);
-//                    setPathState(PathState.INTAKE_PRESET3);
-//                }
-//                break;
-//            case INTAKE_PRESET3:
-//                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-//                    doRampSlow();
-//                    kickerStop();
-//                    telemetry.addLine("Aligning Artifacts");
-//                    follower.followPath(drivePreset3PosIntakePose,0.5,true);
-//                    setPathState(PathState.SHOOT_PRESET3);
-//
-//                }
-//                break;
-//            case SHOOT_PRESET3:
-//                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-//                    doRampOn();
-//                    telemetry.addLine("Intaking Artifacts");
-//                    follower.followPath(driveIntakePoseShootPosePreset3, true);
-//                    setPathState(PathState.SHOOT_PRESET3_PRESET2);
-//                }
-//                break;
-//            case SHOOT_PRESET3_PRESET2:
-//                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-//                        sleep (1500);
-//                        shoot();
-//                    sleep(50);
-//                    kickerLaunch();
-//                    sleep(5200);
-//
-//                    telemetry.addLine("Shooting Preset 3");
-//                    follower.followPath(drivePreset2PosIntakePose, true);
-//                    setPathState(PathState.LEAVE_LAUNCH_ZONE);
-//
-//                        shoot();
-//                        doDepositOff();
-//                }
-//                break;
-//            case LEAVE_LAUNCH_ZONE:
-//                if(!follower.isBusy() ) {
-//                    telemetry.addLine("Leaving Launch Zone");
-//                        follower.followPath(drivePreset2PosIntakePose, true);
-//                    setPathState(PathState.LEAVE_LAUNCH_ZONE);
-//                }
-//                break;
-
-//                case STRAFE_OUT:
-//                    if (!follower.isBusy()) {
-//                        telemetry.addLine("Strafing out");
-//                        follower.followPath(driveStrafeOut, true);
-//                        setPathState(PathState.STRAFE_OUT);
-//                    }i
-//                    break;
-//                case INTAKE_PRESET2:
-//                    if(!follower.isBusy()&& pathTimer.getElapsedTime() > 1500) {
-//                        telemetry.addLine("Aligning to artifacts");
-//                        follower.followPath(driveIntakePoseShootPosePreset2, true);
-//                            setPathState(PathState.PRESET2_EMPTY_RAMP);
-//                    }
-//                    break;
-//                case PRESET2_EMPTY_RAMP:
-//                    if(!follower.isBusy()2&& pathTimer.getElapsedTime() > 2500) {
-//                        telemetry.addLine("Emptying Ramp");
-//                        follower.followPath(drivePreset2IntakeEmptyRamp, true);
-//                            setPathState(PathState.EMPTY_RAMP_SHOOT);
-//                    }
-//                    break;
-//                case EMPTY_RAMP_SHOOT:
-//                    if(!follower.isBusy() && pathTimer.getElapsedTime() > 4500) {
-//                        telemetry.addLine("Shooting");
-//                        follower.followPath(driveEmptyRampShootPos, true);
-//                        setPathState(PathState.EMPTY_RAMP_SHOOT);
-//                    }
-//                    break;
-//                case DONE:
-//                    if(!follower.isBusy()){
-//                        telemetry.addLine("Auto Done");
-//                    }
+                break;
+            case TURN_OFF:
+                if (!follower.isBusy()) {
+                    doRampSlow();
+                    kickerStop();
+                    doDepositOff();
+                    setPathState(PathState.TURN_OFF);
+                    telemetry.addLine("Turning-Off");
+                }
             default:
                 telemetry.addLine("No State Commanded");
         }
 
     }
-
-
-
-
-//        @Override
-//        public void init () {
-//            pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
-//            pathTimer = new Timer();
-//            opModeTimer = new Timer();
-//            follower = Constants.createFollower(hardwareMap);
-//            //TODO add in any other init mechanisms
-//
-//            buildPaths();
-//            follower.setPose(startPose);
-//        }
-
-
-
-//        @Override
-//        public void loop () {
-//
-//            follower.update();
-//            statePathUpdate();
-//
-//            telemetry.addData("path state", pathState.toString());
-//            telemetry.addData("x", follower.getPose().getX());
-//            telemetry.addData("y", follower.getPose().getY());
-//            telemetry.addData("heading", follower.getPose().getHeading());
-//            telemetry.addData("Path time", pathTimer.getElapsedTimeSeconds());
-//        }
-
-
 }

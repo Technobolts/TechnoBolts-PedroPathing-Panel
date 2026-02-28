@@ -78,7 +78,7 @@ public class TeleOpBlue extends OpMode {
     double error = 0;
     double lastError = 0;
     double goalX = 0; //offset here
-    double angleTolerance = 0.4;
+    double angleTolerance = 0.1;
     double kD = 0.0004;
     double curTime = 0;
     double lastTime = 0;
@@ -92,7 +92,7 @@ public class TeleOpBlue extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(71.82222222222222, 73.77777777777779, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(55.46666666666667, 75.19999999999999, Math.toRadians(320)): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -105,8 +105,8 @@ public class TeleOpBlue extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
                 .build();
         FarBlue = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(62.773, 5.0301))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(295), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72.4878, 22.8712))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(305), 0.8))
                 .build();
         InTri = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(67.9588, 98.1942))))
@@ -312,8 +312,8 @@ public class TeleOpBlue extends OpMode {
                 launchflag = 1;
             }
             else if (launchflag == 0 && id20 == null){
-                rightDeposit.setVelocity(780);
-                leftDeposit.setVelocity(780);
+                rightDeposit.setVelocity(760);
+                leftDeposit.setVelocity(760);
                 launchflag = 1;
             }
             else if (launchflag == 1) {

@@ -306,7 +306,7 @@ public class AutoTopRed {
                         doRampOn();
                         doIntakePowerOn();
                         kickerLaunch();
-                        sleep(5300);
+                        sleep(5000);
                         halfPowerAll();
                         follower.followPath(driveShootPosPreset3Pos,  true);
                         setPathState(PathState.INTAKE_PRESET3);
@@ -334,10 +334,10 @@ public class AutoTopRed {
                         doRampOn();
                         doIntakePowerOn();
                         kickerLaunch();
-                        sleep(5300);
+                        sleep(5000);
                         halfPowerAll();
                         telemetry.addLine("Shooting Preset 3");
-                        follower.followPath(drivePreset2PosIntakePose, true);
+                        follower.followPath(driveLeaveLaunchZone, true);
                        setPathState(PathState.LEAVE_LAUNCH_ZONE);
 
 //                        shoot();
@@ -347,7 +347,7 @@ public class AutoTopRed {
                 case LEAVE_LAUNCH_ZONE:
                     if(!follower.isBusy() ) {
                         telemetry.addLine("Leaving Launch Zone");
-                        follower.followPath(driveLeaveLaunchZone, true);
+//                        follower.followPath(driveLeaveLaunchZone, true);
                         setPathState(PathState.LEAVE_LAUNCH_ZONE);
                     }
 //                    break;

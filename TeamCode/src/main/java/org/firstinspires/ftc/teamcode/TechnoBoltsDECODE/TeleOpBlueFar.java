@@ -78,7 +78,7 @@ public class TeleOpBlueFar extends OpMode {
     double error = 0;
     double lastError = 0;
     double goalX = 0; //offset here
-    double angleTolerance = 0.4;
+    double angleTolerance = 0.1;
     double kD = 0.0004;
     double curTime = 0;
     double lastTime = 0;
@@ -92,7 +92,7 @@ public class TeleOpBlueFar extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(14.933333333333335, 11.7333333333333, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(40.82222222222222,24.711111111111112, 0): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -102,11 +102,11 @@ public class TeleOpBlueFar extends OpMode {
                 .build();
         CloseRed = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(85.13333333333333, 84.91111111111108))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(225), 0.8))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(305), 0.8))
                 .build();
         FarRed = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(90.8655666, 24.48555))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(255), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72.4878, 22.8712))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(3), 0.8))
                 .build();
         InTri = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(50.2232412, 117.251333334))))
@@ -312,8 +312,8 @@ public class TeleOpBlueFar extends OpMode {
                 launchflag = 1;
             }
             else if (launchflag == 0 && id20 == null){
-                rightDeposit.setVelocity(780);
-                leftDeposit.setVelocity(780);
+                rightDeposit.setVelocity(760);
+                leftDeposit.setVelocity(760);
                 launchflag = 1;
             }
             else if (launchflag == 1) {
@@ -363,8 +363,8 @@ public class TeleOpBlueFar extends OpMode {
 
             telemetry.update();
 
-            boolean isReady = (errorLeft >= -20 && errorLeft <= 40 &&
-                    errorRight >= -20 && errorRight <= 40);
+            boolean isReady = (errorLeft >= -20 && errorLeft <= 20 &&
+                    errorRight >= -20 && errorRight <= 20);
 
             // 2. Only update the LED if the state has CHANGED
             if (isReady != wasReady) {
