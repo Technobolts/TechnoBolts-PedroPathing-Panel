@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Auto;
 
 import static android.os.SystemClock.sleep;
 
@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-public class AutoBottomBlue {
+public class AutoBottomRed {
 
     private Follower follower;
     private Timer pathTimer, opModeTimer;
@@ -31,7 +31,7 @@ public class AutoBottomBlue {
     public final Servo ledDepo;
 
 
-    private final double ShooterOn = 800;
+    private final double ShooterOn = 820;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
     private final double lowerRampOn = -0.5;
@@ -51,7 +51,7 @@ public class AutoBottomBlue {
 
     Telemetry telemetry;
 
-    public AutoBottomBlue(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoBottomRed(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -162,13 +162,12 @@ public class AutoBottomBlue {
 
     PathState pathState;
 
-    private final Pose startPose = new Pose(50.93333333333336, 9.689999999999999999, Math.toRadians(270));
-//    private final Pose startShootPose = new Pose(38.06666666666667, 105.24444444444444, Math.toRadians(225));
+    private final Pose startPose = new Pose(92, 9.689999999999999999, Math.toRadians(270));
+    private final Pose startShootPose = new Pose(92, 12.689999999999999999, Math.toRadians(245));
 
-    private final Pose startShootPose = new Pose(60, 24, Math.toRadians(295));
-//    private final Pose startHumanPose = new Pose(55.7777777777778,25.466666666666647, Math.toRadians(180));
-    private final Pose humanZone = new Pose(40.82222222222222,24.711111111111112, 0);
-    private PathChain driveStartPosShootPos, drivehumanZone ;
+    private final Pose ShootPosehumanPos = new Pose(85.5111111111111, 23.999999999999993);
+    private final Pose humanZone = new Pose(100.26666666666667, 24.53333333333334, 0);
+    private PathChain driveStartPosShootPos, drivehumanZone;
 
 
     public void buildPaths () {
@@ -179,8 +178,8 @@ public class AutoBottomBlue {
                 .build();
 
         drivehumanZone = follower.pathBuilder()
-                .addPath(new BezierLine(startShootPose,humanZone))
-                .setLinearHeadingInterpolation(startShootPose.getHeading(), humanZone.getHeading())
+                .addPath(new BezierCurve(startShootPose,ShootPosehumanPos,humanZone))
+                .setLinearHeadingInterpolation(startShootPose.getHeading(), ShootPosehumanPos.getHeading(),humanZone.getHeading())
                 .build();
     }
 
@@ -199,7 +198,7 @@ public class AutoBottomBlue {
 
             case SHOOT_PRELOAD:
                 //check is follower done its path?
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
+                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
                     doDepositOn();
                     sleep(1500);
                     kickerLaunch();
@@ -217,7 +216,6 @@ public class AutoBottomBlue {
                 if (!follower.isBusy()) {
                     doRampSlow();
                     kickerStop();
-                    doIntakePowerOff();
                     telemetry.addLine("Aligning to human position");
                     follower.followPath(drivehumanZone, 0.5,true);
                     setPathState(PathState.TURN_OFF);
@@ -228,9 +226,9 @@ public class AutoBottomBlue {
                     doRampSlow();
                     kickerStop();
                     doDepositOff();
+                    setPathState(PathState.TURN_OFF);
                     telemetry.addLine("Turning-Off");
                 }
-
             default:
                 telemetry.addLine("No State Commanded");
         }

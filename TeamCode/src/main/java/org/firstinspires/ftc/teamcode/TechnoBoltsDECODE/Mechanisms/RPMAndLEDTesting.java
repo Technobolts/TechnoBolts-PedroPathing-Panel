@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo; // Changed from CRServo

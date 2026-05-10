@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.TBWebcam;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @TeleOp(name = "Align To AprilTag", group = "Test")

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
 //import static org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam.flywheelSpeed;
 
@@ -21,6 +21,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBolts;
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.slf4j.Logger;
@@ -55,7 +57,7 @@ public class TeleOpBlue extends OpMode {
     int parkflag = 0;
     int limeflag = 0;
     private int launcherOff = 0;
-    private double intakeOn = -0.3;
+    private double intakeOn = -0.6;
     private int intakeOff = 0;
     private double intakeReverse = 0.1;
     private double flickDown = 0.8;

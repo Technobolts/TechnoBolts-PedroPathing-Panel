@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-public class AlignToAprilTag2 {
+public class AlignToAprilTagTurret {
 
     private DcMotor turret;
     private double kP = 0.0001;

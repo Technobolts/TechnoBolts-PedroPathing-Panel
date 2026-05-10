@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
 //import static org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam.flywheelSpeed;
 
@@ -21,6 +21,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBolts;
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
 @TeleOp
 @Configurable
-public class TeleOpRed extends OpMode {
+public class TeleOpRedFar extends OpMode {
 
     private final TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
 
@@ -55,7 +57,7 @@ public class TeleOpRed extends OpMode {
     int parkflag = 0;
     int limeflag = 0;
     private int launcherOff = 0;
-    private double intakeOn = -0.3;
+    private double intakeOn = -0.6;
     private int intakeOff = 0;
     private double intakeReverse = 0.1;
     private double flickDown = 0.8;
@@ -92,7 +94,7 @@ public class TeleOpRed extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(90.48888888888891, 70.17777777777778, Math.toRadians(235)): startingPose);   // set where the robot starts in TeleOp
+        follower.setStartingPose(startingPose == null ? new Pose(100.26666666666667, 24.53333333333334, 0): startingPose);   // set where the robot starts in TeleOp
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();

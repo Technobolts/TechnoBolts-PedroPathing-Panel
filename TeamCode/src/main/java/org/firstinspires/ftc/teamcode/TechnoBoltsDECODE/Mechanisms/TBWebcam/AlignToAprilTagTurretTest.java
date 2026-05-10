@@ -1,15 +1,16 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.TBWebcam;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.AlignToAprilTagTurret;
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TechnoBoltsAprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @TeleOp
-public class AlignToAprilTag2Test extends OpMode {
+public class AlignToAprilTagTurretTest extends OpMode {
     private TechnoBoltsAprilTagWebcam aprilTagWebcam = new TechnoBoltsAprilTagWebcam();
-    private AlignToAprilTag2 turret = new AlignToAprilTag2();
+    private AlignToAprilTagTurret turret = new AlignToAprilTagTurret();
 
 
     double[] stepSizes = {10, 1.0, 0.1, 0.01, 0.001, 0.0001};

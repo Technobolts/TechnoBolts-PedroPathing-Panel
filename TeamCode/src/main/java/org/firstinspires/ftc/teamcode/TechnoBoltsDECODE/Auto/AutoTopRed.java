@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Auto;
 
 import static android.os.SystemClock.sleep;
 
