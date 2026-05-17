@@ -122,6 +122,5 @@ public class TurretTest extends OpMode {
         telemetry.update();
     }
 }
-
 // P = -0.0026
 // D = 0.0058
