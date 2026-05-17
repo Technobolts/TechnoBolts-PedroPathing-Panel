@@ -12,7 +12,7 @@ public class MagnetTest extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Magnet state", bench.isMagneticlimitsensorCLosed());
+        telemetry.addData("Magnet state", bench.IsMagnetTest));
 
     }
-}
+}1. if MagnetTest is closed print "magnet detected"
