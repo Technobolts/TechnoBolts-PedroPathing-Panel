@@ -39,47 +39,72 @@ public class Sensors {
         if (value < 0.15) {
             color = "Black";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.BLACK;
         }
 // 2. WHITE CHECK
         else if (saturation < 0.20 && value > 0.70) {
             color = "White";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.WHITE;
         }
 // 3. YELLOW CHECK
         else if (hue >= 45 && hue < 95 && saturation > 0.40) {
             color = "Yellow";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.YELLOW;
+
         }
 // 4. GREEN CHECK
         else if (hue >= 95 && hue <= 140 && saturation > 0.40) {
             color = "Green";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.GREEN;
         }
 // 5. BLUE CHECK
         else if (hue >= 190 && hue < 225 && saturation > 0.40) {
             color = "Blue";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.BLUE;
         }
 // 6. PURPLE CHECK
         else if (hue >= 225 && hue <= 270 && saturation > 0.40) {
             color = "Purple";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.PURPLE;
         }
 // 7. RED CHECK (Handles the 360 to 0 wrap-around)
         else if ((hue >= 340 || hue <= 20) && saturation > 0.40) {
             color = "Red";
             telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE",hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE",value);
             return DetectedColor.RED;
         }
 
 // Default Fallback
         telemetry.addData("COLOR:", "Unknown");
+        telemetry.addData("HUE",hue);
+        telemetry.addData("SATURATION", saturation);
+        telemetry.addData("VALUE",value);
         return DetectedColor.UNKNOWN;
 
     }
