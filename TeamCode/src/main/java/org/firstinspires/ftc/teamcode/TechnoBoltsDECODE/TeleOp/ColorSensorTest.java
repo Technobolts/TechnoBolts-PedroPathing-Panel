@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.Sensors;
-
+@TeleOp
 public class ColorSensorTest extends OpMode {
 
     Sensors sensor = new Sensors();

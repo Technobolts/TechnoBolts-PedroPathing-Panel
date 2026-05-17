@@ -18,6 +18,7 @@ public class TurretTest extends OpMode {
     // --- TUNING (Lowered P to stop oscillations) ---
     public static double P = -0.0026;
     public  static double I = 0.00001;
+    public  static double F = 0.0;
     public static double D = 0.0058;
     public static double TICKS_PER_DEGREE = 15.5;
 
@@ -66,8 +67,14 @@ public class TurretTest extends OpMode {
         if(gamepad1.dpadDownWasPressed()){
             P -= stepSizes[stepIndex];
         }
+        if(gamepad1.yWasPressed()){
+            F += stepSizes[stepIndex];
+        }
+        if(gamepad1.aWasPressed()){
+            F -= stepSizes[stepIndex];
+        }
 
-        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, I,D,0);
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, I,D,F);
         turret.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficients);
 
 
@@ -118,6 +125,7 @@ public class TurretTest extends OpMode {
         telemetry.addLine("------------------------------------");
         telemetry.addData( "Tuning P",  "%.4f (D-Pad U/D)", P);
         telemetry.addData( "Tuning D", "%.4f (D-Pad L/R)", D);
+        telemetry.addData( "Tuning F", "%.4f (Buttons Y/A)", F);
         telemetry.addData( "Step Size",  "%.4f (B Button)", stepSizes[stepIndex]);
         telemetry.update();
     }

@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms;
 
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+@TeleOp
 public class Sensors {
     NormalizedColorSensor colorSensor;
 
@@ -43,11 +45,11 @@ public class Sensors {
         String color = "";
 
         // 4. Threshold Logic (Adjust these numbers based on your field tests)
-        if (hue >= 100 && hue <= 140 && saturation > 0.4) {
+        if (hue >= 100 && hue <= 185 && saturation > 0.4) {
             color = "Green";
             telemetry.addData("COLOR:", color);
             return DetectedColor.GREEN;
-         } else if (hue >= 165 && hue <= 240 && saturation > 0.4) {
+         } else if (hue >= 195 && hue <= 250 && saturation > 0.4) {
             color = "Purple";
             telemetry.addData("COLOR:", color);
             return DetectedColor.PURPLE;
