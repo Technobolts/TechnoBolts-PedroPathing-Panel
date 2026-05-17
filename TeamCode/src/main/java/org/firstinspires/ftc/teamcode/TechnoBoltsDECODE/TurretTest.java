@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @TeleOp
 @Configurable
@@ -15,8 +16,9 @@ public class TurretTest extends OpMode {
     private Limelight3A limelight;
 
     // --- TUNING (Lowered P to stop oscillations) ---
-    public static double P = 0.0006;
-    public static double D = 0.0003;
+    public static double P = -0.0026;
+    public  static double I = 0.00001;
+    public static double D = 0.0058;
     public static double TICKS_PER_DEGREE = 15.5;
 
     public static double SEARCH_POWER = 0.12;
@@ -25,6 +27,10 @@ public class TurretTest extends OpMode {
     private double targetTicks = 0;
     private double lastError = 0;
     private boolean isLocked = false;
+
+    double [] stepSizes = {10.0, 1.0, 0.1, 0.01, 0.001, 0.0001};
+
+    int stepIndex = 1;
 
     @Override
     public void init() {
@@ -42,6 +48,29 @@ public class TurretTest extends OpMode {
 
     @Override
     public void loop() {
+
+        if(gamepad1.bWasPressed()){
+            stepIndex = (stepIndex + 1) % stepSizes.length;
+        }
+
+        if(gamepad1.dpadRightWasPressed()){
+            D += stepSizes[stepIndex];
+        }
+        if(gamepad1.dpadLeftWasPressed()){
+            D -= stepSizes[stepIndex];
+        }
+
+        if(gamepad1.dpadUpWasPressed()){
+            P += stepSizes[stepIndex];
+        }
+        if(gamepad1.dpadDownWasPressed()){
+            P -= stepSizes[stepIndex];
+        }
+
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, I,D,0);
+        turret.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficients);
+
+
         LLResult result = limelight.getLatestResult();
         int currentTicks = turret.getCurrentPosition();
 
@@ -73,7 +102,7 @@ public class TurretTest extends OpMode {
                 double power = (P * tickError) + (D * derivative);
 
                 // Limit power to prevent overshooting
-                power = Math.max(-0.25, Math.min(0.25, power));
+                power = Math.max(-0.47, Math.min(0.47, power));
                 turret.setPower(power);
                 lastError = tickError;
                 telemetry.addData("Status", "LOCKING...");
@@ -86,6 +115,13 @@ public class TurretTest extends OpMode {
 
         telemetry.addData("Target Ticks", (int)targetTicks);
         telemetry.addData("Current Ticks", currentTicks);
+        telemetry.addLine("------------------------------------");
+        telemetry.addData( "Tuning P",  "%.4f (D-Pad U/D)", P);
+        telemetry.addData( "Tuning D", "%.4f (D-Pad L/R)", D);
+        telemetry.addData( "Step Size",  "%.4f (B Button)", stepSizes[stepIndex]);
         telemetry.update();
     }
 }
+
+// P = -0.0026
+// D = 0.0058
