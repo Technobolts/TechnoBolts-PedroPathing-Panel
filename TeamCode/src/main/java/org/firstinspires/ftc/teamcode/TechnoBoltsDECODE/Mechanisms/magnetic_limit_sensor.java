@@ -15,9 +15,6 @@ public class magnetic_limit_sensor {
     }
 
     public boolean getMagneticLimitSensor() {
-        // REV magnetic switch is ACTIVE-LOW:
-        // getState() == true  → OPEN (not triggered)
-        // getState() == false → CLOSED (triggered)
         return !magneticLimitSensor.getState();
     }
 }
