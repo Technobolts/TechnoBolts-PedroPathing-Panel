@@ -1,18 +1,11 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver; // Official Pinpoint Driver
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
-@TeleOp(name = "Drive Train with Pinpoint Test", group = "OpMode")
-public class DriveTrain extends OpMode {
-
+public class DriveTrain {
     // 1. HARDWARE DECLARATIONS
     // Drivetrain Motors
     public DcMotor frontLeft;
@@ -20,17 +13,16 @@ public class DriveTrain extends OpMode {
     public DcMotorEx backLeft;
     public DcMotorEx backRight;
 
-    // Intake Motor
+    // Intake Motor (Expansion Hub 2, Port 2)
     public DcMotorEx intake;
 
-    // Pinpoint Odometry Computer Object
-    public GoBildaPinpointDriver pinpoint;
+    public DcMotorEx encoderX; // Parallel wheel (tracks forward/backward)
+    public DcMotorEx encoderY; // Perpendicular wheel (tracks strafe/sideways)
 
     // ==========================================
     // 2. INITIALIZATION METHOD
     // ==========================================
-    @Override
-    public void init() {
+    public void init(HardwareMap hardwareMap) {
 
         // Map motors to the names configured on the Driver Station
         frontLeft = hardwareMap.get(DcMotor.class, "front-left");
@@ -39,46 +31,39 @@ public class DriveTrain extends OpMode {
         backRight = hardwareMap.get(DcMotorEx.class, "back-right");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
-        // Initialize Pinpoint Computer (Make sure "pinpoint" matches your Driver Station active config exactly)
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-
         /*
-         * PINPOINT CALIBRATION & CONFIGURATION
-         * 1. Set the physical offsets of your pods relative to your robot's center of rotation (in mm or inches).
-         * X offset is how far forward/backward the tracking point is. Y offset is how far left/right it is.
+         * ODOMETRY ENCODER PORT MAPPING
+         * TODO: change these ports to what it actually is
          */
-        pinpoint.setOffsets(-84.0, -168.0, DistanceUnit.MM); // TODO: Input your team's specific physical offsets
+        encoderX = hardwareMap.get(DcMotorEx.class, "encoder-x");
+        encoderY = hardwareMap.get(DcMotorEx.class, "encoder-y");
 
-        /*
-         * 2. Define your encoder resolution.
-         * If using goBILDA pods, use goBILDA_4_BAR_POD or goBILDA_SWINGARM_POD.
-         */
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        // Reset the odometry pods to 0 ticks at startup
+        encoderX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        encoderY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        /*
-         * 3. Set Directions. X should increase when pushed forward. Y should increase when pushed left.
-         * Change GoBildaPinpointDriver.EncoderDirection.REVERSED if your numbers read backward.
-         */
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-        /*
-         * 4. Reset position and recalibrate built-in IMU.
-         * CRITICAL: The robot must remain perfectly still for roughly 0.25 seconds during initialization for this.
-         */
-        pinpoint.resetPosAndIMU();
+        // Set them to run without internal velocity PID (required for dead wheels)
+        encoderX.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        encoderY.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Configure Motor Directions
+        // Reverse left side so positive power drives the whole robot forward
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+
+        // Intake direction (switch to REVERSE if it spits out instead of sucking in)
         intake.setDirection(DcMotor.Direction.FORWARD);
 
         // Set Zero Power Behaviors
+        // BRAKE helps the drivetrain stop immediately when you let go of the sticks
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // FLOAT keeps the intake safe from snapping if a game element jams
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Set drivetrain motors to run using raw power percentages
@@ -89,39 +74,21 @@ public class DriveTrain extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    // ==========================================
-    // 3. MAIN LOOP METHOD
-    // ==========================================
-    @Override
-    public void loop() {
-        // CRITICAL: You must call update() every loop cycle, or your odometry tracking will not refresh!
-        pinpoint.update();
-
-        // Handle driving and auxiliary motor controls
-        handleControls(gamepad1);
-
-        // Fetch and display live tracking data on the driver station
-        Pose2D currentPose = pinpoint.getPosition();
-        telemetry.addData("X Position (in)", currentPose.getX(DistanceUnit.INCH));
-        telemetry.addData("Y Position (in)", currentPose.getY(DistanceUnit.INCH));
-        telemetry.addData("Heading (deg)", currentPose.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Pinpoint Status", pinpoint.getDeviceStatus());
-        telemetry.update();
-    }
-
-    // ==========================================
-    // 4. GAMEPAD CONTROL METHOD
-    // ==========================================
+    // 3. GAMEPAD CONTROL METHOD
     public void handleControls(Gamepad gamepad1) {
-        double y   = -gamepad1.left_stick_y;
-        double x   =  gamepad1.left_stick_x;
-        double rx  =  gamepad1.right_stick_x;
 
+        // Mecanum Drive Math
+        double y   = -gamepad1.left_stick_y; // Inverted because joysticks are negative when pushed up
+        double x   =  gamepad1.left_stick_x;
+        double rx  =  gamepad1.right_stick_x; // Controls rotation
+
+        // Calculate power for each wheel
         double frontLeftPower  = y + x + rx;
         double backLeftPower   = y - x + rx;
         double frontRightPower = y - x - rx;
         double backRightPower  = y + x - rx;
 
+        // Scale powers proportionally if any value exceeds 1.0 (100% motor speed)
         double max = Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower),
                 Math.max(Math.abs(frontRightPower), Math.abs(backRightPower))));
 
@@ -132,17 +99,35 @@ public class DriveTrain extends OpMode {
             backRightPower  /= max;
         }
 
+        // Apply calculated power values to motors
         frontLeft.setPower(frontLeftPower);
         backLeft.setPower(backLeftPower);
         frontRight.setPower(frontRightPower);
         backRight.setPower(backRightPower);
 
+        // Intake Button Mapping
         if (gamepad1.right_bumper) {
-            intake.setPower(1.0);
+            intake.setPower(1.0);  // Intake fully inward
         } else if (gamepad1.left_bumper) {
-            intake.setPower(-1.0);
+            intake.setPower(-1.0); // Outtake/Spit out fully
         } else {
-            intake.setPower(0.0);
+            intake.setPower(0.0);  // Stop spin when no button is held
         }
     }
 }
+
+
+
+    /*
+     * CONTROL HUB CONFIG
+     * Motors:
+     * front-right: port 0
+     * back-right: port 1
+     *EXPANSION HUB
+     * front-left: PORT 0
+     * back-left port 1
+     * Encoders:
+     * encoder-right:
+     * encoder-left:
+     * */
+
