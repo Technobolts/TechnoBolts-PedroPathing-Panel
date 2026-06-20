@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 @TeleOp(name = "Magnet Switch Test")
 public class MagnetTest extends OpMode {
+
+
     private DigitalChannel magnetSwitch;
 
     @Override
