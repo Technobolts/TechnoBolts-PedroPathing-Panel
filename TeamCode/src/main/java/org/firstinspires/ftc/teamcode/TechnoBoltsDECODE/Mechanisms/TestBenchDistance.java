@@ -15,6 +15,6 @@ public class TestBenchDistance {
 
     // Getter method to retrieve distance in centimeters
     public double getDistance() {
-        return distance.getDistance(DistanceUnit.CM);
+        return distance.getDistance(DistanceUnit.INCH);
     }
 }

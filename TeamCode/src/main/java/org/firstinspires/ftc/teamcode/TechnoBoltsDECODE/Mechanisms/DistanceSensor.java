@@ -3,7 +3,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
-public class DistanceTest extends OpMode {
+public class DistanceSensor extends OpMode {
 
     // Create an instance of the mechanism class
     TestBenchDistance bench = new TestBenchDistance();
@@ -20,10 +20,10 @@ public class DistanceTest extends OpMode {
         double currentDistance = bench.getDistance();
 
         // Think & Act: logic to display a message based on object distance
-        if (currentDistance < 10.0) {
-            telemetry.addLine("Too Close!");
+        if (currentDistance < .5) {
+            telemetry.addData("Object Detected at",currentDistance);
         } else {
-            telemetry.addData("Distance (cm)", currentDistance);
+            telemetry.addLine("No Object in 0.5 in distance");
         }
 
         telemetry.update();
