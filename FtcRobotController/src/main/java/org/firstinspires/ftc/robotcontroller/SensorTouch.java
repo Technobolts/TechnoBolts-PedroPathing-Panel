@@ -14,7 +14,7 @@ public class SensorTouch {
 
     // Returns true when the button is PRESSED
     public boolean isPressed() {
-        return !ftc_touch_Sensor.getState();  // REV touch sensor is active‑low
+        return ftc_touch_Sensor.getState();  // REV touch sensor is active‑low
     }
 
     // Returns true when the button is NOT pressed
