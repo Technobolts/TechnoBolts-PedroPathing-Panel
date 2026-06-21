@@ -104,15 +104,7 @@ public class colorSensor extends OpMode {
         // 3. BROAD SPECTRIC HUES (Least Specific / Large Windows)
         // ==========================================
 
-        // GREEN: Huge window (95-140)
-        else if (hue >= 95 && hue <= 140 && saturation > 0.40) {
-            color = "Green";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.GREEN;
-        }
+
         // YELLOW: Broad middle window (45-94)
         else if (hue >= 45 && hue < 95 && saturation > 0.40) {
             color = "Yellow";
@@ -121,6 +113,19 @@ public class colorSensor extends OpMode {
             telemetry.addData("SATURATION", saturation);
             telemetry.addData("VALUE", value);
             return DetectedColor.YELLOW;
+        }
+        // GREEN: Huge window (95-140)
+        //hue 153
+        //saturation 0.78
+        //valyue 0.57
+        // OG hue upper = 140, OG saturation 0.4
+        else if (hue >= 95 && hue <= 155 && saturation > 0.80) {
+            color = "Green";
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.GREEN;
         }
         // RED: Massive split window (340-360 AND 0-20) acts as a wide net
         else if ((hue >= 340 || hue <= 20) && saturation > 0.40) {
