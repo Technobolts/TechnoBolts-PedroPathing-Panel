@@ -19,11 +19,10 @@ public class DistanceSensor extends OpMode {
         // Sense: grab the current distance
         double currentDistance = bench.getDistance();
 
-        // Think & Act: logic to display a message based on object distance
-        if (currentDistance < .5) {
+        if (currentDistance <= 0.5) {
             telemetry.addData("Object Detected at",currentDistance);
         } else {
-            telemetry.addLine("No Object in 0.5 in distance");
+            telemetry.addData("No Object in 0.5 in distance: ", currentDistance);
         }
 
         telemetry.update();
