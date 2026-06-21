@@ -18,7 +18,7 @@ public class DistanceSensor extends OpMode {
     public void loop() {
         // Sense: grab the current distance
         double currentDistance = bench.getDistance();
-
+        telemetry.addData("Inches", currentDistance);
         if (currentDistance <= 0.5) {
             telemetry.addData("Object Detected at",currentDistance);
         } else {
