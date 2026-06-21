@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms;
 
 import android.graphics.Color;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name="Color Sensor")
-
+@TeleOp(name="Run Color Sensor", group="Test")
 public class colorSensor extends OpMode {
     NormalizedColorSensor colorSensor;
 
@@ -19,11 +15,19 @@ public class colorSensor extends OpMode {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
     }
 
-    public void init(HardwareMap hwMap){
-        colorSensor = hwMap.get(NormalizedColorSensor.class, "color_sensor_1");
+    // This handles the setup on your Driver Hub when you hit INIT
+    @Override
+    public void init() {
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor_1");
     }
 
-    public DetectedColor getDetectedColor(Telemetry telemetry){
+    // This runs continuously on your Driver Hub after you press PLAY
+    @Override
+    public void loop() {
+        getDetectedColor();
+    }
+
+    public DetectedColor getDetectedColor(){
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         float[] hsv = new float[3];
