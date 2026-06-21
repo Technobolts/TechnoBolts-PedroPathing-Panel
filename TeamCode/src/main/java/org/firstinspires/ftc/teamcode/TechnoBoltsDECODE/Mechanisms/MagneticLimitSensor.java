@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class magnetic_limit_sensor {
+@TeleOp
+public class MagneticLimitSensor{
 
     private DigitalChannel magneticLimitSensor;
 

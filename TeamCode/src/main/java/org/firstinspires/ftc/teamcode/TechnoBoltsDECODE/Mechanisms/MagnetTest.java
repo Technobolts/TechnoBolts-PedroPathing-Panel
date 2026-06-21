@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
+package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,12 +13,12 @@ public class MagnetTest extends OpMode {
     @Override
     public void init() {
         // Hardware name must match your configuration EXACTLY
-        magnetSwitch = hardwareMap.get(DigitalChannel.class, "magnet_switch_sensor");
+        magnetSwitch = hardwareMap.get(DigitalChannel.class, "magnet_limit_sensor");
 
         // REV Magnetic Switch is a digital input
         magnetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        telemetry.addLine("Magnet Switch Initialized");
+        telemetry.addLine("Magnet Limit Initialized");
     }
 
     @Override
