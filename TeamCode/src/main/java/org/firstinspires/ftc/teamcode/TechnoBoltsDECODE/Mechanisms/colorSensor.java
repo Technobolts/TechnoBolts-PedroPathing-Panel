@@ -53,7 +53,7 @@ public class colorSensor extends OpMode {
         // ==========================================
         // 2. NARROW SPECTRIC HUES (Highly Specific)
         // ==========================================
-        else if (hue > 20 && hue < 45 && saturation > 0.40) {
+        else if (hue > 30  && hue < 60 && saturation > 0.40) {
             color = "Orange";
             telemetry.addData("COLOR:", color);
             telemetry.addData("HUE", hue);
@@ -89,7 +89,7 @@ public class colorSensor extends OpMode {
             telemetry.addData("VALUE", value);
             return DetectedColor.GREEN;
         }
-        else if (hue >= 45 && hue < 95 && saturation > 0.40) {
+        else if (hue >= 50 && hue < 95 && saturation > 0.40) {
             color = "Yellow";
             telemetry.addData("COLOR:", color);
             telemetry.addData("HUE", hue);
@@ -97,7 +97,7 @@ public class colorSensor extends OpMode {
             telemetry.addData("VALUE", value);
             return DetectedColor.YELLOW;
         }
-        else if ((hue >= 340 || hue <= 20) && saturation > 0.40) {
+        else if ((hue >= 340 || hue <= 27) && saturation > 0.40) {
             color = "Red";
             telemetry.addData("COLOR:", color);
             telemetry.addData("HUE", hue);
