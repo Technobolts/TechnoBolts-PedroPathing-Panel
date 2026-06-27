@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -20,5 +21,25 @@ public class DistanceSensorMechanism {
      */
     public double getDistanceInches() {
         return distanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    public static class SensorTouch {
+
+        private DigitalChannel ftc_touch_Sensor;
+
+        public void init(HardwareMap hwMap) {
+            ftc_touch_Sensor = hwMap.get(DigitalChannel.class, "ftc_touch_sensor");
+            ftc_touch_Sensor.setMode(DigitalChannel.Mode.INPUT);
+        }
+
+        // Returns true when the button is PRESSED
+        public boolean isPressed() {
+            return ftc_touch_Sensor.getState();  // REV touch sensor is active‑low
+        }
+
+        // Returns true when the button is NOT pressed
+        public boolean isReleased() {
+            return ftc_touch_Sensor.getState();
+        }
     }
 }
