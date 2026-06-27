@@ -14,7 +14,7 @@ public class colorSensor extends OpMode {
     public enum DetectedColor {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
     }
-
+// hue 150 saturation .74 value .819
     @Override
     public void init() {
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor_1");
@@ -81,7 +81,7 @@ public class colorSensor extends OpMode {
         // ==========================================
         // 3. BROAD SPECTRIC HUES (Least Specific)
         // ==========================================
-        else if (hue >= 95 && hue <= 140 && saturation > 0.40) {
+        else if (hue >= 100 && hue <= 160 && saturation > 0.40) {
             color = "Green";
             telemetry.addData("COLOR:", color);
             telemetry.addData("HUE", hue);
