@@ -31,7 +31,7 @@ FlyWheelTunerRight extends OpMode {
     public void init() {
 //        ShooterLeft = hardwareMap.get(DcMotorEx.class, "leftDeposit");
 //        ShooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ShooterRight = hardwareMap.get(DcMotorEx.class, "rightDeposit");
+        ShooterRight = hardwareMap.get(DcMotorEx.class, "turretShooter");
         ShooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ShooterRight.setDirection(DcMotorSimple.Direction.REVERSE);
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0,0,F);
@@ -95,5 +95,5 @@ FlyWheelTunerRight extends OpMode {
     }
 }
 
-// P = 100.5
-// F = 12.22
+// P = 27
+// F = 18
