@@ -217,10 +217,10 @@ public class RobotTeleOp extends OpMode {
         double error = curTargetVelocity - curVelocity1;
 
         if(gamepad1.dpadRightWasPressed()){
-            HoodAngle += 0.1;
+            HoodAngleIncrease(0.1);
         }
         if(gamepad1.dpadLeftWasPressed()){
-            HoodAngle -= 0.1;
+            HoodAngleDecrease(0.1);
         }
 
         TurretHood.setPosition(HoodAngle);
@@ -236,4 +236,13 @@ public class RobotTeleOp extends OpMode {
         telemetry.update();
 
     }
+
+    private void HoodAngleDecrease(double amount) {
+        HoodAngle -= amount;
+    }
+
+    private void HoodAngleIncrease(double amount) {
+        HoodAngle += amount;
+    }
 }
+
