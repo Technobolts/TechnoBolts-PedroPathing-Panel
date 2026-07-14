@@ -23,12 +23,10 @@ public class AutoTopBlue {
 
 
     public final DcMotor intake;
-    public final DcMotorEx leftDeposit;
-    public final DcMotorEx rightDeposit;
-    public final CRServo kickerServo;
-    public final CRServo lowerTServo;
-    public final CRServo middleTServo;
-    public final Servo ledDepo;
+    public final DcMotorEx turretShooter;
+    public final Servo Kicker;
+    public final Servo Spindexer;
+    public final Servo turretHood;
 
 
     private final double ShooterOn = 760;
@@ -51,17 +49,15 @@ public class AutoTopBlue {
 
     Telemetry telemetry;
 
-    public AutoTopBlue(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoTopBlue(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
 
         this.follower = follower;
         this.telemetry = telemetry;
         this.intake = intake;
-        this.leftDeposit = leftDeposit;
-        this.rightDeposit = rightDeposit;
-        this.kickerServo = Kicker;
-        this.lowerTServo = lowerTServo;
-        this.middleTServo = middleTServo;
-        this.ledDepo = ledDepo;
+        this.turretShooter = turretShooter;
+        this.Kicker = Kicker;
+        this.Spindexer = Spindexer;
+        this.turretHood = turretHood;
 
 
         pathTimer = new Timer();
@@ -98,48 +94,7 @@ public class AutoTopBlue {
         intake.setPower(intakePowerOff);
     }
 
-    public void doRampOn() {
-        lowerTServo.setPower(lowerRampOn);
-        middleTServo.setPower(middleRampOn);
-    }
 
-    public void doRampSlow() {
-        lowerTServo.setPower(lowerRampSlow);
-        middleTServo.setPower(middleRampSlow);
-    }
-
-    public void kickerStop() {
-        kickerServo.setPower(kickerStopPower);
-    }
-
-    public void kickerHalfLaunch(){
-        kickerServo.setPower(kickerHalfLaunchPower);
-    }
-
-    public void doIntakeHalfPower() {
-        intake.setPower(intakeHalfPower);
-    }
-
-    public void halfPowerAll() {
-        doIntakeHalfPower();
-        doRampSlow();
-        kickerStop();
-
-    }
-
-    public void kickerLaunch() {
-        kickerServo.setPower(kickerLaunchPower);
-    }
-
-    public void doDepositOn() {
-        leftDeposit.setVelocity(ShooterOn);
-        rightDeposit.setVelocity(ShooterOn);
-    }
-
-    public void doDepositOff() {
-        leftDeposit.setPower(leftPowerOff);
-        rightDeposit.setPower(rightPowerOff);
-    }
 
 //    public void shoot() {
 //        KickerStop();
@@ -270,129 +225,10 @@ public class AutoTopBlue {
 
             case DRIVE_STARTPOS_SHOOT_POS:
                 follower.followPath(driveStartPosShootPos, true);
-                doDepositOn();
-                kickerHalfLaunch();
+
                 setPathState(PathState.SHOOT_PRELOAD); //reset the timer & make new state
                 break;
 
-            case SHOOT_PRELOAD:
-                //check is follower done its path?
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
-                    kickerLaunch();
-                    doRampOn();
-                    doIntakePowerOn();
-                    sleep(4700);
-                    kickerStop();
-                    telemetry.addLine("Shooting Preload");
-                    follower.followPath(driveShootPosPreset1Pos,true);
-                    setPathState(PathState.SHOOT_PRELOAD_PRESET1);
-                }
-                break;
-
-            case SHOOT_PRELOAD_PRESET1:
-                if (!follower.isBusy()) {
-                    halfPowerAll();
-                    telemetry.addLine("Aligning to preset1");
-                    follower.followPath(drivePreset1PosIntakePose, 0.5,true);
-                    setPathState(PathState.INTAKE_PRESET1);
-                }
-                break;
-
-            case INTAKE_PRESET1:
-                if (!follower.isBusy()) {
-                    doRampSlow();
-                    telemetry.addLine("Intaking Artifacts of Preset 1");
-                    follower.followPath(driveIntakePoseShootPosePreset1,true);
-                    setPathState(PathState.SHOOT_PRESET1_PRESET3);
-
-                }
-                break;
-
-
-            case SHOOT_PRESET1_PRESET3:
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 2500 ) {
-                    telemetry.addLine("Shooting Preset 1");
-                    doRampOn();
-                    doIntakePowerOn();
-                    kickerLaunch();
-                    sleep(5000);
-                    halfPowerAll();
-                    follower.followPath(driveShootPosPreset3Pos,  true);
-                    setPathState(PathState.INTAKE_PRESET3);
-                }
-                break;
-            case INTAKE_PRESET3:
-                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                    halfPowerAll();
-                    telemetry.addLine("Aligning Artifacts");
-                    follower.followPath(drivePreset3PosIntakePose,0.5,true);
-                    setPathState(PathState.SHOOT_PRESET3);
-
-                }
-                break;
-            case SHOOT_PRESET3:
-                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                    halfPowerAll();
-                    telemetry.addLine("Intaking Artifacts");
-                    follower.followPath(driveIntakePoseShootPosePreset3, true);
-                    setPathState(PathState.SHOOT_PRESET3_PRESET2);
-                }
-                break;
-            case SHOOT_PRESET3_PRESET2:
-                if(!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                    doRampOn();
-                    doIntakePowerOn();
-                    kickerLaunch();
-                    sleep(5000);
-                    halfPowerAll();
-                    telemetry.addLine("Shooting Preset 3");
-                    follower.followPath(driveLeaveLaunchZone, true);
-                    setPathState(PathState.LEAVE_LAUNCH_ZONE);
-
-//                        shoot();
-//                        doDepositOff();
-                }
-                break;
-            case LEAVE_LAUNCH_ZONE:
-                if(!follower.isBusy() ) {
-                    telemetry.addLine("Leaving Launch Zone");
-//                        follower.followPath(driveLeaveLaunchZone, true);
-                    setPathState(PathState.LEAVE_LAUNCH_ZONE);
-                }
-//                    break;
-
-//                case STRAFE_OUT:
-//                    if (!follower.isBusy()) {
-//                        telemetry.addLine("Strafing out");
-//                        follower.followPath(driveStrafeOut, true);
-//                        setPathState(PathState.STRAFE_OUT);
-//                    }i
-//                    break;
-//                case INTAKE_PRESET2:
-//                    if(!follower.isBusy()&& pathTimer.getElapsedTime() > 1500) {
-//                        telemetry.addLine("Aligning to artifacts");
-//                        follower.followPath(driveIntakePoseShootPosePreset2, true);
-//                            setPathState(PathState.PRESET2_EMPTY_RAMP);
-//                    }
-//                    break;
-//                case PRESET2_EMPTY_RAMP:
-//                    if(!follower.isBusy()2&& pathTimer.getElapsedTime() > 2500) {
-//                        telemetry.addLine("Emptying Ramp");
-//                        follower.followPath(drivePreset2IntakeEmptyRamp, true);
-//                            setPathState(PathState.EMPTY_RAMP_SHOOT);
-//                    }
-//                    break;
-//                case EMPTY_RAMP_SHOOT:
-//                    if(!follower.isBusy() && pathTimer.getElapsedTime() > 4500) {
-//                        telemetry.addLine("Shooting");
-//                        follower.followPath(driveEmptyRampShootPos, true);
-//                        setPathState(PathState.EMPTY_RAMP_SHOOT);
-//                    }
-//                    break;
-//                case DONE:
-//                    if(!follower.isBusy()){
-//                        telemetry.addLine("Auto Done");
-//                    }
             default:
                 telemetry.addLine("No State Commanded");
         }

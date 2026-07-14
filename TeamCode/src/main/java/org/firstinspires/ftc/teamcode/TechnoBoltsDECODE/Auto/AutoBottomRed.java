@@ -21,14 +21,11 @@ public class AutoBottomRed {
     private Follower follower;
     private Timer pathTimer, opModeTimer;
 
-
     public final DcMotor intake;
-    public final DcMotorEx leftDeposit;
-    public final DcMotorEx rightDeposit;
-    public final CRServo kickerServo;
-    public final CRServo lowerTServo;
-    public final CRServo middleTServo;
-    public final Servo ledDepo;
+    public final DcMotorEx turretShooter;
+    public final Servo Kicker;
+    public final Servo Spindexer;
+    public final Servo turretHood;
 
 
     private final double ShooterOn = 820;
@@ -51,17 +48,15 @@ public class AutoBottomRed {
 
     Telemetry telemetry;
 
-    public AutoBottomRed(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx leftDeposit, DcMotorEx rightDeposit, CRServo Kicker, CRServo lowerTServo, CRServo middleTServo, Servo ledDepo) {
+    public AutoBottomRed(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
 
         this.follower = follower;
         this.telemetry = telemetry;
         this.intake = intake;
-        this.leftDeposit = leftDeposit;
-        this.rightDeposit = rightDeposit;
-        this.kickerServo = Kicker;
-        this.lowerTServo = lowerTServo;
-        this.middleTServo = middleTServo;
-        this.ledDepo = ledDepo;
+        this.turretShooter = turretShooter;
+        this.Kicker = Kicker;
+        this.Spindexer = Spindexer;
+        this.turretHood = turretHood;
 
 
         pathTimer = new Timer();
@@ -98,37 +93,7 @@ public class AutoBottomRed {
         intake.setPower(intakePowerOff);
     }
 
-    public void doRampOn() {
-        lowerTServo.setPower(lowerRampOn);
-        middleTServo.setPower(middleRampOn);
-    }
 
-    public void doRampSlow() {
-        lowerTServo.setPower(lowerRampSlow);
-        middleTServo.setPower(middleRampSlow);
-    }
-
-    public void kickerStop() {
-        kickerServo.setPower(kickerStopPower);
-    }
-
-    public void kickerHalfLaunch(){
-        kickerServo.setPower(kickerHalfLaunchPower);
-    }
-
-    public void kickerLaunch() {
-        kickerServo.setPower(kickerLaunchPower);
-    }
-
-    public void doDepositOn() {
-        leftDeposit.setVelocity(ShooterOn);
-        rightDeposit.setVelocity(ShooterOn);
-    }
-
-    public void doDepositOff() {
-        leftDeposit.setPower(leftPowerOff);
-        rightDeposit.setPower(rightPowerOff);
-    }
 
 //    public void shoot() {
 //        KickerStop();
@@ -188,47 +153,13 @@ public class AutoBottomRed {
 
             case DRIVE_STARTPOS_SHOOT_POS:
                 if (!follower.isBusy()) {
-                    doDepositOn();
-                    kickerStop();
+
                     doIntakePowerOn();
                     follower.followPath(driveStartPosShootPos, true);
                     setPathState(PathState.SHOOT_PRELOAD);
                 }//reset the timer & make new state
                 break;
 
-            case SHOOT_PRELOAD:
-                //check is follower done its path?
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
-                    doDepositOn();
-                    sleep(1500);
-                    kickerLaunch();
-                    doRampOn();
-                    //doIntakePowerOn();
-                    sleep(6000);
-                    kickerStop();
-                    telemetry.addLine("Shooting Preload");
-                    follower.followPath(drivehumanZone);
-                    setPathState(PathState.SHOOT_PRELOAD_HUMAN);
-                }
-                break;
-
-            case SHOOT_PRELOAD_HUMAN:
-                if (!follower.isBusy()) {
-                    doRampSlow();
-                    kickerStop();
-                    telemetry.addLine("Aligning to human position");
-                    follower.followPath(drivehumanZone, 0.5,true);
-                    setPathState(PathState.TURN_OFF);
-                }
-                break;
-            case TURN_OFF:
-                if (!follower.isBusy()) {
-                    doRampSlow();
-                    kickerStop();
-                    doDepositOff();
-                    setPathState(PathState.TURN_OFF);
-                    telemetry.addLine("Turning-Off");
-                }
             default:
                 telemetry.addLine("No State Commanded");
         }

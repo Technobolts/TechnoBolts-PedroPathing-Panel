@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.pedropathing.follower.Follower;
@@ -36,13 +35,12 @@ public class AutoSelector extends OpMode {
 
     Follower follower;
 
-    public CRServo Kicker, lowerTServo, middleTServo;
     public DcMotor intake;
-    public DcMotorEx rightDeposit, leftDeposit;
-    public Servo ledDepo;
+    public DcMotorEx turretShooter;
+    public Servo Spindexer, Kicker, turretHood;
 
 
-    AutoTopRed topRedAuto;   // the top red auto
+    AutoTopRedA topRedAuto;   // the top red auto
     AutoTopBlue topBlueAuto;   // the top blue auto
     AutoBottomBlue bottomBlueAuto; // the bottom blue auto
     AutoBottomRed bottomRedAuto; // the bottom red auto
@@ -51,29 +49,25 @@ public class AutoSelector extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        intake = hardwareMap.get(DcMotor.class, "intake");     // Hardware map names
+        intake = hardwareMap.get(DcMotor.class, "intake1");     // Hardware map names
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightDeposit = hardwareMap.get(DcMotorEx.class, "rightDeposit");
-        leftDeposit = hardwareMap.get(DcMotorEx.class, "leftDeposit");
-        leftDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDeposit.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDeposit.setDirection(DcMotorSimple.Direction.REVERSE);
+        turretShooter = hardwareMap.get(DcMotorEx.class, "turretShooter");
+        turretShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turretShooter.setDirection(DcMotorSimple.Direction.REVERSE);
         PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
         PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
-        leftDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsLeft);
-        rightDeposit.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
-        Kicker = hardwareMap.get(CRServo.class, "Kicker");
-        lowerTServo = hardwareMap.get(CRServo.class, "lowerTServo");
-        middleTServo = hardwareMap.get(CRServo.class, "middleTServo");
-        ledDepo = hardwareMap.get(Servo.class, "ledDepo");
+        turretShooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
+        Kicker = hardwareMap.get(Servo.class, "kickerServo");
+        Spindexer = hardwareMap.get(Servo.class, "spindexerServo");
+        turretHood = hardwareMap.get(Servo.class, "hoodShooter");
 
 
 //        bottomBlueAuto = new AutoBottomBlue(follower, flip1, intake, launcher1, launcher2);
 //        bottomRedAuto = new AutoBottomRed(follower, flip1, intake, launcher1, launcher2);
-        topRedAuto = new AutoTopRed(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
-        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
-        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
-        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, rightDeposit, leftDeposit, Kicker, lowerTServo, middleTServo, ledDepo);
+        topRedAuto = new AutoTopRedA(follower, telemetry, intake, turretShooter , Kicker, Spindexer, turretHood);
+        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, turretShooter , Kicker, Spindexer, turretHood);
+        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, turretShooter, Kicker, Spindexer,turretHood);
+        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
     }
 
     @Override

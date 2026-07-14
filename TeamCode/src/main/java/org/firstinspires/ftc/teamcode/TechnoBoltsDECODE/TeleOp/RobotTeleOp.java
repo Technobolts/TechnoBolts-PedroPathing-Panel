@@ -38,15 +38,15 @@ public class RobotTeleOp extends OpMode {
 
     // YOUR TUNED POSITIONS
     private final double[] intakePos = {
-            0.2,
-            0.5,
-            0.7
+            0,
+            0.4,
+            0.76
     };
 
     private final double[] shootPos = {
-            0.26,
-            0.63,
-            1.00
+            0.22,
+            0.59,
+            0.96
     };
 
     private boolean lastA = false;
