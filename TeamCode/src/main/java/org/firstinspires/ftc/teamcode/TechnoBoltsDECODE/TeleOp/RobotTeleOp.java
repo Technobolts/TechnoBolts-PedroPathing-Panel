@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class RobotTeleOp extends OpMode {
@@ -52,6 +53,20 @@ public class RobotTeleOp extends OpMode {
     private boolean lastA = false;
     private boolean lastB = false;
     private boolean lastRB = false;
+
+    // ---------------- Auto Shoot ----------------
+
+    private boolean autoShoot = false;
+    private int autoState = 0;
+
+    private final ElapsedTime autoTimer = new ElapsedTime();
+
+    private final double SHOOT_SPEED = 2100;
+
+    private final double KICKER_REST = 0.15;
+    private final double KICKER_FIRE = 0.50;
+
+    private int autoSlot = 0;
 
 
     // ==========================================
@@ -156,15 +171,22 @@ public class RobotTeleOp extends OpMode {
             intake1.setPower(0.0);  // Stop spin when no button is held
         }
 
+        if(gamepad1.a && !lastA && !autoShoot){
+
+            autoShoot = true;
+            autoState = 0;
+            autoSlot = 0;
+
+            autoTimer.reset();
+
+        }
+
         //----------Spindexer-------------------
 
 
         // =========================
         // INTAKE (instant snap)
         // =========================
-        if (gamepad1.a && !lastA) {
-            spindexer.setPosition(intakePos[slot]);
-        }
 
         // =========================
         // SHOOT (instant snap)
@@ -192,23 +214,27 @@ public class RobotTeleOp extends OpMode {
 
 
         //----------Kicker-------------------
-
-        if(gamepad1.dpad_up){
-            Kicker.setPosition(0.5);
-        }
-        else {
-            Kicker.setPosition(0.15);
+        if (!autoShoot) {
+            if (gamepad1.dpad_up) {
+                Kicker.setPosition(0.5);
+            } else {
+                Kicker.setPosition(0.15);
+            }
         }
 
         //----------Turret-------------------
 
-        double curTargetVelocity = 2000;
+        double curTargetVelocity = SHOOT_SPEED;
 
-        if(gamepad1.x){
-            TurretShooter.setVelocity(curTargetVelocity);
-        }
-        else{
-            TurretShooter.setVelocity(0);
+        if(!autoShoot){
+
+            if(gamepad1.x){
+                TurretShooter.setVelocity(curTargetVelocity);
+            }
+            else{
+                TurretShooter.setVelocity(0);
+            }
+
         }
         //        double curVelocity2 = ShooterLeft.getVelocity();
         double curVelocity1 = TurretShooter.getVelocity();
@@ -225,6 +251,7 @@ public class RobotTeleOp extends OpMode {
 
         TurretHood.setPosition(HoodAngle);
 
+        runAutoShoot();
 
         telemetry.addData("Target Velocity", curTargetVelocity);
         telemetry.addData("Current Velocity", "%.2f", curVelocity1);
@@ -233,6 +260,8 @@ public class RobotTeleOp extends OpMode {
         telemetry.addData("Slot", slot);
         telemetry.addData("Intake", intakePos[slot]);
         telemetry.addData("Shoot", shootPos[slot]);
+        telemetry.addData("Auto State", autoState);
+        telemetry.addData("Timer", autoTimer.milliseconds());
         telemetry.update();
 
     }
@@ -244,5 +273,183 @@ public class RobotTeleOp extends OpMode {
     private void HoodAngleIncrease(double amount) {
         HoodAngle += amount;
     }
+
+    private void runAutoShoot() {
+
+        if (!autoShoot) return;
+
+        switch (autoState) {
+
+            //==========================
+            // Spin up shooter & move to first ball
+            //==========================
+            case 0:
+
+                TurretShooter.setVelocity(SHOOT_SPEED);
+
+                if (Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+
+                    spindexer.setPosition(shootPos[0]);
+
+                    autoTimer.reset();
+                    autoState = 1;
+                }
+
+                break;
+
+            //==========================
+            // Wait for spindexer
+            //==========================
+            case 1:
+
+                if (autoTimer.milliseconds() > 550) {
+
+                    Kicker.setPosition(KICKER_FIRE);
+
+                    autoTimer.reset();
+                    autoState = 2;
+                }
+
+                break;
+
+            //==========================
+            // Hold kicker out
+            //==========================
+            case 2:
+
+                if (autoTimer.milliseconds() > 280) {
+
+                    Kicker.setPosition(KICKER_REST);
+
+                    autoTimer.reset();
+                    autoState = 3;
+                }
+
+                break;
+
+            //==========================
+            // Wait for kicker to retract
+            //==========================
+            case 3:
+
+                if (autoTimer.milliseconds() > 350) {
+
+                    spindexer.setPosition(shootPos[1]);
+
+                    autoTimer.reset();
+                    autoState = 4;
+                }
+
+                break;
+
+            //==========================
+            // Wait for second position
+            //==========================
+            case 4:
+
+                if (autoTimer.milliseconds() > 550 &&
+                        Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+
+                    Kicker.setPosition(KICKER_FIRE);
+
+                    autoTimer.reset();
+                    autoState = 5;
+                }
+
+                break;
+
+            //==========================
+            // Hold kicker
+            //==========================
+            case 5:
+
+                if (autoTimer.milliseconds() > 280) {
+
+                    Kicker.setPosition(KICKER_REST);
+
+                    autoTimer.reset();
+                    autoState = 6;
+                }
+
+                break;
+
+            //==========================
+            // Wait for kicker before moving
+            //==========================
+            case 6:
+
+                if (autoTimer.milliseconds() > 350) {
+
+                    spindexer.setPosition(shootPos[2]);
+
+                    autoTimer.reset();
+                    autoState = 7;
+                }
+
+                break;
+
+            //==========================
+            // Wait for third position
+            //==========================
+            case 7:
+
+                if (autoTimer.milliseconds() > 550 &&
+                        Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+
+                    Kicker.setPosition(KICKER_FIRE);
+
+                    autoTimer.reset();
+                    autoState = 8;
+                }
+
+                break;
+
+            //==========================
+            // Hold kicker
+            //==========================
+            case 8:
+
+                if (autoTimer.milliseconds() > 280) {
+
+                    Kicker.setPosition(KICKER_REST);
+
+                    autoTimer.reset();
+                    autoState = 9;
+                }
+
+                break;
+
+            //==========================
+            // Wait for kicker to retract
+            //==========================
+            case 9:
+
+                if (autoTimer.milliseconds() > 350) {
+
+                    spindexer.setPosition(intakePos[0]);
+
+                    autoTimer.reset();
+                    autoState = 10;
+                }
+
+                break;
+
+            //==========================
+            // Finish
+            //==========================
+            case 10:
+
+                if (autoTimer.milliseconds() > 550) {
+
+                    TurretShooter.setVelocity(0);
+
+                    autoShoot = false;
+                    autoState = 0;
+                }
+
+                break;
+        }
+    }
+
 }
 
