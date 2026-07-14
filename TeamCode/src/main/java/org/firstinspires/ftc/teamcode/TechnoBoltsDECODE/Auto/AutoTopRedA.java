@@ -66,7 +66,7 @@ public class AutoTopRedA {
         follower.setPose(startPose);
         buildPaths();
 
-        pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
+        pathState = PathState.STARTPOS_SHOOTPOS;
         setPathState(pathState);
 
         pathTimer = new Timer();
@@ -97,14 +97,13 @@ public class AutoTopRedA {
         // START POSITION --> END POSITION
         // DRIVE > MOVEMENT STATE
         // SHOOT > ATTEMPT TO SCORE
-        DRIVE_STARTPOS_SHOOT_POS, //From start to shoot position
-        SHOOT_PRELOAD_INTAKE1, //Shoot preload
-        SHOOT_INTAKE_PRESET1, //aligned preset to fully intake preset
-        PRESET1_PRESET3 , //From shooting to preset 3
-        INTAKE_PRESET3 , //Intaking preset 3
-        SHOOT_PRESET3 , // Shooting preset 3
-        SHOOT_PRESET3_PRESET2 , //From shooting preset 3 to preset 2
-        DONE
+        STARTPOS_SHOOTPOS, //From start to shoot position
+        SHOOTPOS_INTAKE1, //From shoot position to intake preset 1
+        INTAKE1_SHOOT1POS, //From intake preset 1 to shoot preset 1
+        SHOOT1POS_ALIGN3, //From shoot preset 1 to align preset 3
+        ALIGN3_INTAKE3, //From align preset 3 to intake preset 3
+        INTAKE3_SHOOT3, //From intake preset 3 to shoot preset 3
+        SHOOT3_LEAVE, //From shoot preset 3 to leave zone
     }
 
    PathState pathState;
@@ -112,85 +111,97 @@ public class AutoTopRedA {
    private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
 
    private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
-   private final Pose IntakePreset1 = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
-   private final Pose shootPoseAlignPreset3 = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
-   private final Pose shootPoseIntake3Align = new Pose(104.46666666666667, 35.6888888888889, Math.toRadians(360));
-        private final Pose shootPoseIntake3AlignCtrl = new Pose(95.41111111111111, 38.33333333333323, Math.toRadians(360));
-   private final Pose shootPoseIntake3 = new Pose(123, 35.46666666666667, Math.toRadians(360));
+   private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
+   private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
+   private final Pose AlignToPreset3Pose = new Pose(104.46666666666667, 35.6888888888889, Math.toRadians(360));
+        private final Pose AlignToPreset3PoseControl = new Pose(95.41111111111111, 38.33333333333323, Math.toRadians(360));
+   private final Pose IntakePreset3Pose = new Pose(123, 35.46666666666667, Math.toRadians(360));
+   private final Pose ShootPreset3Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
+        private final Pose ShootPreset3PoseControl = new Pose(87.39524838012959, 55.04967602591793, Math.toRadians(290));
+   private final Pose LeaveZonePose = new Pose(102.06493506493507, 76.22077922077922, Math.toRadians(290));
 
 
 
-    private PathChain driveStartPosShootPosAlign, driveShootPosAlignIntake1, driveIntake1ShootPos, driveShootPosIntake3Align, driveIntake3AlignIntake3;
+    private PathChain StartToShoot, ShootToIntake1, Intake1ToShoot1, Shoot1ToAlignPreset3, AlignPreset3ToIntake3, Intake3ToShoot3, Shoot3ToLeave;
 
 
         public void buildPaths () {
             // put in coordinates for starting pose > ending pose
-            driveStartPosShootPosAlign = follower.pathBuilder()
+            StartToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))
                     .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                     .build();
 
-            driveShootPosAlignIntake1 = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPose, IntakePreset1))
-                    .setLinearHeadingInterpolation(shootPose.getHeading(), IntakePreset1.getHeading())
+            ShootToIntake1 = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, IntakePreset1Pose))
+                    .setLinearHeadingInterpolation(shootPose.getHeading(), IntakePreset1Pose.getHeading())
                     .build();
 
-            driveIntake1ShootPos = follower.pathBuilder()
-                    .addPath(new BezierLine(IntakePreset1, shootPoseAlignPreset3))
-                    .setLinearHeadingInterpolation(IntakePreset1.getHeading(), shootPoseAlignPreset3.getHeading())
+            Intake1ToShoot1 = follower.pathBuilder()
+                    .addPath(new BezierLine(IntakePreset1Pose, ShootPreset1Pose))
+                    .setLinearHeadingInterpolation(IntakePreset1Pose.getHeading(), ShootPreset1Pose.getHeading())
                     .build();
 
-            driveShootPosIntake3Align = follower.pathBuilder()
-                    .addPath(new BezierCurve(shootPoseAlignPreset3, shootPoseIntake3AlignCtrl, shootPoseIntake3Align))
-                    .setLinearHeadingInterpolation(shootPoseAlignPreset3.getHeading(), shootPoseIntake3Align.getHeading())
+            Shoot1ToAlignPreset3 = follower.pathBuilder()
+                    .addPath(new BezierCurve(ShootPreset1Pose, AlignToPreset3PoseControl, AlignToPreset3Pose))
+                    .setLinearHeadingInterpolation(ShootPreset1Pose.getHeading(), AlignToPreset3Pose.getHeading())
                     .build();
 
-            driveIntake3AlignIntake3 = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPoseIntake3Align, shootPoseIntake3))
-                    .setLinearHeadingInterpolation(shootPoseIntake3Align.getHeading(), shootPoseIntake3.getHeading())
+            AlignPreset3ToIntake3 = follower.pathBuilder()
+                    .addPath(new BezierLine(AlignToPreset3Pose, IntakePreset3Pose))
+                    .setLinearHeadingInterpolation(AlignToPreset3Pose.getHeading(), IntakePreset3Pose.getHeading())
                     .build();
 
+            Intake3ToShoot3 = follower.pathBuilder()
+                    .addPath(new BezierCurve(IntakePreset3Pose, ShootPreset3PoseControl, ShootPreset3Pose))
+                    .setLinearHeadingInterpolation(IntakePreset3Pose.getHeading(), ShootPreset3Pose.getHeading())
+                    .build();
+
+            Shoot3ToLeave = follower.pathBuilder()
+                    .addPath(new BezierLine(ShootPreset3Pose, LeaveZonePose))
+                    .setLinearHeadingInterpolation(ShootPreset3Pose.getHeading(), LeaveZonePose.getHeading())
+                    .build();
         }
 
         public void autonomousPathUpdate() {
             switch (pathState) {
 
-                case DRIVE_STARTPOS_SHOOT_POS:
-                    follower.followPath(driveStartPosShootPosAlign, true);
+                case STARTPOS_SHOOTPOS:
+                    follower.followPath(StartToShoot, true);
 
-                    setPathState(PathState.SHOOT_PRELOAD_INTAKE1); //reset the timer & make new state
+                    setPathState(PathState.SHOOTPOS_INTAKE1); //reset the timer & make new state
                     break;
 
-                case SHOOT_PRELOAD_INTAKE1:
+                case SHOOTPOS_INTAKE1:
                     if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
 
                         telemetry.addLine("Intake Preset 1");
-                        follower.followPath(driveShootPosAlignIntake1,0.5,true);
-                        setPathState(PathState.SHOOT_INTAKE_PRESET1);
+                        follower.followPath(ShootToIntake1,0.5,true);
+                        setPathState(PathState.INTAKE1_SHOOT1POS);
                     }
                     break;
 
-                case SHOOT_INTAKE_PRESET1:
+                case INTAKE1_SHOOT1POS:
                     if (!follower.isBusy()) {
 
                         telemetry.addLine("Shoot Preset");
-                        follower.followPath(driveIntake1ShootPos, true);
-                        setPathState(PathState.PRESET1_PRESET3);
+                        follower.followPath(Intake1ToShoot1, true);
+                        setPathState(PathState.SHOOT1POS_ALIGN3);
                     }
                     break;
 
-                case PRESET1_PRESET3:
+                case SHOOT1POS_ALIGN3:
                     if  (!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
                         telemetry.addLine("Aligning to Preset 3");
-                        follower.followPath(driveShootPosIntake3Align,true);
-                        setPathState(PathState.INTAKE_PRESET3);
+                        follower.followPath(Shoot1ToAlignPreset3,true);
+                        setPathState(PathState.ALIGN3_INTAKE3);
                     }
 
-                case INTAKE_PRESET3:
+                case ALIGN3_INTAKE3:
                     if (!follower.isBusy()){
                         telemetry.addLine("Intake Preset 3");
-                        follower.followPath(driveIntake3AlignIntake3, 0.5, true);
-                        setPathState(PathState.SHOOT_PRESET3);
+                        follower.followPath(AlignPreset3ToIntake3, 0.5, true);
+                        setPathState(PathState.INTAKE3_SHOOT3);
                     }
 
                 default:
