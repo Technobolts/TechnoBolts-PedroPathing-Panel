@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-public class AutoTopRedA {
+public class AutoRedA {
 
     private Follower follower;
     private Timer pathTimer, opModeTimer;
@@ -46,7 +46,7 @@ public class AutoTopRedA {
 
     Telemetry telemetry;
 
-    public AutoTopRedA(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
+    public AutoRedA(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
 
         this.follower = follower;
         this.telemetry = telemetry;

@@ -10,132 +10,133 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-//import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous (name = "Auto Selector")
+@Autonomous (name = "Auto Selector", group = "Autonomous")
 public class AutoSelector extends OpMode {
 
+    // Enums for selection
+    enum Alliance { BLUE, RED }
+    enum StartPos { A, B, C }
 
-    enum Alliance {BLUE, RED}
-
-    enum StartPos {TOP, BOTTOM}
-
-    enum Preset {ZERO, ONE, TWO, THREE}
-
+    // Constants for shooter PIDF
     double FR = 12.22;
     double PR = 100.5;
 
     double FL = 12.62;
     double PL = 100.85;
 
-    Alliance alliance = Alliance.BLUE;
-    StartPos startPos = StartPos.BOTTOM;
+    // Selection variables with default values
+    Alliance alliance = Alliance.RED;
+    StartPos startPos = StartPos.A;
 
-    Preset preset = Preset.ZERO;
+    // Button state variable for debouncing (prevents crazy fast toggling)
+    boolean lastGamepad2X = false;
 
+    // Followers and hardware
     Follower follower;
-
     public DcMotor intake;
     public DcMotorEx turretShooter;
     public Servo Spindexer, Kicker, turretHood;
 
+    // Sub-auto instances for all 6 paths
+    AutoRedA redAutoA;
+    AutoRedB redAutoB;
+    AutoRedC redAutoC;
 
-    AutoTopRedA topRedAuto;   // the top red auto
-    AutoTopBlue topBlueAuto;   // the top blue auto
-    AutoBottomBlue bottomBlueAuto; // the bottom blue auto
-    AutoBottomRed bottomRedAuto; // the bottom red auto
-
+    AutoBlueA blueAutoA;
+    AutoBlueB blueAutoB;
+    AutoBlueC blueAutoC;
 
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        intake = hardwareMap.get(DcMotor.class, "intake1");     // Hardware map names
+
+        // Initialize motors
+        intake = hardwareMap.get(DcMotor.class, "intake1");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
         turretShooter = hardwareMap.get(DcMotorEx.class, "turretShooter");
         turretShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turretShooter.setDirection(DcMotorSimple.Direction.REVERSE);
-        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0,0,FR);
-        PIDFCoefficients pidfCoefficientsLeft = new PIDFCoefficients(PL, 0,0,FL);
-        turretShooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficientsRight);
+
+        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0, 0, FR);
+        turretShooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficientsRight);
+
+        // Initialize servos
         Kicker = hardwareMap.get(Servo.class, "kickerServo");
         Spindexer = hardwareMap.get(Servo.class, "spindexerServo");
         turretHood = hardwareMap.get(Servo.class, "hoodShooter");
 
+        // Instantiate all 6 auto classes with the follower and hardware dependencies
+        redAutoA = new AutoRedA(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
+        redAutoB = new AutoRedB(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
+        redAutoC = new AutoRedC(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
 
-//        bottomBlueAuto = new AutoBottomBlue(follower, flip1, intake, launcher1, launcher2);
-//        bottomRedAuto = new AutoBottomRed(follower, flip1, intake, launcher1, launcher2);
-        topRedAuto = new AutoTopRedA(follower, telemetry, intake, turretShooter , Kicker, Spindexer, turretHood);
-        topBlueAuto = new AutoTopBlue(follower, telemetry, intake, turretShooter , Kicker, Spindexer, turretHood);
-        bottomBlueAuto = new AutoBottomBlue(follower, telemetry, intake, turretShooter, Kicker, Spindexer,turretHood);
-        bottomRedAuto = new AutoBottomRed(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
+        blueAutoA = new AutoBlueA(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
+        blueAutoB = new AutoBlueB(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
+        blueAutoC = new AutoBlueC(follower, telemetry, intake, turretShooter, Kicker, Spindexer, turretHood);
     }
 
     @Override
     public void init_loop() {
+        telemetry.addLine("=== AUTO SELECTION ===");
+        telemetry.addLine("Press X to TOGGLE Alliance (Red/Blue)");
+        telemetry.addLine("Press A, B, or Y to choose Position (A, B, C)");
+        telemetry.addLine("---------------------------------------------");
 
-        telemetry.addLine("gamepad2X = BLUE");
-        telemetry.addLine("gamepad2B = RED");
-        telemetry.addLine("gamepad2A = BOTTOM");
-        telemetry.addLine("gamepad2Y = TOP");
-        telemetry.addLine("-------------------");
+        // Alliance Toggle Logic (Registers only once per complete press)
+        if (gamepad2.x && !lastGamepad2X) {
+            if (alliance == Alliance.RED) {
+                alliance = Alliance.BLUE;
+            } else {
+                alliance = Alliance.RED;
+            }
+        }
+        lastGamepad2X = gamepad2.x; // Update last button state
 
-        if (gamepad2.x) alliance = Alliance.BLUE;   // alliance and color selections
-        if (gamepad2.b) alliance = Alliance.RED;
+        // Position Selection Input
+        if (gamepad2.a) startPos = StartPos.A;
+        if (gamepad2.b) startPos = StartPos.B;
+        if (gamepad2.y) startPos = StartPos.C;
 
-        if (gamepad2.a) startPos = StartPos.BOTTOM;
-        if (gamepad2.y) startPos = StartPos.TOP;
-
-        if(gamepad2.dpadUpWasPressed()) preset = Preset.ZERO;
-        if(gamepad2.dpadLeftWasPressed()) preset = Preset.ONE;
-        if(gamepad2.dpadRightWasPressed()) preset = Preset.TWO;
-        if(gamepad2.dpadDownWasPressed()) preset = Preset.THREE;
-
-
-        telemetry.addData("Alliance", alliance);
-        telemetry.addData("Start Position", startPos);
-        telemetry.addData("Number of Preset", preset);
-        telemetry.addLine("-------------------");
+        // Display selection telemetry
+        telemetry.addData("Selected Alliance", alliance);
+        telemetry.addData("Selected Position", startPos);
+        telemetry.addLine("---------------------------------------------");
         telemetry.update();
     }
 
     @Override
     public void start() {
-        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {   // starts the selected auto
-            bottomBlueAuto.start();
+        // Starts the path state machine inside the selected auto class
+        if (alliance == Alliance.RED) {
+            if (startPos == StartPos.A) redAutoA.start();
+            else if (startPos == StartPos.B) redAutoB.start();
+            else if (startPos == StartPos.C) redAutoC.start();
+        } else { // BLUE
+            if (startPos == StartPos.A) blueAutoA.start();
+            else if (startPos == StartPos.B) blueAutoB.start();
+            else if (startPos == StartPos.C) blueAutoC.start();
         }
-        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
-            bottomRedAuto.start();
-        }
-        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
-            topRedAuto.start();
-            }
-        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-            topBlueAuto.start();
-            }
+    }
+
+    @Override
+    public void loop() {
+        // Continuously runs the update method for the active path
+        if (alliance == Alliance.RED) {
+            if (startPos == StartPos.A) redAutoA.update();
+            else if (startPos == StartPos.B) redAutoB.update();
+            else if (startPos == StartPos.C) redAutoC.update();
+        } else { // BLUE
+            if (startPos == StartPos.A) blueAutoA.update();
+            else if (startPos == StartPos.B) blueAutoB.update();
+            else if (startPos == StartPos.C) blueAutoC.update();
         }
 
-        @Override
-        public void loop() {
-
-
-        if (alliance == Alliance.BLUE && startPos == StartPos.BOTTOM) {  // updates the selected auto
-                    bottomBlueAuto.update();
-        }
-        if (alliance == Alliance.RED && startPos == StartPos.BOTTOM) {
-                    bottomRedAuto.update();
-        }
-        if (alliance == Alliance.RED && startPos == StartPos.TOP) {
-                    topRedAuto.update();
-        }
-        if (alliance == Alliance.BLUE && startPos == StartPos.TOP) {
-                    topBlueAuto.update();
-        }
-
-            telemetry.addData("Y", follower.getPose().getY());
-
-            telemetry.addData("X", follower.getPose().getX());
-
-            telemetry.addData("Heading", follower.getPose().getHeading());
-
-            }
-        }
+        // Live coordinate feedback on the Driver Station
+        telemetry.addData("X Position", follower.getPose().getX());
+        telemetry.addData("Y Position", follower.getPose().getY());
+        telemetry.addData("Heading (Deg)", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.update();
+    }
+}
