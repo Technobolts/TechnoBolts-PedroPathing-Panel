@@ -9,6 +9,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -42,8 +43,6 @@ public class AutoRedA {
     // Define the motor at the top of your OpMode class
 
 
-
-
     Telemetry telemetry;
 
     public AutoRedA(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
@@ -60,7 +59,7 @@ public class AutoRedA {
         pathTimer = new Timer();
     }
 
-    public void start () {
+    public void start() {
 //        opModeTimer.resetTimer();
 
         follower.setPose(startPose);
@@ -78,7 +77,7 @@ public class AutoRedA {
         autonomousPathUpdate();
     }
 
-    public void setPathState (PathState newState){
+    public void setPathState(PathState newState) {
         pathState = newState;
         pathTimer.resetTimer();
     }
@@ -90,7 +89,6 @@ public class AutoRedA {
     public void doIntakePowerOff() {
         intake.setPower(intakePowerOff);
     }
-
 
 
     public enum PathState {
@@ -107,61 +105,60 @@ public class AutoRedA {
         IDLE //Done with code
     }
 
-   PathState pathState;
+    PathState pathState;
 
-   private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
-   private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
-   private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
-   private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
-   private final Pose AlignToPreset3Pose = new Pose(104.46666666666667, 35.6888888888889, Math.toRadians(360));
-        private final Pose AlignToPreset3PoseControl = new Pose(95.41111111111111, 38.33333333333323, Math.toRadians(360));
-   private final Pose IntakePreset3Pose = new Pose(123, 35.46666666666667, Math.toRadians(360));
-   private final Pose ShootPreset3Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
-        private final Pose ShootPreset3PoseControl = new Pose(87.39524838012959, 55.04967602591793, Math.toRadians(290));
-   private final Pose LeaveZonePose = new Pose(102.06493506493507, 76.22077922077922, Math.toRadians(290));
-
+    private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
+    private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
+    private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
+    private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
+    private final Pose AlignToPreset3Pose = new Pose(104.46666666666667, 35.6888888888889, Math.toRadians(360));
+    private final Pose AlignToPreset3PoseControl = new Pose(95.41111111111111, 38.33333333333323, Math.toRadians(360));
+    private final Pose IntakePreset3Pose = new Pose(123, 35.46666666666667, Math.toRadians(360));
+    private final Pose ShootPreset3Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
+    private final Pose ShootPreset3PoseControl = new Pose(87.39524838012959, 55.04967602591793, Math.toRadians(290));
+    private final Pose LeaveZonePose = new Pose(102.06493506493507, 76.22077922077922, Math.toRadians(290));
 
 
     private PathChain StartToShoot, ShootToIntake1, Intake1ToShoot1, Shoot1ToAlignPreset3, AlignPreset3ToIntake3, Intake3ToShoot3, Shoot3ToLeave;
 
 
-        public void buildPaths () {
-            // put in coordinates for starting pose > ending pose
-            StartToShoot = follower.pathBuilder()
-                    .addPath(new BezierLine(startPose, shootPose))
-                    .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
-                    .build();
+    public void buildPaths() {
+        // put in coordinates for starting pose > ending pose
+        StartToShoot = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, shootPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
+                .build();
 
-            ShootToIntake1 = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPose, IntakePreset1Pose))
-                    .setLinearHeadingInterpolation(shootPose.getHeading(), IntakePreset1Pose.getHeading())
-                    .build();
+        ShootToIntake1 = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, IntakePreset1Pose))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), IntakePreset1Pose.getHeading())
+                .build();
 
-            Intake1ToShoot1 = follower.pathBuilder()
-                    .addPath(new BezierLine(IntakePreset1Pose, ShootPreset1Pose))
-                    .setLinearHeadingInterpolation(IntakePreset1Pose.getHeading(), ShootPreset1Pose.getHeading())
-                    .build();
+        Intake1ToShoot1 = follower.pathBuilder()
+                .addPath(new BezierLine(IntakePreset1Pose, ShootPreset1Pose))
+                .setLinearHeadingInterpolation(IntakePreset1Pose.getHeading(), ShootPreset1Pose.getHeading())
+                .build();
 
-            Shoot1ToAlignPreset3 = follower.pathBuilder()
-                    .addPath(new BezierCurve(ShootPreset1Pose, AlignToPreset3PoseControl, AlignToPreset3Pose))
-                    .setLinearHeadingInterpolation(ShootPreset1Pose.getHeading(), AlignToPreset3Pose.getHeading())
-                    .build();
+        Shoot1ToAlignPreset3 = follower.pathBuilder()
+                .addPath(new BezierCurve(ShootPreset1Pose, AlignToPreset3PoseControl, AlignToPreset3Pose))
+                .setLinearHeadingInterpolation(ShootPreset1Pose.getHeading(), AlignToPreset3Pose.getHeading())
+                .build();
 
-            AlignPreset3ToIntake3 = follower.pathBuilder()
-                    .addPath(new BezierLine(AlignToPreset3Pose, IntakePreset3Pose))
-                    .setLinearHeadingInterpolation(AlignToPreset3Pose.getHeading(), IntakePreset3Pose.getHeading())
-                    .build();
+        AlignPreset3ToIntake3 = follower.pathBuilder()
+                .addPath(new BezierLine(AlignToPreset3Pose, IntakePreset3Pose))
+                .setLinearHeadingInterpolation(AlignToPreset3Pose.getHeading(), IntakePreset3Pose.getHeading())
+                .build();
 
-            Intake3ToShoot3 = follower.pathBuilder()
-                    .addPath(new BezierCurve(IntakePreset3Pose, ShootPreset3PoseControl, ShootPreset3Pose))
-                    .setLinearHeadingInterpolation(IntakePreset3Pose.getHeading(), ShootPreset3Pose.getHeading())
-                    .build();
+        Intake3ToShoot3 = follower.pathBuilder()
+                .addPath(new BezierCurve(IntakePreset3Pose, ShootPreset3PoseControl, ShootPreset3Pose))
+                .setLinearHeadingInterpolation(IntakePreset3Pose.getHeading(), ShootPreset3Pose.getHeading())
+                .build();
 
-            Shoot3ToLeave = follower.pathBuilder()
-                    .addPath(new BezierLine(ShootPreset3Pose, LeaveZonePose))
-                    .setLinearHeadingInterpolation(ShootPreset3Pose.getHeading(), LeaveZonePose.getHeading())
-                    .build();
-        }
+        Shoot3ToLeave = follower.pathBuilder()
+                .addPath(new BezierLine(ShootPreset3Pose, LeaveZonePose))
+                .setLinearHeadingInterpolation(ShootPreset3Pose.getHeading(), LeaveZonePose.getHeading())
+                .build();
+    }
 
     public void autonomousPathUpdate() {
         switch (pathState) {
@@ -169,9 +166,7 @@ public class AutoRedA {
             case STARTPOS_SHOOTPOS:
                 if (!follower.isBusy()) {
                     follower.followPath(StartToShoot, true);
-                }
-                // 2. ONLY transition once we have arrived and the follower is done
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    // 2. ONLY transition once we have arrived and the follower is done
                     setPathState(PathState.SHOOTPOS_INTAKE1); // Resets pathTimer and advances
                 }
                 break;
@@ -180,25 +175,17 @@ public class AutoRedA {
                 if (!follower.isBusy()) {
                     telemetry.addLine("Intake Preset 1");
                     telemetry.update();
-                    follower.followPath(ShootToIntake1, 0.5, true);
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
-                    telemetry.addLine("Intake Preset 1 set path");
-                    telemetry.update();
+                    follower.followPath(ShootToIntake1, 0.4, true);
                     setPathState(PathState.INTAKE1_SHOOT1POS);
                 }
                 break;
 
             case INTAKE1_SHOOT1POS:
-                if (!follower.isBusy()) {
-                    follower.followPath(Intake1ToShoot1, true);
+                if (!follower.isBusy() && pathTimer.getElapsedTime() > 0) {
+                    follower.followPath(Intake1ToShoot1, 0.7,true);
                     telemetry.addLine("Shoot Preset");
                     telemetry.update();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT1POS_ALIGN3);
-                    telemetry.addLine("Shoot Preset 1 set path");
-                    telemetry.update();
                 }
                 break;
 
@@ -207,11 +194,7 @@ public class AutoRedA {
                     follower.followPath(Shoot1ToAlignPreset3, true);
                     telemetry.addLine("Aligning to Preset 3");
                     telemetry.update();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.ALIGN3_INTAKE3);
-                    telemetry.addLine("Aligning to Preset 3 Path state");
-                    telemetry.update();
                 }
                 break;
 
@@ -220,8 +203,6 @@ public class AutoRedA {
                     follower.followPath(AlignPreset3ToIntake3, 0.5, true);
                     telemetry.addLine("Intake Preset 3");
                     telemetry.update();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.INTAKE3_SHOOT3);
                 }
                 break;
@@ -231,8 +212,6 @@ public class AutoRedA {
                     follower.followPath(Intake3ToShoot3, true);
                     telemetry.addLine("Shoot Preset 3");
                     telemetry.update();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT3_LEAVE);
                 }
                 break;
@@ -242,8 +221,6 @@ public class AutoRedA {
                     follower.followPath(Shoot3ToLeave, true);
                     telemetry.addLine("Leaving Zone");
                     telemetry.update();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.IDLE);
                 }
                 break;
@@ -272,7 +249,6 @@ public class AutoRedA {
 //            buildPaths();
 //            follower.setPose(startPose);
 //        }
-
 
 
 //        @Override
