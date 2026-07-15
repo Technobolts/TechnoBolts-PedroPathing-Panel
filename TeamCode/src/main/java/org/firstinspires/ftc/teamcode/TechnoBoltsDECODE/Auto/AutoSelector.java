@@ -19,11 +19,9 @@ public class AutoSelector extends OpMode {
     enum StartPos { A, B, C }
 
     // Constants for shooter PIDF
-    double FR = 12.22;
-    double PR = 100.5;
+    double F = 27;
+    double P = 18;
 
-    double FL = 12.62;
-    double PL = 100.85;
 
     // Selection variables with default values
     Alliance alliance = Alliance.RED;
@@ -59,7 +57,7 @@ public class AutoSelector extends OpMode {
         turretShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turretShooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(PR, 0, 0, FR);
+        PIDFCoefficients pidfCoefficientsRight = new PIDFCoefficients(P, 0, 0, F);
         turretShooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficientsRight);
 
         // Initialize servos
@@ -110,13 +108,13 @@ public class AutoSelector extends OpMode {
     public void start() {
         // Starts the path state machine inside the selected auto class
         if (alliance == Alliance.RED) {
-            if (startPos == StartPos.A) redAutoA.start();
-            else if (startPos == StartPos.B) redAutoB.start();
-            else if (startPos == StartPos.C) redAutoC.start();
+            if (startPos == StartPos.A) {redAutoA.start();}
+            else if (startPos == StartPos.B) {redAutoB.start();}
+            else if (startPos == StartPos.C) {redAutoC.start();}
         } else { // BLUE
-            if (startPos == StartPos.A) blueAutoA.start();
-            else if (startPos == StartPos.B) blueAutoB.start();
-            else if (startPos == StartPos.C) blueAutoC.start();
+            if (startPos == StartPos.A) {blueAutoA.start();}
+            else if (startPos == StartPos.B) {blueAutoB.start();}
+            else if (startPos == StartPos.C) {blueAutoC.start();}
         }
     }
 
@@ -124,20 +122,19 @@ public class AutoSelector extends OpMode {
     public void loop() {
         // Continuously runs the update method for the active path
         if (alliance == Alliance.RED) {
-            if (startPos == StartPos.A) redAutoA.update();
-            else if (startPos == StartPos.B) redAutoB.update();
-            else if (startPos == StartPos.C) redAutoC.update();
+            if (startPos == StartPos.A) {redAutoA.update();}
+            else if (startPos == StartPos.B) {redAutoB.update();}
+            else if (startPos == StartPos.C) {redAutoC.update();}
         } else { // BLUE
-            if (startPos == StartPos.A) blueAutoA.update();
-            else if (startPos == StartPos.B) blueAutoB.update();
-            else if (startPos == StartPos.C) blueAutoC.update();
+            if (startPos == StartPos.A) {blueAutoA.update();}
+            else if (startPos == StartPos.B) {blueAutoB.update();}
+            else if (startPos == StartPos.C) {blueAutoC.update();}
         }
 
         // Live coordinate feedback on the Driver Station
         telemetry.addData("X Position", follower.getPose().getX());
         telemetry.addData("Y Position", follower.getPose().getY());
         telemetry.addData("Heading (Deg)", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("Telemtry:",telemetry);
         telemetry.update();
     }
 }
