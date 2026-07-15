@@ -274,7 +274,7 @@ public class RobotTeleOp extends OpMode {
         HoodAngle += amount;
     }
 
-    private void runAutoShoot() {
+    public void runAutoShoot() {
 
         if (!autoShoot) return;
 
@@ -302,7 +302,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 1:
 
-                if (autoTimer.milliseconds() > 550) {
+                if (autoTimer.milliseconds() > 650) {
 
                     Kicker.setPosition(KICKER_FIRE);
 
@@ -317,7 +317,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 2:
 
-                if (autoTimer.milliseconds() > 280) {
+                if (autoTimer.milliseconds() > 380) {
 
                     Kicker.setPosition(KICKER_REST);
 
@@ -332,7 +332,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 3:
 
-                if (autoTimer.milliseconds() > 350) {
+                if (autoTimer.milliseconds() > 450) {
 
                     spindexer.setPosition(shootPos[1]);
 
@@ -347,7 +347,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 4:
 
-                if (autoTimer.milliseconds() > 550 &&
+                if (autoTimer.milliseconds() > 650 &&
                         Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     Kicker.setPosition(KICKER_FIRE);
@@ -363,7 +363,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 5:
 
-                if (autoTimer.milliseconds() > 280) {
+                if (autoTimer.milliseconds() > 380) {
 
                     Kicker.setPosition(KICKER_REST);
 
@@ -378,7 +378,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 6:
 
-                if (autoTimer.milliseconds() > 350) {
+                if (autoTimer.milliseconds() > 450) {
 
                     spindexer.setPosition(shootPos[2]);
 
@@ -393,7 +393,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 7:
 
-                if (autoTimer.milliseconds() > 550 &&
+                if (autoTimer.milliseconds() > 650 &&
                         Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     Kicker.setPosition(KICKER_FIRE);
@@ -409,7 +409,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 8:
 
-                if (autoTimer.milliseconds() > 280) {
+                if (autoTimer.milliseconds() > 380) {
 
                     Kicker.setPosition(KICKER_REST);
 
@@ -424,7 +424,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 9:
 
-                if (autoTimer.milliseconds() > 350) {
+                if (autoTimer.milliseconds() > 450) {
 
                     spindexer.setPosition(intakePos[0]);
 
@@ -439,7 +439,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 10:
 
-                if (autoTimer.milliseconds() > 550) {
+                if (autoTimer.milliseconds() > 650) {
 
                     TurretShooter.setVelocity(0);
 

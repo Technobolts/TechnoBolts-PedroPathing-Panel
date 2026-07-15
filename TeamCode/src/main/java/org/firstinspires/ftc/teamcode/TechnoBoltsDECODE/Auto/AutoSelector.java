@@ -137,6 +137,7 @@ public class AutoSelector extends OpMode {
         telemetry.addData("X Position", follower.getPose().getX());
         telemetry.addData("Y Position", follower.getPose().getY());
         telemetry.addData("Heading (Deg)", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("Telemtry:",telemetry);
         telemetry.update();
     }
 }

@@ -104,14 +104,12 @@ public class AutoRedA {
         ALIGN3_INTAKE3, //From align preset 3 to intake preset 3
         INTAKE3_SHOOT3, //From intake preset 3 to shoot preset 3
         SHOOT3_LEAVE, //From shoot preset 3 to leave zone
-
         IDLE //Done with code
     }
 
    PathState pathState;
 
    private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
-
    private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
    private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
    private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
@@ -169,64 +167,95 @@ public class AutoRedA {
         switch (pathState) {
 
             case STARTPOS_SHOOTPOS:
-                follower.followPath(StartToShoot, true);
-                setPathState(PathState.SHOOTPOS_INTAKE1); // reset the timer & make new state
+                if (!follower.isBusy()) {
+                    follower.followPath(StartToShoot, true);
+                }
+                // 2. ONLY transition once we have arrived and the follower is done
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    setPathState(PathState.SHOOTPOS_INTAKE1); // Resets pathTimer and advances
+                }
                 break;
 
             case SHOOTPOS_INTAKE1:
                 if (!follower.isBusy()) {
                     telemetry.addLine("Intake Preset 1");
+                    telemetry.update();
                     follower.followPath(ShootToIntake1, 0.5, true);
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    telemetry.addLine("Intake Preset 1 set path");
+                    telemetry.update();
                     setPathState(PathState.INTAKE1_SHOOT1POS);
                 }
                 break;
 
             case INTAKE1_SHOOT1POS:
                 if (!follower.isBusy()) {
-                    telemetry.addLine("Shoot Preset");
                     follower.followPath(Intake1ToShoot1, true);
+                    telemetry.addLine("Shoot Preset");
+                    telemetry.update();
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT1POS_ALIGN3);
+                    telemetry.addLine("Shoot Preset 1 set path");
+                    telemetry.update();
                 }
                 break;
 
             case SHOOT1POS_ALIGN3:
                 if (!follower.isBusy()) {
-                    telemetry.addLine("Aligning to Preset 3");
                     follower.followPath(Shoot1ToAlignPreset3, true);
+                    telemetry.addLine("Aligning to Preset 3");
+                    telemetry.update();
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.ALIGN3_INTAKE3);
+                    telemetry.addLine("Aligning to Preset 3 Path state");
+                    telemetry.update();
                 }
                 break;
 
             case ALIGN3_INTAKE3:
                 if (!follower.isBusy()) {
-                    telemetry.addLine("Intake Preset 3");
                     follower.followPath(AlignPreset3ToIntake3, 0.5, true);
+                    telemetry.addLine("Intake Preset 3");
+                    telemetry.update();
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.INTAKE3_SHOOT3);
                 }
                 break;
 
             case INTAKE3_SHOOT3:
                 if (!follower.isBusy()) {
-                    telemetry.addLine("Shoot Preset 3");
                     follower.followPath(Intake3ToShoot3, true);
+                    telemetry.addLine("Shoot Preset 3");
+                    telemetry.update();
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT3_LEAVE);
                 }
                 break;
 
             case SHOOT3_LEAVE:
                 if (!follower.isBusy()) {
-                    telemetry.addLine("Leaving Zone");
                     follower.followPath(Shoot3ToLeave, true);
-                    setPathState(PathState.IDLE); // Transitions to IDLE so it doesn't loop this path!
+                    telemetry.addLine("Leaving Zone");
+                    telemetry.update();
+                }
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    setPathState(PathState.IDLE);
                 }
                 break;
 
             case IDLE:
                 telemetry.addLine("Autonomous Complete!");
+                telemetry.update();
                 break;
 
             default:
                 telemetry.addLine("No State Commanded");
+                telemetry.update();
                 break;
         }
     }
