@@ -227,8 +227,6 @@ public class AutoRedA {
     }
 
 
-
-
 //        @Override
 //        public void init () {
 //            pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
