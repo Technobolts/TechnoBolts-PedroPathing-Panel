@@ -171,50 +171,59 @@ public class AutoRedA {
         switch (pathState) {
 
             case DRIVE_STARTPOS_SHOOT_POS:
-                follower.followPath(StartToShoot, true);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(StartToShoot, true);
+                }
 
-                setPathState(PathState.SHOOT_PRELOAD_INTAKE1); //reset the timer & make new state
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    setPathState(PathState.SHOOT_PRELOAD_INTAKE1);
+                }
                 break;
 
             case SHOOT_PRELOAD_INTAKE1:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(ShootToIntake1, 0.35, true);
+                }
 
-                    telemetry.addLine("Intake Preset 1");
-                    follower.followPath(ShootToIntake1,0.35,true);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT_INTAKE_PRESET1);
                 }
                 break;
 
             case SHOOT_INTAKE_PRESET1:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(Intake1ToShoot1, 0.5, true);
+                }
 
-                    telemetry.addLine("Shoot Preset");
-                    follower.followPath(Intake1ToShoot1, 0.5,true);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.PRESET1_PRESET3);
                 }
                 break;
 
             case PRESET1_PRESET3:
-                if  (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(Shoot1ToAlignPreset3, true);
+                }
 
-                    telemetry.addLine("Aligning to Preset 3");
-                    follower.followPath(Shoot1ToAlignPreset3,true);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.INTAKE_PRESET3);
                 }
                 break;
 
             case INTAKE_PRESET3:
-                if (!follower.isBusy()){
-                    telemetry.addLine("Intake Preset 3");
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
                     follower.followPath(AlignPreset3ToIntake3, 0.5, true);
+                }
+
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT_PRESET3);
                 }
                 break;
 
             default:
                 telemetry.addLine("No State Commanded");
+                break;
         }
-
     }
 
 
