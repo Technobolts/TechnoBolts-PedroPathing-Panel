@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class RobotTeleOp extends OpMode {
+
+
     public DcMotor frontLeft;
     public DcMotor frontRight;
     public DcMotorEx backLeft;
@@ -101,10 +103,10 @@ public class RobotTeleOp extends OpMode {
 
         // Set Zero Power Behaviors
         // BRAKE helps the drivetrain stop immediately when you let go of the sticks
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // FLOAT keeps the intake safe from snapping if a game element jams
         intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -131,8 +133,8 @@ public class RobotTeleOp extends OpMode {
 
         //----------Drivetrain-------------------
 
-        double y   =  gamepad1.left_stick_y; // Inverted because joysticks are negative when pushed up
-        double x   =  -gamepad1.left_stick_x; // Strafe
+        double y   =  -gamepad1.left_stick_y; // Inverted because joysticks are negative when pushed up
+        double x   =  gamepad1.left_stick_x; // Strafe
         double rx  =  gamepad1.right_stick_x; // Controls rotation
 
         // Calculate power for each wheel
@@ -163,15 +165,15 @@ public class RobotTeleOp extends OpMode {
 
 
         // Intake Button Mapping
-        if (gamepad1.right_bumper) {
+        if (gamepad2.right_bumper) {
             intake1.setPower(0.6);  // Intake fully inward
-        } else if (gamepad1.left_bumper) {
+        } else if (gamepad2.left_bumper) {
             intake1.setPower(-0.6); // Outtake/Spit out fully
         } else {
             intake1.setPower(0.0);  // Stop spin when no button is held
         }
 
-        if(gamepad1.a && !lastA && !autoShoot){
+        if(gamepad2.a && !lastA && !autoShoot){
 
             autoShoot = true;
             autoState = 0;
@@ -191,7 +193,7 @@ public class RobotTeleOp extends OpMode {
         // =========================
         // SHOOT (instant snap)
         // =========================
-        if (gamepad1.b && !lastB) {
+        if (gamepad2.b && !lastB) {
             spindexer.setPosition(shootPos[slot]);
         }
 
@@ -199,7 +201,7 @@ public class RobotTeleOp extends OpMode {
         // CLOCKWISE ONLY INDEX
         // (important for stability)
         // =========================
-        if (gamepad1.yWasPressed() && !lastRB) {
+        if (gamepad2.yWasPressed() && !lastRB) {
 
             slot = (slot + 1) % 3;
 
@@ -208,14 +210,14 @@ public class RobotTeleOp extends OpMode {
         }
 
         // save buttons
-        lastA = gamepad1.a;
-        lastB = gamepad1.b;
-        lastRB = gamepad1.yWasPressed();
+        lastA = gamepad2.a;
+        lastB = gamepad2.b;
+        lastRB = gamepad2.yWasPressed();
 
 
         //----------Kicker-------------------
         if (!autoShoot) {
-            if (gamepad1.dpad_up) {
+            if (gamepad2.dpad_up) {
                 Kicker.setPosition(0.5);
             } else {
                 Kicker.setPosition(0.15);
@@ -228,7 +230,7 @@ public class RobotTeleOp extends OpMode {
 
         if(!autoShoot){
 
-            if(gamepad1.x){
+            if(gamepad2.x){
                 TurretShooter.setVelocity(curTargetVelocity);
             }
             else{
@@ -242,10 +244,10 @@ public class RobotTeleOp extends OpMode {
 //        double errorLeft = curTargetVelocity - curVelocity2;
         double error = curTargetVelocity - curVelocity1;
 
-        if(gamepad1.dpadRightWasPressed()){
+        if(gamepad2.dpadRightWasPressed()){
             HoodAngleIncrease(0.1);
         }
-        if(gamepad1.dpadLeftWasPressed()){
+        if(gamepad2.dpadLeftWasPressed()){
             HoodAngleDecrease(0.1);
         }
 
@@ -290,6 +292,7 @@ public class RobotTeleOp extends OpMode {
                 if (Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     spindexer.setPosition(shootPos[0]);
+                    HoodAngleIncrease(0.1);
 
                     autoTimer.reset();
                     autoState = 1;
@@ -347,8 +350,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 4:
 
-                if (autoTimer.milliseconds() > 650 &&
-                        Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     Kicker.setPosition(KICKER_FIRE);
 
@@ -393,8 +395,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 7:
 
-                if (autoTimer.milliseconds() > 650 &&
-                        Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     Kicker.setPosition(KICKER_FIRE);
 
