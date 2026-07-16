@@ -214,7 +214,6 @@ public class RobotTeleOp extends OpMode {
         lastB = gamepad2.b;
         lastRB = gamepad2.yWasPressed();
 
-
         //----------Kicker-------------------
         if (!autoShoot) {
             if (gamepad2.dpad_up) {
