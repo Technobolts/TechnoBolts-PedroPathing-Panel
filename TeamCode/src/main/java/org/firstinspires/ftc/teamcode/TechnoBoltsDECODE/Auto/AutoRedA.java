@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class AutoRedA {
 
     private Follower follower;
-    private Timer pathTimer, opModeTimer;
+    public Timer pathTimer, opModeTimer;
 
 
     public final DcMotor intake;
@@ -46,6 +46,7 @@ public class AutoRedA {
 
     Telemetry telemetry;
 
+
     public AutoRedA(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
 
         this.follower = follower;
@@ -55,8 +56,6 @@ public class AutoRedA {
         this.Kicker = Kicker;
         this.Spindexer = Spindexer;
         this.turretHood = turretHood;
-
-
         pathTimer = new Timer();
     }
 
@@ -80,8 +79,12 @@ public class AutoRedA {
 
     public void setPathState (PathState newState){
         pathState = newState;
+        this.telemetry.addData("Path timer:", pathTimer.getElapsedTime());
+       // this.telemetry.update();
         pathTimer.resetTimer();
     }
+
+
 
     public void doIntakePowerOn() {
         intake.setPower(intakePowerOn);
@@ -171,51 +174,53 @@ public class AutoRedA {
         switch (pathState) {
 
             case DRIVE_STARTPOS_SHOOT_POS:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
                     follower.followPath(StartToShoot, true);
-                }
-
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.SHOOT_PRELOAD_INTAKE1);
                 }
                 break;
-
+                // at the first line
             case SHOOT_PRELOAD_INTAKE1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
-                    follower.followPath(ShootToIntake1, 0.35, true);
-                }
-
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(ShootToIntake1,  0.35,true);
                     setPathState(PathState.SHOOT_INTAKE_PRESET1);
                 }
                 break;
-
+                // leave first line and shoot
             case SHOOT_INTAKE_PRESET1:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
-                    follower.followPath(Intake1ToShoot1, 0.5, true);
-                }
-
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(Intake1ToShoot1, true);
                     setPathState(PathState.PRESET1_PRESET3);
                 }
                 break;
 
             case PRESET1_PRESET3:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
                     follower.followPath(Shoot1ToAlignPreset3, true);
-                }
-
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
                     setPathState(PathState.INTAKE_PRESET3);
                 }
                 break;
-
+                // ready to get intake 3
             case INTAKE_PRESET3:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
-                    follower.followPath(AlignPreset3ToIntake3, 0.5, true);
+                if (!follower.isBusy()|| pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(AlignPreset3ToIntake3, true);
+                    setPathState(PathState.SHOOT_PRESET3);
                 }
+                break;
 
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.5) {
+            case SHOOT_PRESET3:
+
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(Intake3ToShoot3,  true);
+                    setPathState(PathState.SHOOT_PRESET3_PRESET2);
+                }
+                break;
+
+            case SHOOT_PRESET3_PRESET2:
+
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+
+                    follower.followPath(Shoot3ToLeave,  true);
                     setPathState(PathState.SHOOT_PRESET3);
                 }
                 break;

@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class AutoBlueB {
 
     private Follower follower;
-    private Timer pathTimer, opModeTimer;
+    public Timer pathTimer, opModeTimer;
 
 
     public final DcMotor intake;
@@ -46,6 +46,7 @@ public class AutoBlueB {
 
     Telemetry telemetry;
 
+
     public AutoBlueB(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
 
         this.follower = follower;
@@ -55,8 +56,6 @@ public class AutoBlueB {
         this.Kicker = Kicker;
         this.Spindexer = Spindexer;
         this.turretHood = turretHood;
-
-
         pathTimer = new Timer();
     }
 
@@ -66,7 +65,7 @@ public class AutoBlueB {
         follower.setPose(startPose);
         buildPaths();
 
-        pathState = PathState.STARTPOS_SHOOTPOS;
+        pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
         setPathState(pathState);
 
         pathTimer = new Timer();
@@ -80,8 +79,12 @@ public class AutoBlueB {
 
     public void setPathState (PathState newState){
         pathState = newState;
+        this.telemetry.addData("Path timer:", pathTimer.getElapsedTime());
+        // this.telemetry.update();
         pathTimer.resetTimer();
     }
+
+
 
     public void doIntakePowerOn() {
         intake.setPower(intakePowerOn);
@@ -97,28 +100,30 @@ public class AutoBlueB {
         // START POSITION --> END POSITION
         // DRIVE > MOVEMENT STATE
         // SHOOT > ATTEMPT TO SCORE
-        STARTPOS_SHOOTPOS, //From start to shoot position
-        SHOOTPOS_INTAKE1, //From shoot position to intake preset 1
-        INTAKE1_SHOOT1POS, //From intake preset 1 to shoot preset 1
-        SHOOT1POS_ALIGN3, //From shoot preset 1 to align preset 3
-        ALIGN3_INTAKE3, //From align preset 3 to intake preset 3
-        INTAKE3_SHOOT3, //From intake preset 3 to shoot preset 3
-        SHOOT3_LEAVE, //From shoot preset 3 to leave zone
+        DRIVE_STARTPOS_SHOOT_POS, //From start to shoot position
+        SHOOT_PRELOAD_INTAKE1, //Shoot preload
+        SHOOT_INTAKE_PRESET1, //aligned preset to fully intake preset
+        PRESET1_PRESET3 , //From shooting to preset 3
+        INTAKE_PRESET3 , //Intaking preset 3
+        SHOOT_PRESET3 , // Shooting preset 3
+        SHOOT_PRESET3_PRESET2 , //From shooting preset 3 to preset 2
+        DONE
     }
 
     PathState pathState;
 
-    private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
+    private final Pose startPose = new Pose(67, 124.25887777777776, Math.toRadians(315));
+    private final Pose shootPose = new Pose(51.2, 84.22, Math.toRadians(180));
+    private final Pose IntakePreset1Pose = new Pose(21.04444444444444, 84.22, Math.toRadians(180));
+    private final Pose ShootPreset1Pose = new Pose(51.2, 84.22, Math.toRadians(250));
+    private final Pose AlignToPreset3Pose = new Pose(39.53333333333333, 35.6888888888889, Math.toRadians(180));
+    private final Pose AlignToPreset3PoseControl = new Pose(48.58888888888889, 38.33333333333323, Math.toRadians(180));
+    private final Pose IntakePreset3Pose = new Pose(21.0, 35.46666666666667, Math.toRadians(180));
+    private final Pose ShootPreset3Pose = new Pose(51.2, 84.22, Math.toRadians(250));
+    private final Pose ShootPreset3PoseControl = new Pose(56.60475161987041, 55.04967602591793, Math.toRadians(250));
+    private final Pose LeaveZonePose = new Pose(41.93506493506493, 76.22077922077922, Math.toRadians(250));
 
-    private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
-    private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
-    private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
-    private final Pose AlignToPreset3Pose = new Pose(104.46666666666667, 35.6888888888889, Math.toRadians(360));
-    private final Pose AlignToPreset3PoseControl = new Pose(95.41111111111111, 38.33333333333323, Math.toRadians(360));
-    private final Pose IntakePreset3Pose = new Pose(123, 35.46666666666667, Math.toRadians(360));
-    private final Pose ShootPreset3Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
-    private final Pose ShootPreset3PoseControl = new Pose(87.39524838012959, 55.04967602591793, Math.toRadians(290));
-    private final Pose LeaveZonePose = new Pose(102.06493506493507, 76.22077922077922, Math.toRadians(290));
+
 
 
 
@@ -161,56 +166,70 @@ public class AutoBlueB {
                 .addPath(new BezierLine(ShootPreset3Pose, LeaveZonePose))
                 .setLinearHeadingInterpolation(ShootPreset3Pose.getHeading(), LeaveZonePose.getHeading())
                 .build();
+
+
     }
 
     public void autonomousPathUpdate() {
         switch (pathState) {
 
-            case STARTPOS_SHOOTPOS:
-                follower.followPath(StartToShoot, true);
-
-                setPathState(PathState.SHOOTPOS_INTAKE1); //reset the timer & make new state
-                break;
-
-            case SHOOTPOS_INTAKE1:
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
-
-                    telemetry.addLine("Intake Preset 1");
-                    follower.followPath(ShootToIntake1,0.5,true);
-                    setPathState(PathState.INTAKE1_SHOOT1POS);
+            case DRIVE_STARTPOS_SHOOT_POS:
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(StartToShoot, true);
+                    setPathState(PathState.SHOOT_PRELOAD_INTAKE1);
                 }
                 break;
-
-            case INTAKE1_SHOOT1POS:
-                if (!follower.isBusy()) {
-
-                    telemetry.addLine("Shoot Preset");
+            // at the first line
+            case SHOOT_PRELOAD_INTAKE1:
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(ShootToIntake1,  0.35,true);
+                    setPathState(PathState.SHOOT_INTAKE_PRESET1);
+                }
+                break;
+            // leave first line and shoot
+            case SHOOT_INTAKE_PRESET1:
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
                     follower.followPath(Intake1ToShoot1, true);
-                    setPathState(PathState.SHOOT1POS_ALIGN3);
+                    setPathState(PathState.PRESET1_PRESET3);
                 }
                 break;
 
-            case SHOOT1POS_ALIGN3:
-                if  (!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
-                    telemetry.addLine("Aligning to Preset 3");
-                    follower.followPath(Shoot1ToAlignPreset3,true);
-                    setPathState(PathState.ALIGN3_INTAKE3);
+            case PRESET1_PRESET3:
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(Shoot1ToAlignPreset3, true);
+                    setPathState(PathState.INTAKE_PRESET3);
                 }
+                break;
+            // ready to get intake 3
+            case INTAKE_PRESET3:
+                if (!follower.isBusy()|| pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(AlignPreset3ToIntake3, true);
+                    setPathState(PathState.SHOOT_PRESET3);
+                }
+                break;
 
-            case ALIGN3_INTAKE3:
-                if (!follower.isBusy()){
-                    telemetry.addLine("Intake Preset 3");
-                    follower.followPath(AlignPreset3ToIntake3, 0.5, true);
-                    setPathState(PathState.INTAKE3_SHOOT3);
+            case SHOOT_PRESET3:
+
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+                    follower.followPath(Intake3ToShoot3,  true);
+                    setPathState(PathState.SHOOT_PRESET3_PRESET2);
                 }
+                break;
+
+            case SHOOT_PRESET3_PRESET2:
+
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
+
+                    follower.followPath(Shoot3ToLeave,  true);
+                    setPathState(PathState.SHOOT_PRESET3);
+                }
+                break;
 
             default:
                 telemetry.addLine("No State Commanded");
+                break;
         }
-
     }
-
-
 
 
 //        @Override

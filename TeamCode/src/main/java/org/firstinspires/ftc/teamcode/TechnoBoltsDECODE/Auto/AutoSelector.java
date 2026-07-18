@@ -9,10 +9,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous (name = "Auto Selector", group = "Autonomous")
 public class AutoSelector extends OpMode {
+
 
     // Enums for selection
     enum Alliance { BLUE, RED }
@@ -122,7 +124,10 @@ public class AutoSelector extends OpMode {
     public void loop() {
         // Continuously runs the update method for the active path
         if (alliance == Alliance.RED) {
-            if (startPos == StartPos.A) {redAutoA.update();}
+            if (startPos == StartPos.A) {
+                redAutoA.update();
+                telemetry.addData("Path Timer",redAutoA.pathTimer.getElapsedTimeSeconds());
+            }
             else if (startPos == StartPos.B) {redAutoB.update();}
             else if (startPos == StartPos.C) {redAutoC.update();}
         } else { // BLUE
@@ -135,6 +140,7 @@ public class AutoSelector extends OpMode {
         telemetry.addData("X Position", follower.getPose().getX());
         telemetry.addData("Y Position", follower.getPose().getY());
         telemetry.addData("Heading (Deg)", Math.toDegrees(follower.getPose().getHeading()));
+
         telemetry.update();
     }
 }

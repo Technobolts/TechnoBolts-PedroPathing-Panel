@@ -108,7 +108,7 @@ public class AutoRedC {
 
     PathState pathState;
     //Change to bottom side code
-    private final Pose startPose = new Pose(124.7999988888889, 124.25887777777776, Math.toRadians(225));
+    private final Pose startPose = new Pose(92, 9.689999999999999999, Math.toRadians(270));
     private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
     private final Pose IntakePreset1Pose = new Pose(122.95555555555556, 84.219999999999999, Math.toRadians(360));
     private final Pose ShootPreset1Pose = new Pose(92.8, 84.219999999999999, Math.toRadians(290));
