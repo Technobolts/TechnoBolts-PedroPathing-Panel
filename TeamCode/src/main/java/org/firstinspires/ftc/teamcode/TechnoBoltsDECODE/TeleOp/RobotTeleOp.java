@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
+import com.pedropathing.math.MathFunctions;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,15 +13,33 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.TBWebcam.AlignToAprilTagTurret;
+
 @TeleOp
 public class RobotTeleOp extends OpMode {
 
 
+    private Limelight3A limelight;
+
+    private AlignToAprilTagTurret turret = new AlignToAprilTagTurret();
     public DcMotor frontLeft;
     public DcMotor frontRight;
-    public DcMotorEx backLeft;
-    public DcMotorEx backRight;
+    public DcMotor backLeft;
+    public DcMotor backRight;
     public DcMotorEx TurretShooter;
+
+    double distance = 0;
+
+    public double getDistance(double ty){
+        double angleTarget = CAMERA_ANGLE + ty;
+        double heightDifference = GOAL_HEIGHT - CAMERA_HEIGHT_IN;
+
+        return heightDifference / Math.tan(Math.toRadians(angleTarget));
+    }
+
+    private double CAMERA_HEIGHT_IN = 31.11500;
+    private double GOAL_HEIGHT = 74.95;
+    private double CAMERA_ANGLE = 18;
 
     // Intake Motor (Expansion Hub 2, Port 2)
 
@@ -33,9 +54,9 @@ public class RobotTeleOp extends OpMode {
 
     private int slot = 0;
 
-    double F = 18;
+    double F = 1.2;
 
-    double P = 27;
+    double P = 350;
 
     double HoodAngle = 0;
 
@@ -70,6 +91,15 @@ public class RobotTeleOp extends OpMode {
 
     private int autoSlot = 0;
 
+    //y=0.0969498x^{2}-4.97872x+1525.00813
+    public double turretSpeed (double goalDist ){
+//        return  MathFunctions.clamp(- 0.00000569338 * Math.pow(goalDist, 4)  +0.00246149 * Math.pow(goalDist, 3) -0.375414 * Math.pow(goalDist, 2) +24.62591 * (goalDist) +179.82739, 750, 900) - 40;
+        return MathFunctions.clamp((0.0969498 * Math.pow(goalDist, 2)) - (4.97872 * goalDist) + 1525.00813, 1500, 2200);
+    }
+//y=-\left(2.03775\times10^{-7}\right)x^{4}+0.0000739553x^{3}-0.00984175x^{2}+0.57947x-12.29583
+    public double hoodAngle (double goalDist ){
+        return  MathFunctions.clamp((- 0.000000203775 * Math.pow(goalDist, 4))  + (0.0000739553 * Math.pow(goalDist, 3)) - (0.00984175 * Math.pow(goalDist, 2)) + (0.57947 * (goalDist)) - 12.29583, 0, 1);
+    }
 
     // ==========================================
     // 2. INITIALIZATION METHOD
@@ -80,8 +110,8 @@ public class RobotTeleOp extends OpMode {
         // Map motors to the names configured on the Driver Station
         frontLeft = hardwareMap.get(DcMotor.class, "front-left");
         frontRight = hardwareMap.get(DcMotor.class, "front-right");
-        backLeft = hardwareMap.get(DcMotorEx.class, "back-left");
-        backRight = hardwareMap.get(DcMotorEx.class, "back-right");
+        backLeft = hardwareMap.get(DcMotor.class, "back-left");
+        backRight = hardwareMap.get(DcMotor.class, "back-right");
         spindexer = hardwareMap.get(Servo.class, "spindexerServo");
         TurretHood = hardwareMap.get(Servo.class, "hoodShooter");
         intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
@@ -90,6 +120,12 @@ public class RobotTeleOp extends OpMode {
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0,0,F);
         TurretShooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidfCoefficients);
         telemetry.addLine("Init Complete");
+        turret.init(hardwareMap);
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0); // AprilTag pipeline
+        limelight.start();
+
         TurretHood.scaleRange(0.0, 0.9);
 
         // Configure Motor Directions
@@ -254,6 +290,47 @@ public class RobotTeleOp extends OpMode {
 
         runAutoShoot();
 
+
+        //----------Tracking--------------
+
+        LLResult result = limelight.getLatestResult();
+
+        if(result != null && result.isValid()){
+
+            // Horizontal angle from crosshair to tag
+            double tx = result.getTx();
+
+            turret.update(tx);
+
+            telemetry.addData("tx", tx);
+        }
+        else{
+
+            turret.stop();
+
+            telemetry.addLine("No AprilTag");
+        }
+
+        //---------turret speed-------------
+        TurretShooter.setVelocity(turretSpeed(distance));
+
+        //-------hood angle-------
+        HoodAngle = hoodAngle(distance);
+        TurretHood.setPosition(HoodAngle);
+
+
+        LLResult llResult = limelight.getLatestResult();
+
+        if (llResult != null && llResult.isValid()){
+            distance = getDistance(llResult.getTy()) / 2.54;
+            telemetry.addData("Distance", distance);
+        }
+        else {
+            telemetry.addData("No Valid Target", "Found");
+        }
+
+
+
         telemetry.addData("Target Velocity", curTargetVelocity);
         telemetry.addData("Current Velocity", "%.2f", curVelocity1);
         telemetry.addData("Error Right",  "%.2f", error);
@@ -267,11 +344,11 @@ public class RobotTeleOp extends OpMode {
 
     }
 
-    private void HoodAngleDecrease(double amount) {
+    public void HoodAngleDecrease(double amount) {
         HoodAngle -= amount;
     }
 
-    private void HoodAngleIncrease(double amount) {
+    public void HoodAngleIncrease(double amount) {
         HoodAngle += amount;
     }
 
@@ -291,8 +368,6 @@ public class RobotTeleOp extends OpMode {
                 if (Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
                     spindexer.setPosition(shootPos[0]);
-                    HoodAngleIncrease(0.1);
-
                     autoTimer.reset();
                     autoState = 1;
                 }
@@ -334,7 +409,7 @@ public class RobotTeleOp extends OpMode {
             //==========================
             case 3:
 
-                if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 650) {
 
                     spindexer.setPosition(shootPos[1]);
 
@@ -449,6 +524,11 @@ public class RobotTeleOp extends OpMode {
 
                 break;
         }
+    }
+
+    @Override
+    public void stop(){
+        limelight.stop();
     }
 
 }
