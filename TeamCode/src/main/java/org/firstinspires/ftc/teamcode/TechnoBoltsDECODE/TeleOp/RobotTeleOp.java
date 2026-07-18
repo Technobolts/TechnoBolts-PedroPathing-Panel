@@ -219,6 +219,19 @@ public class RobotTeleOp extends OpMode {
 
         }
 
+        //--------TurretRotationLimit---------
+        if (TurretShooter != null) {
+            double TICKS_PER_DEGREE = 0.0778;
+            double currentAngle = TurretShooter.getCurrentPosition() / TICKS_PER_DEGREE;
+
+            double currentPower = TurretShooter.getPower();
+            if (currentAngle >= 90.0 && currentPower > 0) {
+                TurretShooter.setPower(0);
+            } else if (currentAngle <= -90.0 && currentPower < 0) {
+                TurretShooter.setPower(0);
+            }
+        }
+
         //----------Spindexer-------------------
 
 
