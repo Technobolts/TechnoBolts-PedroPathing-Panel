@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.TBWebcam;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,8 +11,8 @@ public class AlignToAprilTagTurret {
     private DcMotorEx turret;
 
     // ---------------- PD Controller ----------------
-    private double kP = 0.1101;
-    private double kD = 0.003;
+    private double kP = 0.1201; //0.1101
+    private double kD = 0.0002;
 
     private double goalAngle = 0;
     private double lastError = 0;
@@ -27,7 +26,7 @@ public class AlignToAprilTagTurret {
 
     public void init(HardwareMap hwMap) {
         turret = hwMap.get(DcMotorEx.class, "turretMotor");
-        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     public void resetTimer() {
@@ -36,7 +35,7 @@ public class AlignToAprilTagTurret {
 
     // ---------------- PD Update ----------------
 
-    public void update(double currentBearing) {
+    public double update(double currentBearing) {
 
         double dt = timer.seconds();
         timer.reset();
@@ -64,6 +63,7 @@ public class AlignToAprilTagTurret {
         turret.setPower(power);
 
         lastError = error;
+        return dt;
     }
 
     public void stop() {
@@ -89,6 +89,8 @@ public class AlignToAprilTagTurret {
     public double getkD() {
         return kD;
     }
+
+    public DcMotorEx getTurret() {return turret;}
 }
 
 // kp = 0.1101

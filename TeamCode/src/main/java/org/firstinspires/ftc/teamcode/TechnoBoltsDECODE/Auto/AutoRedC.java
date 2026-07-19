@@ -172,7 +172,7 @@ public class AutoRedC {
                 break;
 
             case SHOOTPOS_INTAKE1:
-                if (!follower.isBusy() && pathTimer.getElapsedTime() > 1500 ) {
+                if (!follower.isBusy() || pathTimer.getElapsedTime() > 3 ) {
 
                     telemetry.addLine("Intake Preset 1");
                     follower.followPath(ShootToIntake1,0.5,true);
@@ -181,7 +181,7 @@ public class AutoRedC {
                 break;
 
             case INTAKE1_SHOOT1POS:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy()|| pathTimer.getElapsedTime() > 3) {
 
                     telemetry.addLine("Shoot Preset");
                     follower.followPath(Intake1ToShoot1, true);
@@ -190,14 +190,14 @@ public class AutoRedC {
                 break;
 
             case SHOOT1POS_ALIGN3:
-                if  (!follower.isBusy() && pathTimer.getElapsedTime() > 1500) {
+                if  (!follower.isBusy() || pathTimer.getElapsedTime() > 3) {
                     telemetry.addLine("Aligning to Preset 3");
                     follower.followPath(Shoot1ToAlignPreset3,true);
                     setPathState(PathState.ALIGN3_INTAKE3);
                 }
 
             case ALIGN3_INTAKE3:
-                if (!follower.isBusy()){
+                if (!follower.isBusy()|| pathTimer.getElapsedTime() > 3){
                     telemetry.addLine("Intake Preset 3");
                     follower.followPath(AlignPreset3ToIntake3, 0.5, true);
                     setPathState(PathState.INTAKE3_SHOOT3);
