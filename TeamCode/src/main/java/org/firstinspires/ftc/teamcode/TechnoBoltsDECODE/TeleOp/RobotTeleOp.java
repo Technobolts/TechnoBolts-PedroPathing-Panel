@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Mechanisms.TBWebcam.AlignToAprilTagTurret;
 
+
 @TeleOp
 public class RobotTeleOp extends OpMode {
 
@@ -32,6 +33,23 @@ public class RobotTeleOp extends OpMode {
     public DcMotorEx TurretShooter;
 
     double distance = 0;
+
+    // -------- Color Sensor --------
+    private NormalizedColorSensor colorSensor;
+
+    private boolean autoIndexing = false;      // true = color sensor controls spindexer
+    private boolean manualMode = true;         // true = driver controls
+
+    private boolean waitingForBall = true;
+    private boolean ballSeenLastLoop = false;
+
+    private boolean ballDetectedLastLoop = false;
+
+    private boolean lastX = false;
+    private boolean lastY = false;
+
+    private ElapsedTime colorTimer = new ElapsedTime();
+    private boolean delayRunning = false;
 
     public double getDistance(double ty){
         double angleTarget = CAMERA_ANGLE + ty;
@@ -81,10 +99,8 @@ public class RobotTeleOp extends OpMode {
     private boolean lastRB = false;
 
     // ---- NEW COLOR SENSOR VARIABLES ----
-    private NormalizedColorSensor colorSensor;
-    private boolean ballDetectedLastLoop = false;
     private boolean autoIntakeEnabled = true;
-    private boolean lastX = false;
+
 
     public enum DetectedColor {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
@@ -94,6 +110,9 @@ public class RobotTeleOp extends OpMode {
     // ---------------- Auto Shoot ----------------
 
     private boolean autoShoot = false;
+
+    private boolean autoIndexMode = false;
+
     private int autoState = 0;
 
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -235,33 +254,55 @@ public class RobotTeleOp extends OpMode {
         }
 
         //----------Spindexer-------------------
+//----------Spindexer Control Modes-------------------
 
-
-
-
-        // =========================
-        // INTAKE (instant snap)
-        // =========================
-
-        // =========================
-        // SHOOT (instant snap)
-        // =========================
-        if (gamepad2.b && !lastB) {
-            spindexer.setPosition(shootPos[slot]);
-        }
-
-        // =========================
-        // CLOCKWISE ONLY INDEX
-        // (important for stability)
-        // =========================
-        if (gamepad2.yWasPressed() && !lastRB) {
-
-            slot = (slot + 1) % 3;
-
-            // ALWAYS return to intake after indexing
+        // 1. Check if the driver pressed Button Y to activate Auto Mode
+        if (gamepad2.y && !lastY) {
+            autoIndexMode = true;
+            slot = 0;
             spindexer.setPosition(intakePos[slot]);
+            ballSeenLastLoop = false;
         }
 
+        // 2. Check if the driver pressed Button X to Override back to Manual Mode
+        if (gamepad2.x && !lastX) {
+            autoIndexMode = false;
+        }
+
+        // 3. Save the button states for edge detection
+        lastX = gamepad2.x;
+        lastY = gamepad2.y;
+
+
+        // 4. Execute Spindexer Movements based on current Mode
+        if (!autoIndexMode) {
+            // ---- MANUAL MODE ----
+            if (gamepad2.b && !lastB) {
+                spindexer.setPosition(shootPos[slot]);
+            }
+        }
+        else {
+            // ---- AUTO COLOR INDEXING MODE ----
+            DetectedColor currentColor = getDetectedColor();
+
+            // Is the sensor seeing a real ball color?
+            if (currentColor != DetectedColor.UNKNOWN && currentColor != DetectedColor.BLACK) {
+
+                // Only run this once per ball (wait until it's a new detection)
+                if (!ballSeenLastLoop) {
+                    ballSeenLastLoop = true;
+
+                    // Make sure we haven't already hit our 3-slot limit (0, 1, 2)
+                    if (slot < 2) {
+                        slot++;
+                        spindexer.setPosition(intakePos[slot]); // Move to the next intake slot
+                    }
+                }
+            } else {
+                // The ball has cleared past the sensor, unlock for the next one
+                ballSeenLastLoop = false;
+            }
+        }
         // save buttons
         lastA = gamepad2.a;
         lastB = gamepad2.b;
@@ -322,7 +363,7 @@ public class RobotTeleOp extends OpMode {
             TurretShooter.setVelocity(1525);
         }
 
-        runAutoShoot();
+
 
         //-------hood angle-------
         HoodAngle = hoodAngle(distance);
@@ -364,6 +405,16 @@ public class RobotTeleOp extends OpMode {
         turret.getTurret().setPower(power);
 
 
+        if (gamepad2.dpadDownWasPressed()) {
+            autoShoot = true;
+            autoState = 0;
+            autoTimer.reset();
+        }
+
+        runAutoShoot();
+
+
+
         telemetry.addData("Target Velocity", turretSpeed(distance));
         telemetry.addData("Current Velocity", "%.2f", curVelocity1);
         telemetry.addData("Error Right",  "%.2f", error);
@@ -387,7 +438,8 @@ public class RobotTeleOp extends OpMode {
 
     public void runAutoShoot() {
 
-        if (gamepad2.dpadDownWasPressed()) {
+
+        if (!autoShoot) return;
 
             switch (autoState) {
 
@@ -425,7 +477,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 2:
 
-                    if (autoTimer.milliseconds() > 380) {
+                    if (autoTimer.milliseconds() > 450) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -455,7 +507,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 4:
 
-                    if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                    if (autoTimer.milliseconds() > 650) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
@@ -470,7 +522,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 5:
 
-                    if (autoTimer.milliseconds() > 380) {
+                    if (autoTimer.milliseconds() > 450) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -500,7 +552,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 7:
 
-                    if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                    if (autoTimer.milliseconds() > 650) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
@@ -515,7 +567,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 8:
 
-                    if (autoTimer.milliseconds() > 380) {
+                    if (autoTimer.milliseconds() > 450) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -532,7 +584,7 @@ public class RobotTeleOp extends OpMode {
 
                     if (autoTimer.milliseconds() > 450) {
 
-                        spindexer.setPosition(intakePos[0]);
+                        spindexer.setPosition(0);
 
                         autoTimer.reset();
                         autoState = 10;
@@ -554,8 +606,75 @@ public class RobotTeleOp extends OpMode {
                     }
 
                     break;
-            }
+
+
         }
+
+    }
+    public DetectedColor getDetectedColor(){
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+
+        float[] hsv = new float[3];
+        int colorInt = colors.toColor();
+        Color.colorToHSV(colorInt, hsv);
+
+        float hue = hsv[0];
+        float saturation = hsv[1];
+        float value = hsv[2];
+        String color = "";
+
+        // ==========================================
+        // 1. ENVIRONMENTAL FILTERS (White remains specific)
+        // ==========================================
+        if (saturation < 0.20 && value > 0.60) {
+            color = "White";
+            return DetectedColor.WHITE;
+        }
+
+        // ==========================================
+        // 2. NARROW SPECTRIC HUES (Highly Specific)
+        // ==========================================
+        else if (hue > 30  && hue < 60 && saturation > 0.40) {
+            color = "Orange";
+            return DetectedColor.ORANGE;
+        }
+        else if (hue >= 190 && hue < 225 && saturation > 0.40) {
+            color = "Blue";
+            return DetectedColor.BLUE;
+        }
+        else if (hue >= 225 && hue <= 270 && saturation > 0.40) {
+            color = "Purple";
+            return DetectedColor.PURPLE;
+        }
+
+        // ==========================================
+        // 3. BROAD SPECTRIC HUES (Least Specific)
+        // ==========================================
+        else if (hue >= 100 && hue <= 160 && saturation > 0.40) {
+            color = "Green";
+            return DetectedColor.GREEN;
+        }
+        else if (hue >= 50 && hue < 95 && saturation > 0.40) {
+            color = "Yellow";
+            return DetectedColor.YELLOW;
+        }
+        else if ((hue >= 340 || hue <= 27) && saturation > 0.40) {
+            color = "Red";
+
+            return DetectedColor.RED;
+        }
+
+        // ==========================================
+        // 4. LOW LIGHT/FALLBACK FILTERS (Broadest)
+        // ==========================================
+
+        // BLACK: Checked LAST so it only triggers if no actual color hue was matched
+        else if (value < 0.15) {
+            color = "Black";
+            return DetectedColor.BLACK;
+        }
+
+        return DetectedColor.UNKNOWN;
     }
 
     @Override

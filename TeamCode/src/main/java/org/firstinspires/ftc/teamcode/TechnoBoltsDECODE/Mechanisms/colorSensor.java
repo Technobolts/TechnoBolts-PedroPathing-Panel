@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class colorSensor extends OpMode {
     NormalizedColorSensor colorSensor;
 
-    public enum DetectedColor {
+    private enum detectedColor {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
     }
 // hue 150 saturation .74 value .819
@@ -26,7 +26,7 @@ public class colorSensor extends OpMode {
         getDetectedColor();
     }
 
-    public DetectedColor getDetectedColor(){
+    public detectedColor getDetectedColor(){
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         float[] hsv = new float[3];
@@ -43,11 +43,11 @@ public class colorSensor extends OpMode {
         // ==========================================
         if (saturation < 0.20 && value > 0.60) {
             color = "White";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.WHITE;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.WHITE;
         }
 
         // ==========================================
@@ -55,27 +55,27 @@ public class colorSensor extends OpMode {
         // ==========================================
         else if (hue > 30  && hue < 60 && saturation > 0.40) {
             color = "Orange";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.ORANGE;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.ORANGE;
         }
         else if (hue >= 190 && hue < 225 && saturation > 0.40) {
             color = "Blue";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.BLUE;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.BLUE;
         }
         else if (hue >= 225 && hue <= 270 && saturation > 0.40) {
             color = "Purple";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.PURPLE;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.PURPLE;
         }
 
         // ==========================================
@@ -83,27 +83,27 @@ public class colorSensor extends OpMode {
         // ==========================================
         else if (hue >= 100 && hue <= 160 && saturation > 0.40) {
             color = "Green";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.GREEN;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.GREEN;
         }
         else if (hue >= 50 && hue < 95 && saturation > 0.40) {
             color = "Yellow";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.YELLOW;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.YELLOW;
         }
         else if ((hue >= 340 || hue <= 27) && saturation > 0.40) {
             color = "Red";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.RED;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.RED;
         }
 
         // ==========================================
@@ -113,18 +113,18 @@ public class colorSensor extends OpMode {
         // BLACK: Checked LAST so it only triggers if no actual color hue was matched
         else if (value < 0.15) {
             color = "Black";
-            telemetry.addData("COLOR:", color);
-            telemetry.addData("HUE", hue);
-            telemetry.addData("SATURATION", saturation);
-            telemetry.addData("VALUE", value);
-            return DetectedColor.BLACK;
+//            telemetry.addData("COLOR:", color);
+//            telemetry.addData("HUE", hue);
+//            telemetry.addData("SATURATION", saturation);
+//            telemetry.addData("VALUE", value);
+            return detectedColor.BLACK;
         }
 
         // Ultimate Fallback
-        telemetry.addData("COLOR:", "Unknown");
-        telemetry.addData("HUE", hue);
-        telemetry.addData("SATURATION", saturation);
-        telemetry.addData("VALUE", value);
-        return DetectedColor.UNKNOWN;
+//        telemetry.addData("COLOR:", "Unknown");
+//        telemetry.addData("HUE", hue);
+//        telemetry.addData("SATURATION", saturation);
+//        telemetry.addData("VALUE", value);
+        return detectedColor.UNKNOWN;
     }
 }
