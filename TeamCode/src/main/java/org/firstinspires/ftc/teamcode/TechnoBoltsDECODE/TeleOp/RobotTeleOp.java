@@ -99,7 +99,7 @@ public class RobotTeleOp extends OpMode {
     private final ElapsedTime autoTimer = new ElapsedTime();
 
 
-    private final double KICKER_REST = 0.15;
+    private final double KICKER_REST = 0.13;
     private final double KICKER_FIRE = 0.50;
 
     private int autoSlot = 0;
@@ -265,9 +265,9 @@ public class RobotTeleOp extends OpMode {
         //----------Kicker-------------------
         if (!autoShoot) {
             if (gamepad2.dpad_up) {
-                Kicker.setPosition(0.5);
+                Kicker.setPosition(KICKER_FIRE);
             } else {
-                Kicker.setPosition(0.15);
+                Kicker.setPosition(KICKER_REST);
             }
         }
 
@@ -384,171 +384,172 @@ public class RobotTeleOp extends OpMode {
 
         if (!autoShoot) return;
 
-            switch (autoState) {
+        switch (autoState) {
 
 
-                case 0:
+            case 0:
 
-                    TurretShooter.setVelocity(SHOOT_SPEED);
+                TurretShooter.setVelocity(SHOOT_SPEED);
 
-                    if (Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                if (Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
 
-                        spindexer.setPosition(shootPos[0]);
-                        autoTimer.reset();
-                        autoState = 1;
-                    }
+                    spindexer.setPosition(shootPos[0]);
+                    autoTimer.reset();
+                    autoState = 1;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for spindexer
-                //==========================
-                case 1:
+            //==========================
+            // Wait for spindexer
+            //==========================
+            case 1:
 
-                    if (autoTimer.milliseconds() > 650) {
+                if (autoTimer.milliseconds() > 650) {
 
-                        Kicker.setPosition(KICKER_FIRE);
+                    Kicker.setPosition(KICKER_FIRE);
 
-                        autoTimer.reset();
-                        autoState = 2;
-                    }
+                    autoTimer.reset();
+                    autoState = 2;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Hold kicker out
-                //==========================
-                case 2:
+            //==========================
+            // Hold kicker out
+            //==========================
+            case 2:
 
-                    if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 450) {
 
-                        Kicker.setPosition(KICKER_REST);
+                    Kicker.setPosition(KICKER_REST);
 
-                        autoTimer.reset();
-                        autoState = 3;
-                    }
+                    autoTimer.reset();
+                    autoState = 3;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for kicker to retract
-                //==========================
-                case 3:
+            //==========================
+            // Wait for kicker to retract
+            //==========================
+            case 3:
 
-                    if (autoTimer.milliseconds() > 650) {
+                if (autoTimer.milliseconds() > 650) {
 
-                        spindexer.setPosition(shootPos[1]);
+                    spindexer.setPosition(shootPos[1]);
 
-                        autoTimer.reset();
-                        autoState = 4;
-                    }
+                    autoTimer.reset();
+                    autoState = 4;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for second position
-                //==========================
-                case 4:
+            //==========================
+            // Wait for second position
+            //==========================
+            case 4:
 
-                    if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                if (autoTimer.milliseconds() > 650) {
 
-                        Kicker.setPosition(KICKER_FIRE);
+                    Kicker.setPosition(KICKER_FIRE);
 
-                        autoTimer.reset();
-                        autoState = 5;
-                    }
+                    autoTimer.reset();
+                    autoState = 5;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Hold kicker
-                //==========================
-                case 5:
+            //==========================
+            // Hold kicker
+            //==========================
+            case 5:
 
-                    if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 450) {
 
-                        Kicker.setPosition(KICKER_REST);
+                    Kicker.setPosition(KICKER_REST);
 
-                        autoTimer.reset();
-                        autoState = 6;
-                    }
+                    autoTimer.reset();
+                    autoState = 6;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for kicker before moving
-                //==========================
-                case 6:
+            //==========================
+            // Wait for kicker before moving
+            //==========================
+            case 6:
 
-                    if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 450) {
 
-                        spindexer.setPosition(shootPos[2]);
+                    spindexer.setPosition(shootPos[2]);
 
-                        autoTimer.reset();
-                        autoState = 7;
-                    }
+                    autoTimer.reset();
+                    autoState = 7;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for third position
-                //==========================
-                case 7:
+            //==========================
+            // Wait for third position
+            //==========================
+            case 7:
 
-                    if (autoTimer.milliseconds() > 650 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 50) {
+                if (autoTimer.milliseconds() > 650) {
 
-                        Kicker.setPosition(KICKER_FIRE);
+                    Kicker.setPosition(KICKER_FIRE);
 
-                        autoTimer.reset();
-                        autoState = 8;
-                    }
+                    autoTimer.reset();
+                    autoState = 8;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Hold kicker
-                //==========================
-                case 8:
+            //==========================
+            // Hold kicker
+            //==========================
+            case 8:
 
-                    if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 450) {
 
-                        Kicker.setPosition(KICKER_REST);
+                    Kicker.setPosition(KICKER_REST);
 
-                        autoTimer.reset();
-                        autoState = 9;
-                    }
+                    autoTimer.reset();
+                    autoState = 9;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Wait for kicker to retract
-                //==========================
-                case 9:
+            //==========================
+            // Wait for kicker to retract
+            //==========================
+            case 9:
 
-                    if (autoTimer.milliseconds() > 450) {
+                if (autoTimer.milliseconds() > 450) {
 
-                        spindexer.setPosition(intakePos[0]);
+                    spindexer.setPosition(0);
 
-                        autoTimer.reset();
-                        autoState = 10;
-                    }
+                    autoTimer.reset();
+                    autoState = 10;
+                }
 
-                    break;
+                break;
 
-                //==========================
-                // Finish
-                //==========================
-                case 10:
+            //==========================
+            // Finish
+            //==========================
+            case 10:
 
-                    if (autoTimer.milliseconds() > 650) {
+                if (autoTimer.milliseconds() > 650) {
 
-                        TurretShooter.setVelocity(0);
+                    TurretShooter.setVelocity(0);
 
-                        autoShoot = false;
-                        autoState = 0;
-                    }
+                    autoShoot = false;
+                    autoState = 0;
+                }
 
-                    break;
+                break;
+
 
         }
     }
