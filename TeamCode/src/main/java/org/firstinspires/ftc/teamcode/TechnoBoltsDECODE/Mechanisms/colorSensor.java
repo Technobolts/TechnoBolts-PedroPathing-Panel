@@ -11,27 +11,34 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class colorSensor extends OpMode {
     NormalizedColorSensor colorSensor;
 
-    private enum detectedColor {
+    public enum DetectedColor {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
     }
-// hue 150 saturation .74 value .819
+
+    // This handles the setup on your Driver Hub when you hit INIT
     @Override
     public void init() {
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor_1");
-        colorSensor.setGain(15.0f); // Keeps the signal amplified
     }
 
+    // This runs continuously on your Driver Hub after you press PLAY
     @Override
     public void loop() {
         getDetectedColor();
     }
 
-    public detectedColor getDetectedColor(){
+    public DetectedColor getDetectedColor(){
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         float[] hsv = new float[3];
-        int colorInt = colors.toColor();
-        Color.colorToHSV(colorInt, hsv);
+
+        // Convert the normalized colors (scaled 0-255) to HSV
+        Color.RGBToHSV(
+                (int)(colors.red * 255),
+                (int)(colors.green * 255),
+                (int)(colors.blue * 255),
+                hsv
+        );
 
         float hue = hsv[0];
         float saturation = hsv[1];
@@ -39,92 +46,104 @@ public class colorSensor extends OpMode {
         String color = "";
 
         // ==========================================
-        // 1. ENVIRONMENTAL FILTERS (White remains specific)
+        // 1. ENVIRONMENTAL FILTERS (Most Specific)
         // ==========================================
-        if (saturation < 0.20 && value > 0.60) {
+
+        // BLACK: Filter out absolute lack of light first
+        if (value < 0.15) {
+            color = "Black";
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.BLACK;
+        }
+        // WHITE: Filter out completely desaturated light next
+        else if (saturation < 0.20 && value > 0.70) {
             color = "White";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.WHITE;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.WHITE;
         }
 
         // ==========================================
         // 2. NARROW SPECTRIC HUES (Highly Specific)
         // ==========================================
-        else if (hue > 30  && hue < 60 && saturation > 0.40) {
+
+        // ORANGE: Very tight hue window (21-44). Must be checked before broader Red/Yellow.
+        else if (hue > 20 && hue < 45 && saturation > 0.40) {
             color = "Orange";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.ORANGE;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.ORANGE;
         }
+        // BLUE: Moderately tight target window (190-224)
         else if (hue >= 190 && hue < 225 && saturation > 0.40) {
             color = "Blue";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.BLUE;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.BLUE;
         }
+        // PURPLE: Specific upper-end window (225-270)
         else if (hue >= 225 && hue <= 270 && saturation > 0.40) {
             color = "Purple";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.PURPLE;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.PURPLE;
         }
 
         // ==========================================
-        // 3. BROAD SPECTRIC HUES (Least Specific)
+        // 3. BROAD SPECTRIC HUES (Least Specific / Large Windows)
         // ==========================================
-        else if (hue >= 100 && hue <= 160 && saturation > 0.40) {
-            color = "Green";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.GREEN;
-        }
-        else if (hue >= 50 && hue < 95 && saturation > 0.40) {
+
+
+        // YELLOW: Broad middle window (45-94)
+        else if (hue >= 45 && hue < 95 && saturation > 0.40) {
             color = "Yellow";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.YELLOW;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.YELLOW;
         }
-        else if ((hue >= 340 || hue <= 27) && saturation > 0.40) {
+        // GREEN: Huge window (95-140)
+        //hue 153
+        //saturation 0.78
+        //valyue 0.57
+        // OG hue upper = 140, OG saturation 0.4
+        else if (hue >= 95 && hue <= 155 && saturation > 0.80) {
+            color = "Green";
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.GREEN;
+        }
+        // RED: Massive split window (340-360 AND 0-20) acts as a wide net
+        else if ((hue >= 340 || hue <= 20) && saturation > 0.40) {
             color = "Red";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.RED;
+            telemetry.addData("COLOR:", color);
+            telemetry.addData("HUE", hue);
+            telemetry.addData("SATURATION", saturation);
+            telemetry.addData("VALUE", value);
+            return DetectedColor.RED;
         }
 
         // ==========================================
-        // 4. LOW LIGHT/FALLBACK FILTERS (Broadest)
+        // 4. THE ULTIMATE FALLBACK
         // ==========================================
-
-        // BLACK: Checked LAST so it only triggers if no actual color hue was matched
-        else if (value < 0.15) {
-            color = "Black";
-//            telemetry.addData("COLOR:", color);
-//            telemetry.addData("HUE", hue);
-//            telemetry.addData("SATURATION", saturation);
-//            telemetry.addData("VALUE", value);
-            return detectedColor.BLACK;
-        }
-
-        // Ultimate Fallback
-//        telemetry.addData("COLOR:", "Unknown");
-//        telemetry.addData("HUE", hue);
-//        telemetry.addData("SATURATION", saturation);
-//        telemetry.addData("VALUE", value);
-        return detectedColor.UNKNOWN;
+        telemetry.addData("COLOR:", "Unknown");
+        telemetry.addData("HUE", hue);
+        telemetry.addData("SATURATION", saturation);
+        telemetry.addData("VALUE", value);
+        return DetectedColor.UNKNOWN;
     }
 }
