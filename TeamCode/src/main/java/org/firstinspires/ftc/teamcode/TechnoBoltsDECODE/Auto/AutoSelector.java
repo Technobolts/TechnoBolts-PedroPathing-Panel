@@ -53,7 +53,7 @@ public class AutoSelector extends OpMode {
 
         // Initialize motors
         intake = hardwareMap.get(DcMotor.class, "intake1");
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         turretShooter = hardwareMap.get(DcMotorEx.class, "turretShooter");
         turretShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

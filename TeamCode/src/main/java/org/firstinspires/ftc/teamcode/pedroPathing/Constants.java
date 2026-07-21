@@ -21,7 +21,6 @@ public class Constants {
             .headingPIDFCoefficients(new PIDFCoefficients(-2, 0, 0.01, 0.025))
             .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.1, 0.053494634007348565, 0.0014712457201625792));
 
-
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     // FIX: Standard initialization without chaining methods that cause errors
@@ -43,8 +42,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(60.614451971579726)
-            .yVelocity(45.31459297720841);
+            .xVelocity(57.67630317267471)
+            .yVelocity(35.30537618802289);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)

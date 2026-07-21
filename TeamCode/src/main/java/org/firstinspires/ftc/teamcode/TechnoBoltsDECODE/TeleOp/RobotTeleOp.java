@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp;
 
+import static android.os.SystemClock.sleep;
+
 import android.graphics.Color; // Added for color conversion
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.pedropathing.math.MathFunctions;
@@ -41,6 +43,9 @@ public class RobotTeleOp extends OpMode {
     private DistanceSensor distanceSensor;
 
     private int ballCount = 0;
+
+    private boolean manualScanRequested = false;
+    private int scannedBalls = 0;
 
     private enum IntakeState {
         WAIT_FOR_BALL,
@@ -102,7 +107,6 @@ public class RobotTeleOp extends OpMode {
     // ---- NEW COLOR SENSOR VARIABLES ----
     private boolean autoIntakeEnabled = true;
 
-
     public enum DetectedColor {
         GREEN, PURPLE, BLUE, WHITE, BLACK, RED, ORANGE, YELLOW, UNKNOWN
     }
@@ -118,6 +122,7 @@ public class RobotTeleOp extends OpMode {
 
     private final ElapsedTime autoTimer = new ElapsedTime();
 
+    boolean tracking = true;
 
     private final double KICKER_REST = 0.15;
     private final double KICKER_FIRE = 0.50;
@@ -312,22 +317,36 @@ public class RobotTeleOp extends OpMode {
 
         //----------Tracking--------------
 
-        LLResult result = limelight.getLatestResult();
-
-        if(result != null && result.isValid()){
-
-            // Horizontal angle from crosshair to tag
-            double tx = result.getTx();
-
-            turret.update(tx);
-
-            telemetry.addData("tx", tx);
+        if(gamepad2.aWasPressed()){
+            tracking = false;
         }
-        else{
+        if(gamepad2.xWasPressed()){
+            tracking = true;
+        }
 
-            turret.stop();
 
-            telemetry.addLine("No AprilTag");
+
+        if(tracking) {
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+
+
+                // Horizontal angle from crosshair to tag
+                double tx = result.getTx();
+
+                turret.update(tx);
+
+                telemetry.addData("tx", tx);
+            } else {
+
+                turret.stop();
+
+                telemetry.addLine("No AprilTag");
+            }
+        }
+        else if(!tracking){
+            double turretRotate = gamepad2.right_stick_x;
+            turret.getTurret().setPower(turretRotate);
         }
 
         //---------turret speed-------------
@@ -361,31 +380,11 @@ public class RobotTeleOp extends OpMode {
 //        double errorLeft = curTargetVelocity - curVelocity2;
         double error = turretSpeed(distance) - curVelocity1;
 
-//--------TurretRotationLimit---------
-
-        double power = 0;
-        if (result != null && result.isValid()) {
-            double tx = result.getTx();
-            power = turret.update(tx);
-        } else {
-            power = 0; // Stop the turret turning if no target is seen
-        }
-        int pos = turret.getTurret().getCurrentPosition();
-
-        // Left limit
-        if (pos <= LEFT_LIMIT && power < 0) {
-            power = MAX_POWER;
-        }
-
-        // Right limit
-        if (pos >= RIGHT_LIMIT && power > 0) {
-            power = -MAX_POWER;
-        }
-
-        turret.getTurret().setPower(power);
-
+        // Manual recount button
 
         if (gamepad2.dpadDownWasPressed()) {
+
+            // First, count how many balls are actually loaded
             autoShoot = true;
             autoState = 0;
             SHOOT_SPEED = turretSpeed(distance);
@@ -394,19 +393,28 @@ public class RobotTeleOp extends OpMode {
 
 
 
-
+        telemetry.addLine("------------TurretShooter------");
         telemetry.addData("Target Velocity", turretSpeed(distance));
         telemetry.addData("Current Velocity", "%.2f", curVelocity1);
         telemetry.addData("Error Right",  "%.2f", error);
+        telemetry.addLine("------------Hood---------------");
         telemetry.addData("Hood Angle",  "%.2f", HoodAngle);
+        telemetry.addLine("------------Spindexer-----------");
         telemetry.addData("Slot", slot);
         telemetry.addData("Intake", intakePos[slot]);
         telemetry.addData("Shoot", shootPos[slot]);
+        telemetry.addLine("-----------Autoshoot-----------");
         telemetry.addData("Auto State", autoState);
+        telemetry.addLine("-----------Timer---------------");
         telemetry.addData("Timer", autoTimer.milliseconds());
-        updateAutoIndexer();
+
         runAutoShoot();
-        telemetry.addData("Slot", slot);
+        if(!autoShoot) {
+            AutoIndexer();
+        }else {
+            return;
+        }
+
         telemetry.update();
 
     }
@@ -419,14 +427,17 @@ public class RobotTeleOp extends OpMode {
         HoodAngle += amount;
     }
 
-    private void updateAutoIndexer() {
+    public void AutoIndexer() {
 
-        if (autoShoot)
+        if (autoShoot){
+            ballCount = 0;
+        }
+
+
+
+        if (ballCount >= 4) {
             return;
-
-
-        if (ballCount >= 4)
-            return;
+        }
 
         double dist = distanceSensor.getDistance(DistanceUnit.MM);
 
@@ -504,7 +515,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 1:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
@@ -519,7 +530,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 2:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -534,7 +545,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 3:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 100) {
 
                         spindexer.setPosition(shootPos[1]);
 
@@ -549,7 +560,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 4:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
@@ -564,7 +575,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 5:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -579,7 +590,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 6:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750 && Math.abs(TurretShooter.getVelocity() - SHOOT_SPEED) < 100) {
 
                         spindexer.setPosition(shootPos[2]);
 
@@ -594,7 +605,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 7:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
@@ -609,7 +620,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 8:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         Kicker.setPosition(KICKER_REST);
 
@@ -624,7 +635,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 9:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         spindexer.setPosition(0);
 
@@ -639,7 +650,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 10:
 
-                    if (autoTimer.milliseconds() > 650) {
+                    if (autoTimer.milliseconds() > 750) {
 
                         TurretShooter.setVelocity(0);
 
@@ -660,6 +671,8 @@ public class RobotTeleOp extends OpMode {
         }
 
     }
+
+
 
     @Override
     public void stop(){
