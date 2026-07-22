@@ -407,15 +407,16 @@ public class RobotTeleOp extends OpMode {
         telemetry.addData("Intake", intakePos[slot]);
         telemetry.addData("Shoot", shootPos[slot]);
         telemetry.addLine("-----------Autoshoot-----------");
+        telemetry.addData("Auto Shoot", autoShoot);
         telemetry.addData("Auto State", autoState);
         telemetry.addLine("-----------Timer---------------");
         telemetry.addData("Timer", autoTimer.milliseconds());
 
         runAutoShoot(autoShoot);
 
-       if(!autoShoot) {
-           AutoIndexer();
-       }
+    //    if(!autoShoot) {
+    //        AutoIndexer();
+    //    }
 
         telemetry.update();
 
