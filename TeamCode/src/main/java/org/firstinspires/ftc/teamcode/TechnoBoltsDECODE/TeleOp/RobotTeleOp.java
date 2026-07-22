@@ -140,7 +140,7 @@ public class RobotTeleOp extends OpMode {
     //y=0.0969498x^{2}-4.97872x+1525.00813
     public double turretSpeed (double goalDist ){
 //        return  MathFunctions.clamp(- 0.00000569338 * Math.pow(goalDist, 4)  +0.00246149 * Math.pow(goalDist, 3) -0.375414 * Math.pow(goalDist, 2) +24.62591 * (goalDist) +179.82739, 750, 900) - 40;
-        return MathFunctions.clamp((0.0969498 * Math.pow(goalDist, 2)) - (4.97872 * goalDist) + 1625.00813, 1500, 3000);
+        return MathFunctions.clamp((0.0969498 * Math.pow(goalDist, 2)) - (4.97872 * goalDist) + 1550.00813, 1500, 3000);
     }
     //y=-\left(2.03775\times10^{-7}\right)x^{4}+0.0000739553x^{3}-0.00984175x^{2}+0.57947x-12.29583
     public double hoodAngle (double goalDist ){
@@ -414,9 +414,9 @@ public class RobotTeleOp extends OpMode {
 
         runAutoShoot(autoShoot);
 
-    //    if(!autoShoot) {
-    //        AutoIndexer();
-    //    }
+        if(!autoShoot) {
+            AutoIndexer();
+        }
 
         telemetry.update();
 
@@ -656,7 +656,7 @@ public class RobotTeleOp extends OpMode {
 
                     if (autoTimer.milliseconds() > 750) {
 
-                        TurretShooter.setVelocity(0);
+                        TurretShooter.setVelocity(turretSpeed(distance));
 
                         slot = 0;
                         ballCount = 0;
