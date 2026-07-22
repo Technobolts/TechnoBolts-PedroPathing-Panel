@@ -6,8 +6,11 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -20,12 +23,14 @@ public class AutoBlueB {
 
 
     public final DcMotor intake;
-    public final DcMotorEx turretShooter;
+    public final DcMotorEx turretShooter, turretMotor;
     public final Servo Kicker;
     public final Servo Spindexer;
     public final Servo turretHood;
 
-
+    public final Limelight3A limelight;
+    public final NormalizedColorSensor colorSensor;
+    public final DistanceSensor distanceSensor;
     private final double ShooterOn = 760;
     private final double leftPowerOff = 0;
     private final double rightPowerOff = 0;
@@ -47,7 +52,7 @@ public class AutoBlueB {
     Telemetry telemetry;
 
 
-    public AutoBlueB(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood) {
+    public AutoBlueB(Follower follower, Telemetry telemetry, DcMotor intake, DcMotorEx turretShooter, Servo Kicker, Servo Spindexer, Servo turretHood, Limelight3A limelight, NormalizedColorSensor colorSensor, DistanceSensor distanceSensor, DcMotorEx turret) {
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -56,6 +61,10 @@ public class AutoBlueB {
         this.Kicker = Kicker;
         this.Spindexer = Spindexer;
         this.turretHood = turretHood;
+        this.limelight = limelight;
+        this.colorSensor = colorSensor;
+        this.distanceSensor = distanceSensor;
+        this.turretMotor = turret;
         pathTimer = new Timer();
     }
 

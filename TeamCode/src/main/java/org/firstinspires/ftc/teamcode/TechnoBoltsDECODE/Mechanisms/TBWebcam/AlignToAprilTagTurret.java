@@ -28,7 +28,11 @@ public class AlignToAprilTagTurret {
         turret = hwMap.get(DcMotorEx.class, "turretMotor");
         turret.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
-
+// This is used in the auto
+    public void init(DcMotorEx turret)
+    {
+        turret.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+    }
     public void resetTimer() {
         timer.reset();
     }
@@ -66,11 +70,47 @@ public class AlignToAprilTagTurret {
         return dt;
     }
 
+    //USED IN AUTO
+public double update(double currentBearing,DcMotorEx turret) {
+
+        double dt = timer.seconds();
+        timer.reset();
+
+        double error = goalAngle - currentBearing;
+
+        double pTerm = error * kP;
+
+        double dTerm = 0;
+
+        if (dt > 0) {
+            dTerm = ((error - lastError) / dt) * kD;
+        }
+
+        double power;
+
+        if (Math.abs(error) < ANGLE_TOLERANCE) {
+            power = 0;
+        } else {
+            power = Range.clip(pTerm + dTerm,
+                    -MAX_POWER,
+                    MAX_POWER);
+        }
+
+        turret.setPower(power);
+
+        lastError = error;
+        return dt;
+    }
+
     public void stop() {
         turret.setPower(0);
         lastError = 0;
     }
 
+    public void stop(DcMotorEx turret) {
+        turret.setPower(0);
+        lastError = 0;
+    }
 
     // ---------------- PD Getters/Setters ----------------
 

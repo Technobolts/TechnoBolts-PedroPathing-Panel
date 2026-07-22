@@ -89,15 +89,15 @@ public class RobotTeleOp extends OpMode {
 
     // YOUR TUNED POSITIONS
     private final double[] intakePos = {
-            0,
-            0.4,
+            0.02,
+            0.39,
             0.76
     };
 
     private final double[] shootPos = {
-            0.22,
-            0.59,
-            0.96
+            0.19,
+            0.57,
+            0.95
     };
 
     private boolean lastA = false;
@@ -382,15 +382,18 @@ public class RobotTeleOp extends OpMode {
 
         // Manual recount button
 
-        if (gamepad2.dpadDownWasPressed()) {
+        if (gamepad2.dpadDownWasPressed() && !autoShoot) {
 
             // First, count how many balls are actually loaded
             autoShoot = true;
             autoState = 0;
             SHOOT_SPEED = turretSpeed(distance);
             autoTimer.reset();
+
         }
 
+//Manual override for positions 1 and 2
+        //position 1
 
 
         telemetry.addLine("------------TurretShooter------");
@@ -408,12 +411,17 @@ public class RobotTeleOp extends OpMode {
         telemetry.addLine("-----------Timer---------------");
         telemetry.addData("Timer", autoTimer.milliseconds());
 
-        runAutoShoot();
-        if(!autoShoot) {
-            AutoIndexer();
-        }else {
-            return;
-        }
+        runAutoShoot(autoShoot);
+
+
+//        if (!autoShoot)
+//            gamepad2. dpad_down = false;
+
+//        if(!autoShoot) {
+//            AutoIndexer();
+//        }else {
+//            return;
+//        }
 
         telemetry.update();
 
@@ -489,11 +497,12 @@ public class RobotTeleOp extends OpMode {
         telemetry.addData("Intake State", intakeState);
     }
 
-    public void runAutoShoot() {
+    public void runAutoShoot(boolean autoShoot) {
+//        int autoState =0;
 
         if (!autoShoot) return;
 
-        telemetry.addData("== Auto State ", autoState);
+        telemetry.addData("== Auto State ==", autoState);
 
         switch (autoState) {
 
@@ -659,9 +668,11 @@ public class RobotTeleOp extends OpMode {
                         intakeState = IntakeState.WAIT_FOR_BALL;
 
                         spindexer.setPosition(intakePos[0]);
-
-                        autoShoot = false;
                         autoState = 0;
+                        autoShoot = false;
+
+                        telemetry.addLine("---> Setting up autoState to 0 and autoShoot to false");
+                        sleep(5000);
                     }
 
                     break;
