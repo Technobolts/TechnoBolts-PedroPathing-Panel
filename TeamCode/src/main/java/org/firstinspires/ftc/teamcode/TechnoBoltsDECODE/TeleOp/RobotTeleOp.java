@@ -413,15 +413,9 @@ public class RobotTeleOp extends OpMode {
 
         runAutoShoot(autoShoot);
 
-
-//        if (!autoShoot)
-//            gamepad2. dpad_down = false;
-
-//        if(!autoShoot) {
-//            AutoIndexer();
-//        }else {
-//            return;
-//        }
+       if(!autoShoot) {
+           AutoIndexer();
+       }
 
         telemetry.update();
 
@@ -497,10 +491,10 @@ public class RobotTeleOp extends OpMode {
         telemetry.addData("Intake State", intakeState);
     }
 
-    public void runAutoShoot(boolean autoShoot) {
+    public void runAutoShoot(boolean autoShootVar) {
 //        int autoState =0;
 
-        if (!autoShoot) return;
+        if (!autoShootVar) return;
 
         telemetry.addData("== Auto State ==", autoState);
 
