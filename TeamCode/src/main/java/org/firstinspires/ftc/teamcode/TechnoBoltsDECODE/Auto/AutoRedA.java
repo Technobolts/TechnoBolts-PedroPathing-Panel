@@ -229,86 +229,85 @@ public class AutoRedA {
         switch (pathState) {
 
             case DRIVE_STARTPOS_SHOOT_POS:
-                if (pathTimer.getElapsedTimeSeconds() > 0) {
+
+                if (!follower.isBusy()) {
                     follower.followPath(driveStartPosShootPosAlign, true);
-                }
-                if (pathTimer.getElapsedTimeSeconds() > 5) {
-//                    doIntakePowerOn();
-                    telemetry.addLine("AutoRed - A - ");
+                    doIntakePowerOn();
                     TurretAprilTagTracking();
-//                    autoSelector.runAutoShoot(true, this.turretShooter, this.spindexer, this.kicker);
-                    autoSelector.runAutoShoot(true);
-                    StopTurretAprilTagTracking();
-                    setPathState(PathState.ALIGN_PRESET1); //reset the timer & make new state
+                    if (autoSelector.runAutoShoot(pathState.equals(PathState.DRIVE_STARTPOS_SHOOT_POS), this.turretShooter, this.spindexer, this.kicker))
+                    {
+                        StopTurretAprilTagTracking();
+                        setPathState(PathState.ALIGN_PRESET1); //reset the timer & make new state
+                   }
                 }
                 break;
 
-//            case ALIGN_PRESET1:
-//                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
-//
-//                    telemetry.addLine("Align Preset 1");
-//                    follower.followPath(driveShootPosAlignIntake1,0.5,true);
-//                    setPathState(PathState.INTAKE_PRESET_1);
-//                }
-//                break;
-//
-//            case INTAKE_PRESET_1:
-//                if (!follower.isBusy()|| pathTimer.getElapsedTimeSeconds() > 3) {
-//
-//                    telemetry.addLine("Intaking Preset 1");
-//                    follower.followPath(driveAlignPresetToIntake1, true);
-//                    setPathState(PathState.SHOOT_INTAKE_PRESET1);
-//                }
-//                break;
-//
-//            case SHOOT_INTAKE_PRESET1:
-//                if  (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
-//                    telemetry.addLine("Shooting Preset 1");
-//                    follower.followPath(driveIntake1ShootPos,true);
-//                    autoSelector.runAutoShoot(true, this.turretShooter, this.spindexer, this.kicker);
-//                    StopTurretAprilTagTracking();
-//                    setPathState(PathState.PRESET1_PRESET3);
-//                }
-//                break;
-//
-//            case PRESET1_PRESET3:
-//                if (!follower.isBusy()|| pathTimer.getElapsedTimeSeconds() > 3){
-//                    telemetry.addLine("Aligning to Preset 3");
-//                    follower.followPath(driveShootPosIntake3Align, 0.5, true);
-//                    setPathState(PathState.INTAKE_PRESET3);
-//                }
-//                break;
-//
-//            case INTAKE_PRESET3:
-//
-//                    if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
-//                        telemetry.addLine("Intaking Preset 3");
-//                        follower.followPath(driveIntake3AlignIntake3,  true);
-//                        setPathState(PathState.SHOOT_PRESET3);
-//                    }
-//                    break;
-//
-//
-//            case SHOOT_PRESET3:
-//
-//                    if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
-//                        telemetry.addLine("Shooting Preset 3");
-//                        follower.followPath(Intake3ToShoot3,  true);
-//                        autoSelector.runAutoShoot(true, this.turretShooter, this.spindexer, this.kicker);
-//                        StopTurretAprilTagTracking();
-//                        setPathState(PathState.SHOOT_PRESET3_PRESET2);
-//                    }
-//                    break;
-//
-//            case SHOOT_PRESET3_PRESET2:
-//
-//                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
-//                    telemetry.addLine("Shooting Preset 3");
-//                    follower.followPath(Shoot3ToLeave,  true);
-//
-//                    setPathState(PathState.DONE);
-//                }
-//                break;
+            case ALIGN_PRESET1:
+                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+
+                    telemetry.addLine("Align Preset 1");
+                    follower.followPath(driveShootPosAlignIntake1,0.5,true);
+                    setPathState(PathState.INTAKE_PRESET_1);
+                }
+                break;
+
+            case INTAKE_PRESET_1:
+                if (!follower.isBusy()|| pathTimer.getElapsedTimeSeconds() > 3) {
+
+                    telemetry.addLine("Intaking Preset 1");
+                    follower.followPath(driveAlignPresetToIntake1, true);
+                    setPathState(PathState.SHOOT_INTAKE_PRESET1);
+                }
+                break;
+
+            case SHOOT_INTAKE_PRESET1:
+                if  (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+                    telemetry.addLine("Shooting Preset 1");
+                    follower.followPath(driveIntake1ShootPos,true);
+                    autoSelector.runAutoShoot(true, this.turretShooter, this.spindexer, this.kicker);
+                    StopTurretAprilTagTracking();
+                    setPathState(PathState.PRESET1_PRESET3);
+                }
+                break;
+
+            case PRESET1_PRESET3:
+                if (!follower.isBusy()|| pathTimer.getElapsedTimeSeconds() > 3){
+                    telemetry.addLine("Aligning to Preset 3");
+                    follower.followPath(driveShootPosIntake3Align, 0.5, true);
+                    setPathState(PathState.INTAKE_PRESET3);
+                }
+                break;
+
+            case INTAKE_PRESET3:
+
+                    if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+                        telemetry.addLine("Intaking Preset 3");
+                        follower.followPath(driveIntake3AlignIntake3,  true);
+                        setPathState(PathState.SHOOT_PRESET3);
+                    }
+                    break;
+
+
+            case SHOOT_PRESET3:
+
+                    if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+                        telemetry.addLine("Shooting Preset 3");
+                        follower.followPath(Intake3ToShoot3,  true);
+                        autoSelector.runAutoShoot(true, this.turretShooter, this.spindexer, this.kicker);
+                        StopTurretAprilTagTracking();
+                        setPathState(PathState.SHOOT_PRESET3_PRESET2);
+                    }
+                    break;
+
+            case SHOOT_PRESET3_PRESET2:
+
+                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+                    telemetry.addLine("Shooting Preset 3");
+                    follower.followPath(Shoot3ToLeave,  true);
+
+                    setPathState(PathState.DONE);
+                }
+                break;
 
             default:
                 telemetry.addLine("No State Commanded");

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.Auto;
 
+import static android.os.SystemClock.sleep;
+
 import com.pedropathing.math.MathFunctions;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -17,6 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.TechnoBoltsDECODE.TeleOp.RobotTeleOp;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous (name = "Auto Selector", group = "Autonomous")
@@ -58,15 +61,15 @@ public class AutoSelector extends OpMode {
 
     private IntakeState intakeState = IntakeState.WAIT_FOR_BALL;
     private final double[] intakePos = {
-            0,
-            0.4,
+            0.02,
+            0.39,
             0.76
     };
 
     private final double[] shootPos = {
-            0.22,
-            0.59,
-            0.96
+            0.19,
+            0.57,
+            0.95
     };
 
 
@@ -265,22 +268,18 @@ public class AutoSelector extends OpMode {
         telemetry.update();
     }
 
-    public void runAutoShoot(boolean autoShoot) {
-
-        if (!autoShoot) return;
+    public boolean runAutoShoot(boolean autoShoot, DcMotorEx turretShooter, Servo spindexer, Servo kicker) {
+        //int autoState =0;
+        if (!autoShoot) return false;
 
         SHOOT_SPEED = turretSpeed(distance);
-        telemetry.addData("distance in runAutoShoot ->> ", distance);
-        telemetry.addData("SHOOT_SPEED in runAutoShoot ->> ", SHOOT_SPEED);
 
         switch (autoState) {
 
             case 0:
-
                 turretShooter.setVelocity(SHOOT_SPEED);
-
+                sleep(750);
                 if (Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
-
                     spindexer.setPosition(shootPos[0]);
                     autoTimer.reset();
                     autoState = 1;
@@ -293,7 +292,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 1:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_FIRE);
 
@@ -308,7 +307,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 2:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_REST);
 
@@ -323,7 +322,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 3:
 
-                if (autoTimer.seconds() > 3 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
+                if (autoTimer.milliseconds() > 750 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
 
                     spindexer.setPosition(shootPos[1]);
 
@@ -338,7 +337,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 4:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_FIRE);
 
@@ -353,7 +352,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 5:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_REST);
 
@@ -368,7 +367,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 6:
 
-                if (autoTimer.seconds() > 3 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
+                if (autoTimer.milliseconds() > 750 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
 
                     spindexer.setPosition(shootPos[2]);
 
@@ -383,7 +382,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 7:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_FIRE);
 
@@ -398,7 +397,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 8:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     kicker.setPosition(KICKER_REST);
 
@@ -413,7 +412,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 9:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     spindexer.setPosition(0);
 
@@ -428,7 +427,7 @@ public class AutoSelector extends OpMode {
             //==========================
             case 10:
 
-                if (autoTimer.seconds() > 3) {
+                if (autoTimer.milliseconds() > 750) {
 
                     turretShooter.setVelocity(0);
 
@@ -437,9 +436,8 @@ public class AutoSelector extends OpMode {
                     intakeState = IntakeState.WAIT_FOR_BALL;
 
                     spindexer.setPosition(intakePos[0]);
-
-                    autoShoot = false;
                     autoState = 0;
+                    return true;
                 }
 
                 break;
@@ -447,196 +445,8 @@ public class AutoSelector extends OpMode {
             default:
                 break;
         }
+        return false;
 
-    }
-
-//    public void runAutoShootOld(boolean autoShoot, DcMotorEx turretShooter, Servo Spindexer, Servo Kicker) {
-//
-//        if (!autoShoot) return;
-//
-//
-//        switch (autoState) {
-//
-//            case 0:
-//
-//                turretShooter.setVelocity(SHOOT_SPEED);
-//
-//                if (Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
-//
-//                    Spindexer.setPosition(shootPos[0]);
-//                    autoTimer.reset();
-//                    autoState = 1;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for spindexer
-//            //==========================
-//            case 1:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_FIRE);
-//
-//                    autoTimer.reset();
-//                    autoState = 2;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Hold kicker out
-//            //==========================
-//            case 2:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_REST);
-//
-//                    autoTimer.reset();
-//                    autoState = 3;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for kicker to retract
-//            //==========================
-//            case 3:
-//
-//                if (autoTimer.seconds() > 3 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
-//
-//                    Spindexer.setPosition(shootPos[1]);
-//
-//                    autoTimer.reset();
-//                    autoState = 4;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for second position
-//            //==========================
-//            case 4:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_FIRE);
-//
-//                    autoTimer.reset();
-//                    autoState = 5;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Hold kicker
-//            //==========================
-//            case 5:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_REST);
-//
-//                    autoTimer.reset();
-//                    autoState = 6;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for kicker before moving
-//            //==========================
-//            case 6:
-//
-//                if (autoTimer.seconds() > 3 && Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) < 100) {
-//
-//                    Spindexer.setPosition(shootPos[2]);
-//
-//                    autoTimer.reset();
-//                    autoState = 7;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for third position
-//            //==========================
-//            case 7:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_FIRE);
-//
-//                    autoTimer.reset();
-//                    autoState = 8;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Hold kicker
-//            //==========================
-//            case 8:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Kicker.setPosition(KICKER_REST);
-//
-//                    autoTimer.reset();
-//                    autoState = 9;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Wait for kicker to retract
-//            //==========================
-//            case 9:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    Spindexer.setPosition(0);
-//
-//                    autoTimer.reset();
-//                    autoState = 10;
-//                }
-//
-//                break;
-//
-//            //==========================
-//            // Finish
-//            //==========================
-//            case 10:
-//
-//                if (autoTimer.seconds() > 3) {
-//
-//                    turretShooter.setVelocity(0);
-//
-//                    slot = 0;
-//                    ballCount = 0;
-//                    intakeState = IntakeState.WAIT_FOR_BALL;
-//
-//                    Spindexer.setPosition(intakePos[0]);
-//
-//                    autoShoot = false;
-//                    autoState = 0;
-//                }
-//
-//                break;
-//
-//            default:
-//                break;
-//        }
-//
-//    }
-
-    public double getDistance(double ty){
-        double angleTarget = CAMERA_ANGLE + ty;
-        double heightDifference = GOAL_HEIGHT - CAMERA_HEIGHT_IN;
-
-        return heightDifference / Math.tan(Math.toRadians(angleTarget));
     }
     public void AutoIndexer(boolean autoShoot) {
 
@@ -700,5 +510,10 @@ public class AutoSelector extends OpMode {
         telemetry.addData("Intake State", intakeState);
     }
 
+    public double getDistance(double ty){
+        double angleTarget = CAMERA_ANGLE + ty;
+        double heightDifference = GOAL_HEIGHT - CAMERA_HEIGHT_IN;
 
+        return heightDifference / Math.tan(Math.toRadians(angleTarget));
+    }
 }
