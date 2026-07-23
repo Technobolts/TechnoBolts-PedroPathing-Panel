@@ -85,7 +85,6 @@ public class AutoSelector extends OpMode {
     Alliance alliance = Alliance.RED;
     StartPos startPos = StartPos.A;
 
-
     // Button state variable for debouncing (prevents crazy fast toggling)
     boolean lastGamepad2X = false;
 
