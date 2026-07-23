@@ -194,10 +194,7 @@ public class AutoSelector extends OpMode {
 
     @Override
     public void loop() {
-
-        double curVelocity1 = turretShooter.getVelocity();
-        double error = turretSpeed(distance) - curVelocity1;
-
+        
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()){
             distance = getDistance(llResult.getTy()) / 2.54;
@@ -207,13 +204,17 @@ public class AutoSelector extends OpMode {
             telemetry.addData("No Valid Target", "Found");
         }
 
+        double curVelocity1 = turretShooter.getVelocity();
+        double targetVelocity = turretSpeed(distance);
+        double error = targetVelocity - curVelocity1;
+
         // Continuously runs the update method for the active path
         if (alliance == Alliance.RED) {
             if (startPos == StartPos.A) {
                 redAutoA.update();
                 telemetry.addData("Path Timer",redAutoA.pathTimer.getElapsedTimeSeconds());
                 telemetry.addData("== Auto State ==", autoState);
-                telemetry.addData("Target Velocity", turretSpeed(distance));
+                telemetry.addData("Target Velocity", "%.2f", targetVelocity);
                 telemetry.addData("Current Velocity", "%.2f", curVelocity1);
                 telemetry.addData("Error",  "%.2f", error);
             }
@@ -268,8 +269,82 @@ public class AutoSelector extends OpMode {
         telemetry.update();
     }
 
+    // Max time (ms) to wait for the shooter to reach target speed before firing anyway,
+    // so a shooter that can't hit target speed doesn't hang auto forever.
+    private static final long SPINUP_TIMEOUT_MS = 2000;
+
+    public boolean runAutoShoot(boolean autoShoot) {
+
+        if (!autoShoot) return false;
+
+        SHOOT_SPEED = turretSpeed(distance);
+
+        // ---- Step 1: spin up shooter, then load first ball ----
+        turretShooter.setVelocity(SHOOT_SPEED);
+        waitForShooterSpeed();
+        spindexer.setPosition(shootPos[0]);
+        sleep(750);
+
+        // ---- Step 2: fire first ball ----
+        kicker.setPosition(KICKER_FIRE);
+        sleep(750);
+
+        // ---- Step 3: retract kicker ----
+        kicker.setPosition(KICKER_REST);
+        sleep(750);
+
+        // ---- Step 4: load second ball (wait for shooter to recover speed) ----
+        waitForShooterSpeed();
+        spindexer.setPosition(shootPos[1]);
+        sleep(750);
+
+        // ---- Step 5: fire second ball ----
+        kicker.setPosition(KICKER_FIRE);
+        sleep(750);
+
+        // ---- Step 6: retract kicker ----
+        kicker.setPosition(KICKER_REST);
+        sleep(750);
+
+        // ---- Step 7: load third ball (wait for shooter to recover speed) ----
+        waitForShooterSpeed();
+        spindexer.setPosition(shootPos[2]);
+        sleep(750);
+
+        // ---- Step 8: fire third ball ----
+        kicker.setPosition(KICKER_FIRE);
+        sleep(750);
+
+        // ---- Step 9: retract kicker ----
+        kicker.setPosition(KICKER_REST);
+        sleep(750);
+
+        // ---- Step 10: return spindexer, then finish ----
+        spindexer.setPosition(0);
+        sleep(750);
+
+        turretShooter.setVelocity(0);
+        slot = 0;
+        ballCount = 0;
+        intakeState = IntakeState.WAIT_FOR_BALL;
+        spindexer.setPosition(intakePos[0]);
+        autoState = 0;
+
+        return true;
+    }
+
+    // Blocks until the shooter is within 100 ticks/sec of SHOOT_SPEED,
+    // or until SPINUP_TIMEOUT_MS elapses (safety guard against a hang).
+    private void waitForShooterSpeed() {
+        autoTimer.reset();
+        while (Math.abs(turretShooter.getVelocity() - SHOOT_SPEED) >= 100
+                && autoTimer.milliseconds() < SPINUP_TIMEOUT_MS) {
+            sleep(20);
+        }
+    }
+
     public boolean runAutoShoot(boolean autoShoot, DcMotorEx turretShooter, Servo spindexer, Servo kicker) {
-        //int autoState =0;
+        
         if (!autoShoot) return false;
 
         SHOOT_SPEED = turretSpeed(distance);
@@ -448,6 +523,7 @@ public class AutoSelector extends OpMode {
         return false;
 
     }
+
     public void AutoIndexer(boolean autoShoot) {
 
         if (autoShoot){

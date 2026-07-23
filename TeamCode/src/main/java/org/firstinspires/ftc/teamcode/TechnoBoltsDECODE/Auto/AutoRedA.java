@@ -212,12 +212,14 @@ public class AutoRedA {
 
             turret.update(tx, turretMotor);
 
-            telemetry.addData("tx", tx);
+            telemetry.addData("TX foudn -> tx : ", tx);
+            telemetry.update();
         } else {
 
             turret.stop(turretMotor);
 
             telemetry.addLine("No AprilTag");
+            telemetry.update();
         }
     }
 
@@ -234,11 +236,10 @@ public class AutoRedA {
                     follower.followPath(driveStartPosShootPosAlign, true);
                     doIntakePowerOn();
                     TurretAprilTagTracking();
-                    if (autoSelector.runAutoShoot(pathState.equals(PathState.DRIVE_STARTPOS_SHOOT_POS), this.turretShooter, this.spindexer, this.kicker))
-                    {
+                    if (autoSelector.runAutoShoot(true)) {
                         StopTurretAprilTagTracking();
                         setPathState(PathState.ALIGN_PRESET1); //reset the timer & make new state
-                   }
+                    }
                 }
                 break;
 

@@ -666,8 +666,8 @@ public class RobotTeleOp extends OpMode {
                         autoState = 0;
                         autoShoot = false;
 
-                        telemetry.addLine("---> Setting up autoState to 0 and autoShoot to false");
-                        sleep(5000);
+                        // telemetry.addLine("---> Setting up autoState to 0 and autoShoot to false");
+                        // sleep(5000);
                     }
 
                     break;
