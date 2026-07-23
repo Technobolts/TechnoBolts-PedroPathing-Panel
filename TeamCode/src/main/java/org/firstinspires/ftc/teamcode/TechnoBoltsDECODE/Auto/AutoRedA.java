@@ -140,7 +140,7 @@ public class AutoRedA {
     private final Pose shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
     private final Pose shootPoseAlignPreset1 = new Pose(104.46666666666667, 60.219999999999999, Math.toRadians(360));
     private final Pose IntakePreset1 = new Pose(122.95555555555556, 60.219999999999999, Math.toRadians(360));
-    private final Pose Preset1shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(300));
+    private final Pose Preset1shootPose = new Pose(92.8, 84.219999999999999, Math.toRadians(360));
     private final Pose shootPoseIntake3Align = new Pose(104.46666666666667, 11.6888888888889, Math.toRadians(360));
     private final Pose shootPoseIntake3AlignCtrl = new Pose(95.41111111111111, 14.33333333333323, Math.toRadians(360));
     private final Pose shootPoseIntake3 = new Pose(123, 11.46666666666667, Math.toRadians(360));
@@ -234,17 +234,19 @@ public class AutoRedA {
 
                 if (!follower.isBusy()) {
                     follower.followPath(driveStartPosShootPosAlign, true);
-                    doIntakePowerOn();
-                    TurretAprilTagTracking();
-                    if (autoSelector.runAutoShoot(true)) {
-                        StopTurretAprilTagTracking();
-                        setPathState(PathState.ALIGN_PRESET1); //reset the timer & make new state
-                    }
+                    setPathState(PathState.ALIGN_PRESET1);
                 }
+
                 break;
 
             case ALIGN_PRESET1:
                 if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 3) {
+                    doIntakePowerOn();
+//                    TurretAprilTagTracking();
+                    if (autoSelector.runAutoShoot(true)) {
+//                        StopTurretAprilTagTracking();
+                        //reset the timer & make new state
+                    }
 
                     telemetry.addLine("Align Preset 1");
                     follower.followPath(driveShootPosAlignIntake1,0.5,true);
@@ -255,8 +257,9 @@ public class AutoRedA {
             case INTAKE_PRESET_1:
                 if (!follower.isBusy()|| pathTimer.getElapsedTimeSeconds() > 3) {
 
+                    autoSelector.AutoIndexer(false);
                     telemetry.addLine("Intaking Preset 1");
-                    follower.followPath(driveAlignPresetToIntake1, true);
+                    follower.followPath(driveAlignPresetToIntake1, 0.35,true);
                     setPathState(PathState.SHOOT_INTAKE_PRESET1);
                 }
                 break;
