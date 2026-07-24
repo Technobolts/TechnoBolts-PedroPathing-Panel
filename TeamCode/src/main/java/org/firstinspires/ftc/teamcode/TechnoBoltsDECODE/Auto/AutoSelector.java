@@ -211,12 +211,12 @@ public class AutoSelector extends OpMode {
         // Continuously runs the update method for the active path
         if (alliance == Alliance.RED) {
             if (startPos == StartPos.A) {
-                redAutoA.update();
+                redAutoA.update(telemetry);
                 telemetry.addData("Path Timer",redAutoA.pathTimer.getElapsedTimeSeconds());
                 telemetry.addData("== Auto State ==", autoState);
                 telemetry.addData("Target Velocity", "%.2f", targetVelocity);
                 telemetry.addData("Current Velocity", "%.2f", curVelocity1);
-                telemetry.addData("Error",  "%.2f", error);
+                telemetry.addData("Error", "%.2f", error);
             }
             else if (startPos == StartPos.B) {
                 redAutoB.update();
