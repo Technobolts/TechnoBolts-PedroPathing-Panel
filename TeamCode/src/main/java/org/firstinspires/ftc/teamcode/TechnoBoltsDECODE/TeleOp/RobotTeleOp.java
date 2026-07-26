@@ -422,6 +422,7 @@ public class RobotTeleOp extends OpMode {
         telemetry.addLine("-----------Autoshoot-----------");
         telemetry.addData("Auto Shoot", autoShoot);
         telemetry.addData("Auto State", autoState);
+        telemetry.addData("Auto Shoot Timer", autoTimer);
         telemetry.addLine("-----------Timer---------------");
         telemetry.addData("Timer", autoTimer.milliseconds());
 
