@@ -141,7 +141,7 @@ public class AutoSelector extends OpMode {
 
         // Instantiate all 6 auto classes with the follower and hardware dependencies
         redAutoA = new AutoRedA(this, follower, telemetry, intake, turretShooter, kicker, spindexer, turretHood, limelight, colorSensor, distanceSensor, turret);
-        redAutoB = new AutoRedB(follower, telemetry, intake, turretShooter, kicker, spindexer, turretHood, limelight, colorSensor, distanceSensor, turret);
+        redAutoB = new AutoRedB(this, follower, telemetry, intake, turretShooter, kicker, spindexer, turretHood, limelight, colorSensor, distanceSensor, turret);
         redAutoC = new AutoRedC(follower, telemetry, intake, turretShooter, kicker, spindexer, turretHood, limelight, colorSensor, distanceSensor, turret);
 
         blueAutoA = new AutoBlueA(follower, telemetry, intake, turretShooter, kicker, spindexer, turretHood, limelight, colorSensor, distanceSensor, turret);
@@ -219,7 +219,7 @@ public class AutoSelector extends OpMode {
                 telemetry.addData("Error", "%.2f", error);
             }
             else if (startPos == StartPos.B) {
-                redAutoB.update();
+                redAutoB.update(telemetry);
                 telemetry.addData("Path Timer",redAutoB.pathTimer.getElapsedTimeSeconds());
                 telemetry.addData("== Auto State ==", autoState);
                 telemetry.addData("Target Velocity", turretSpeed(distance));

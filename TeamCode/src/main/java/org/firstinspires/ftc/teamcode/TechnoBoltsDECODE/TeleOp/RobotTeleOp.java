@@ -223,6 +223,19 @@ public class RobotTeleOp extends OpMode {
     @Override
     public void loop() {
 
+        //--------Limelight tag-----------------
+        if(gamepad2.dpadUpWasPressed()){
+            limelight.pipelineSwitch(1); // Red Prism
+        }
+        if(gamepad2.dpadRightWasPressed()){
+            limelight.pipelineSwitch(2); // Blue Prism
+        }
+        if(gamepad2.dpadLeftWasPressed()){
+            limelight.pipelineSwitch(3); // Blue
+        }
+        if(gamepad2.dpadDownWasPressed()){
+            limelight.pipelineSwitch(0); // Red
+        }
 
         //----------Drivetrain-------------------
 
@@ -290,7 +303,7 @@ public class RobotTeleOp extends OpMode {
 
         //----------Kicker-------------------
         if (!autoShoot) {
-            if (gamepad2.dpad_up) {
+            if (gamepad2.right_trigger > 0.1){
                 Kicker.setPosition(0.5);
             } else {
                 Kicker.setPosition(0.15);
@@ -382,7 +395,7 @@ public class RobotTeleOp extends OpMode {
 
         // Manual recount button
 
-        if (gamepad2.dpadDownWasPressed() && !autoShoot) {
+        if (gamepad2.left_trigger > 0.1 && !autoShoot) {
 
             // First, count how many balls are actually loaded
             autoShoot = true;
