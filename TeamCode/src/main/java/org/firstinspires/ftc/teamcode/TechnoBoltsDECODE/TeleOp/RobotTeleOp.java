@@ -532,7 +532,7 @@ public class RobotTeleOp extends OpMode {
                 //==========================
                 case 1:
 
-                    if (autoTimer.milliseconds() > 750) {
+                    if (autoTimer.milliseconds() > 550) {
 
                         Kicker.setPosition(KICKER_FIRE);
 
